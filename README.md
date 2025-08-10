@@ -2,6 +2,8 @@
 
 This is the official website for the Redstone Lake Cottagers Association (RLCA), built with [Next.js](https://nextjs.org/) and Bootstrap styling.
 
+**Visit the site: [www.redstonelake.com](https://www.redstonelake.com)**
+
 ## About
 
 The RLCA website provides cottagers and visitors with:
