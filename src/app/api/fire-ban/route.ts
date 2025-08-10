@@ -13,7 +13,7 @@ interface DysartFireBanResponse {
   sourceUrl: string;
   alerts: FireBanAlert[];
   hasActiveBan: boolean;
-  decisionSource?: 'ai' | 'heuristic' | 'unknown';
+
   cachedAt?: string; // ISO time when this response was cached server-side
   cacheTtlSeconds?: number; // TTL for cache freshness checks
   aiAnalysis?: {
@@ -122,10 +122,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const debug = searchParams.get('debug') === '1';
     const force = searchParams.get('force') === '1' || debug;
+    const testMode = searchParams.get('test'); // 'none', 'restricted', 'total'
 
-    // Serve from cache if valid
+    // Serve from cache if valid (but skip cache for test mode to allow immediate UI testing)
     const now = Date.now();
-    if (!force && cachedResult && (now - cachedAtMs) < CACHE_TTL_MS) {
+    if (!force && !testMode && cachedResult && (now - cachedAtMs) < CACHE_TTL_MS) {
       return NextResponse.json(cachedResult, {
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -147,6 +148,71 @@ export async function GET(request: NextRequest) {
       }
     };
     const aiDebugMessages: string[] = debug ? [] : [];
+
+    // Test mode for UI development
+    if (testMode) {
+      if (testMode === 'none') {
+        results.alerts = [];
+        results.hasActiveBan = false;
+        results.summary.status = 'none';
+        results.aiAnalysis = {
+          hasFireBan: false,
+          banType: 'none',
+          summary: 'No fire ban is currently in effect.',
+          confidence: 0.98
+        };
+      } else if (testMode === 'restricted') {
+        results.alerts = [{
+          title: 'Restricted Fire Zone in Effect',
+          description: 'A restricted fire zone is in effect. Open air burning is prohibited between 8:00 AM and 8:00 PM. Small cooking fires and properly contained campfires are permitted during evening hours with proper safety precautions.',
+          color: 'Orange'
+        }];
+        results.hasActiveBan = true;
+        results.summary.status = 'active';
+        results.summary.primaryAlert = results.alerts[0];
+        results.aiAnalysis = {
+          hasFireBan: true,
+          banType: 'restricted',
+          effectiveFrom: new Date().toISOString(),
+          summary: 'Restricted fire zone with time-based burning restrictions from 8 AM to 8 PM.',
+          confidence: 0.92
+        };
+      } else if (testMode === 'total') {
+        results.alerts = [{
+          title: 'Total Fire Ban in Haliburton County: Effective Immediately',
+          description: 'A total fire ban is in effect throughout Haliburton County. This means no outdoor burning any time of day or night. Bonfires, fireworks, torches and the lighting of charcoal barbecues, as well as any other light sources that use an open flame, are prohibited.',
+          color: 'Red'
+        }];
+        results.hasActiveBan = true;
+        results.summary.status = 'active';
+        results.summary.primaryAlert = results.alerts[0];
+        results.aiAnalysis = {
+          hasFireBan: true,
+          banType: 'total',
+          effectiveFrom: new Date().toISOString(),
+          summary: 'Total fire ban prohibiting all outdoor burning and open flames.',
+          confidence: 0.99
+        };
+      }
+      
+      // Skip real data fetching in test mode
+      results.cachedAt = new Date().toISOString();
+      results.cacheTtlSeconds = 21600;
+      
+      if (debug) {
+        aiDebugMessages.push(`Test mode: ${testMode}`);
+        (results as any).aiDebug = aiDebugMessages;
+      }
+
+      return NextResponse.json(results, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Cache-Control': 'public, max-age=0, s-maxage=21600'
+        },
+      });
+    }
 
     // Helper: fetch with timeout to avoid hanging requests
     const fetchWithTimeout = async (url: string, init: RequestInit = {}, timeoutMs = 12000) => {
@@ -181,77 +247,32 @@ export async function GET(request: NextRequest) {
           results.debugInfo = results.debugInfo || {};
           results.debugInfo.requestUrl = results.sourceUrl;
         }
-        // Heuristic detection: keywords + color signal
-        const keywords = [
-          'fire ban',
-          'total fire ban',
-          'restricted fire zone',
-          'rfz',
-          'no outdoor burning',
-          'no open air burning',
-          'burn ban',
-          'open flame prohibited',
-          'all burning prohibited'
-        ];
 
-        let matchedKeywords: string[] = [];
-        let heuristicActiveBan: FireBanAlert | undefined;
-
-        for (let i = 0; i < results.alerts.length; i += 1) {
-          const alert = results.alerts[i];
-          const haystack = `${alert.title} ${alert.description}`.toLowerCase();
-          const localMatches = keywords.filter(k => haystack.includes(k));
-          if (localMatches.length > 0 || (alert.color && alert.color.toLowerCase() === 'red')) {
-            const set = new Set<string>(matchedKeywords);
-            for (let j = 0; j < localMatches.length; j += 1) {
-              set.add(localMatches[j]);
-            }
-            matchedKeywords = Array.from(set);
-            if (!heuristicActiveBan) heuristicActiveBan = alert;
-          }
-        }
-
-        const colorMatch = results.alerts.find(a => (a.color || '').toLowerCase() === 'red')?.color || null;
-        const confidence = Math.min(1,
-          (matchedKeywords.length > 0 ? 0.7 : 0) + (colorMatch ? 0.4 : 0)
-        );
-
-        const heuristicHasBan = Boolean(heuristicActiveBan);
-        if (heuristicActiveBan) {
-          results.summary.primaryAlert = heuristicActiveBan;
-        }
-        if (debug) {
-          (results as any).detection = {
-            matchedKeywords,
-            matchedColor: colorMatch,
-            confidence
-          };
-          console.log('[fire-ban] dysart detection:', (results as any).detection);
-        }
-        // AI analysis (best-effort)
+        // AI analysis (required)
         const ai = await analyzeWithClaude(results.alerts, results.sourceUrl, debug, aiDebugMessages);
         if (ai) {
           results.aiAnalysis = ai;
           if (typeof ai.hasFireBan === 'boolean') {
             results.hasActiveBan = ai.hasFireBan;
             results.summary.status = ai.hasFireBan ? 'active' : 'none';
-            results.decisionSource = 'ai';
+
           }
           if (!results.summary.primaryAlert && results.alerts.length > 0) {
             results.summary.primaryAlert = results.alerts[0];
           }
         } else {
-          // Fallback to heuristic if AI unavailable
-          results.hasActiveBan = heuristicHasBan;
-          results.summary.status = heuristicHasBan ? 'active' : 'none';
-          results.decisionSource = 'heuristic';
+          // AI unavailable - cannot determine fire ban status
+          results.hasActiveBan = false;
+          results.summary.status = 'error';
+          if (debug) {
+            aiDebugMessages.push('AI analysis required but unavailable - cannot determine fire ban status');
+          }
         }
       }
     } catch (error) {
       console.error('Error fetching Dysart fire ban data:', error);
     }
-    // Determine overall status
-    results.summary.status = results.hasActiveBan ? 'active' : 'none';
+
     
     // Return comprehensive data with proper CORS headers
     // Attach AI debug messages when requested
@@ -259,20 +280,19 @@ export async function GET(request: NextRequest) {
       (results as any).aiDebug = aiDebugMessages;
     }
 
-    // Update cache
+    // Update cache (only for real API calls, not test mode)
     // Stamp cache metadata
     results.cachedAt = new Date().toISOString();
     results.cacheTtlSeconds = 21600;
 
-    cachedResult = results;
-    cachedAtMs = Date.now();
-
-    // Hide heuristic details unless explicitly debugging
-    if (!debug && (cachedResult as any)?.detection) {
-      delete (cachedResult as any).detection;
+    if (!testMode) {
+      cachedResult = results;
+      cachedAtMs = Date.now();
     }
 
-    return NextResponse.json(cachedResult, {
+
+
+    return NextResponse.json(results, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',

@@ -18,6 +18,7 @@ interface WeatherData {
   pressure: number
   visibility: number
   uv_index: number
+  pop?: number // probability of precipitation
   alerts: Array<{
     sender_name: string
     event: string
@@ -52,6 +53,62 @@ interface HourlyForecast {
 interface WeatherModalProps {
   isOpen: boolean
   onClose: () => void
+}
+
+// RainViewer Radar Component
+function RadarMap() {
+  const [loading, setLoading] = useState(true)
+  
+  // RainViewer iframe URL centered on Redstone Lake
+  const rainviewerUrl = 'https://www.rainviewer.com/map.html?loc=45.0576,-78.4186,10&oFa=0&oC=0&oU=0&oCS=1&oF=0&oAP=0&rmt=4&c=1&o=83&lm=0&layer=radar&sm=1&sn=1&oP=0'
+
+  const handleIframeLoad = () => {
+    setLoading(false)
+  }
+
+  return (
+    <div className="position-relative" style={{ height: '400px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#1a2332' }}>
+      {loading && (
+        <div className="d-flex justify-content-center align-items-center position-absolute w-100 h-100" style={{ zIndex: 2 }}>
+          <div className="text-white-50">
+            <div className="spinner-border spinner-border-sm me-2" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            Loading radar data...
+          </div>
+        </div>
+      )}
+      
+      <iframe
+        src={rainviewerUrl}
+        width="100%"
+        height="100%"
+        style={{ 
+          border: 'none',
+          borderRadius: '8px'
+        }}
+        onLoad={handleIframeLoad}
+        title="RainViewer Weather Radar"
+      />
+
+      {/* Data source attribution */}
+      <div 
+        className="position-absolute" 
+        style={{ 
+          bottom: '10px', 
+          right: '10px', 
+          background: 'rgba(0, 0, 0, 0.7)', 
+          padding: '4px 8px', 
+          borderRadius: '4px',
+          zIndex: 3
+        }}
+      >
+        <small className="text-white-50" style={{ fontSize: '9px' }}>
+          RainViewer
+        </small>
+      </div>
+    </div>
+  )
 }
 
 export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
@@ -258,7 +315,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
       }}
     >
       <div className="modal-dialog modal-dialog-centered modal-xl" style={{ maxWidth: '1100px' }}>
-          <div className="modal-content" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="modal-content" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
           <div className="modal-header border-bottom border-light border-opacity-10 d-flex justify-content-between align-items-center">
             <h5 className="modal-title text-white mb-0">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="me-2">
@@ -310,7 +367,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                   °F
                 </button>
               </div>
-              <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
+            <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
             </div>
           </div>
           
@@ -509,21 +566,21 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                               <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
                                 <div className="small text-white-50 mb-1">UV Index</div>
                                 <div className="h6 mb-0">☀️ {weather.uv_index}</div>
-                              </div>
-                            </div>
+                          </div>
+                        </div>
                             <div className="col-6">
                               <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
                                 <div className="small text-white-50 mb-1">Clouds</div>
                                 <div className="h6 mb-0">☁️ {weather.clouds}%</div>
-                              </div>
-                            </div>
+                      </div>
+                    </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Hourly Weather Chart */}
                       <div className="mt-5">
-                        <h6 className="text-white mb-3">24-Hour Forecast</h6>
+                      <h6 className="text-white mb-3">24-Hour Forecast</h6>
                         <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
                           <svg width="100%" height="200" viewBox="0 0 800 200" style={{ overflow: 'visible' }}>
                             {/* Grid lines */}
@@ -934,19 +991,19 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                         {forecast.map((day, index) => (
                           <div key={index} className="p-3 rounded mb-2" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
                             <div className="d-flex align-items-center justify-content-between">
-                              <div className="d-flex align-items-center">
+                            <div className="d-flex align-items-center">
                                 <span className="fs-4 me-3">{getWeatherIcon(day.icon)}</span>
-                                <div>
+                              <div>
                                   <div className="text-white fw-semibold">{day.date}</div>
                                   <div className="text-white-50 small">{day.desc}</div>
-                                </div>
                               </div>
-                              <div className="text-end">
+                            </div>
+                            <div className="text-end">
                                 <div className="mb-2">
                                   <span className="text-white fw-bold fs-5">{convertTemp(day.temp_max)}°{tempUnit}</span>
                                   <span className="text-white-50 ms-2">{convertTemp(day.temp_min)}°{tempUnit}</span>
-                                </div>
-                                <div className="small text-white-50">
+                              </div>
+                              <div className="small text-white-50">
                                   ☔️ {day.pop}% • 💨 {day.wind_speed} km/h • 💧 {day.humidity}%
                                 </div>
                               </div>
@@ -959,27 +1016,25 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
 
                   {/* Radar Tab */}
                   {activeTab === 'radar' && (
-                    <div className="text-center py-5">
-                      <div className="mb-4">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white-50">
-                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2"/>
-                          <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                        </svg>
+                    <div>
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h6 className="text-white mb-0">Weather Radar</h6>
+                        <small className="text-white-50">Real-time precipitation data</small>
+                            </div>
+                      <RadarMap />
+                      <div className="mt-3 d-flex justify-content-between align-items-center">
+                        <small className="text-white-50">
+                          Interactive radar map for Redstone Lake area
+                        </small>
+                        <a 
+                          href="/radar" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn btn-outline-light btn-sm"
+                              >
+                          Open Full Screen
+                        </a>
                       </div>
-                      <h6 className="text-white mb-3">Weather Radar</h6>
-                      <p className="text-white-50 mb-4">Interactive radar map shows precipitation, storm movement, and weather patterns</p>
-                      <a 
-                        href="/radar" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="btn btn-outline-light"
-                      >
-                        Open Radar Map
-                      </a>
-                      <p className="small text-white-50 mt-3 mb-0">
-                        Updates every 10 minutes
-                      </p>
                     </div>
                   )}
 
@@ -998,9 +1053,9 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                                     <div>From: {new Date(alert.start * 1000).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                                     <div>Until: {new Date(alert.end * 1000).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                                     <div>Source: {alert.sender_name}</div>
-                                  </div>
+                                </div>
                                   <div className="text-white" style={{ lineHeight: '1.5' }}>
-                                    {alert.description}
+                                {alert.description}
                                   </div>
                                 </div>
                               </div>
@@ -1030,10 +1085,10 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
               {cachedAt && (
                 <>Updated {new Date(cachedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</>
               )}
-            </div>
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
-          </div>
         </div>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
+      </div>
+    </div>
       </div>
     </div>,
     document.body

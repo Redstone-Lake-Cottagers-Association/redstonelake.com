@@ -34,20 +34,22 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
   const [forecast, setForecast] = useState<ForecastDay[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C')
+  const [tempUnit, setTempUnit] = useState<'C' | 'F' | null>(null)
 
   useEffect(() => {
     fetchWeatherData()
-  }, [])
-
-  // Load temperature unit preference from localStorage
-  useEffect(() => {
+    
+    // Load temperature unit preference from localStorage
     const savedUnit = localStorage.getItem('weather-temp-unit') as 'C' | 'F'
     if (savedUnit && (savedUnit === 'C' || savedUnit === 'F')) {
       setTempUnit(savedUnit)
+    } else {
+      setTempUnit('C') // Default to Celsius if no preference
     }
+  }, [])
 
-    // Listen for temperature unit changes from other components
+  // Listen for temperature unit changes from other components
+  useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'weather-temp-unit' && e.newValue) {
         const newUnit = e.newValue as 'C' | 'F'
@@ -190,7 +192,7 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
           <div className="row align-items-center">
             <div className="col-7">
               <div className="position-relative" style={{ marginTop: '16px' }}>
-                <div className="h2 mb-1" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>--°{tempUnit}</div>
+                <div className="h2 mb-1" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>--°{tempUnit || ''}</div>
                 {/* Temperature Unit Toggle - Superscript style placeholder */}
                 <div 
                   className="btn-group btn-group-sm" 
@@ -199,7 +201,8 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                     position: 'absolute',
                     top: '-8px',
                     left: '0px',
-                    fontSize: '6px'
+                    fontSize: '6px',
+                    opacity: tempUnit ? 1 : 0.3
                   }}
                 >
                   <button 
@@ -214,9 +217,9 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                       height: '12px',
                       transition: 'none',
                       transform: 'none',
-                      border: tempUnit === 'C' ? '1px solid #6c757d' : '1px solid transparent',
+                      border: tempUnit ? (tempUnit === 'C' ? '1px solid #6c757d' : '1px solid transparent') : 'none',
                       backgroundColor: 'transparent',
-                      color: tempUnit === 'C' ? '#000' : '#6c757d'
+                      color: tempUnit ? (tempUnit === 'C' ? '#000' : '#6c757d') : '#6c757d'
                     }}
                   >
                     C
@@ -233,10 +236,10 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                       height: '12px',
                       transition: 'none',
                       transform: 'none',
-                      border: tempUnit === 'F' ? '1px solid #6c757d' : '1px solid transparent',
+                      border: tempUnit ? (tempUnit === 'F' ? '1px solid #6c757d' : '1px solid transparent') : 'none',
                       backgroundColor: 'transparent',
-                      color: tempUnit === 'F' ? '#000' : '#6c757d',
-                      borderLeft: '1px solid #6c757d'
+                      color: tempUnit ? (tempUnit === 'F' ? '#000' : '#6c757d') : '#6c757d',
+                      borderLeft: tempUnit ? '1px solid #6c757d' : 'none'
                     }}
                   >
                     F
@@ -302,9 +305,9 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
         
         <div className="row align-items-center">
           <div className="col-7">
-            <div className="d-flex align-items-center mb-1" style={{ marginTop: '16px' }}>
-              <div className="position-relative">
-                <span className="h2 mb-0 me-2" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>{convertTemp(weather.temp)}°{tempUnit}</span>
+            <div className="position-relative" style={{ marginTop: '16px' }}>
+              <div className="d-flex align-items-center mb-1">
+                <span className="h2 mb-0 me-2" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>{convertTemp(weather.temp)}°{tempUnit || ''}</span>
                 {/* Temperature Unit Toggle - Superscript style */}
                 <div 
                   className="btn-group btn-group-sm" 
@@ -313,7 +316,8 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                     position: 'absolute',
                     top: '-8px',
                     left: '0px',
-                    fontSize: '6px'
+                    fontSize: '6px',
+                    opacity: tempUnit ? 1 : 0.8
                   }}
                 >
                   <button 
@@ -332,9 +336,9 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                       height: '12px',
                       transition: 'none',
                       transform: 'none',
-                      border: tempUnit === 'C' ? '1px solid #6c757d' : '1px solid transparent',
+                      border: tempUnit ? (tempUnit === 'C' ? '1px solid #6c757d' : '1px solid transparent') : 'none',
                       backgroundColor: 'transparent',
-                      color: tempUnit === 'C' ? '#000' : '#6c757d'
+                      color: tempUnit ? (tempUnit === 'C' ? '#000' : '#6c757d') : '#6c757d'
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'none'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
@@ -357,10 +361,10 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                       height: '12px',
                       transition: 'none',
                       transform: 'none',
-                      border: tempUnit === 'F' ? '1px solid #6c757d' : '1px solid transparent',
+                      border: tempUnit ? (tempUnit === 'F' ? '1px solid #6c757d' : '1px solid transparent') : 'none',
                       backgroundColor: 'transparent',
-                      color: tempUnit === 'F' ? '#000' : '#6c757d',
-                      borderLeft: '1px solid #6c757d'
+                      color: tempUnit ? (tempUnit === 'F' ? '#000' : '#6c757d') : '#6c757d',
+                      borderLeft: tempUnit ? '1px solid #6c757d' : 'none'
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'none'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
@@ -368,8 +372,8 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                     F
                   </button>
                 </div>
+                <span className="fs-3">{getWeatherIcon(weather.icon)}</span>
               </div>
-              <span className="fs-3">{getWeatherIcon(weather.icon)}</span>
             </div>
             <div className="text-muted fw-medium" style={{ marginTop: '4px' }}>{weather.desc}</div>
           </div>

@@ -363,7 +363,7 @@ h1, h2, h3, h4, h5, h6 {
 .weather-widget {
   background: var(--gradient-card);
   border-radius: 24px;
-  padding: 2.5rem;
+  padding: 1.75rem;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: none; /* drop default shadow */
@@ -425,10 +425,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .fireban-updated {
-  color: rgba(220,53,69,0.95);
+  color: var(--fb-color, #dc3545);
   font-size: 0.85rem;
-  background: rgba(220,53,69,0.08);
-  border: 1px solid rgba(220,53,69,0.25);
+  background: var(--fb-bg, rgba(220,53,69,0.08));
+  border: 1px solid var(--fb-border, rgba(220,53,69,0.25));
   padding: 2px 8px;
   border-radius: 999px;
 }

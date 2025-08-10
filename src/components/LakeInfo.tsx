@@ -146,7 +146,17 @@ export default function LakeInfo() {
       // Coordinates no longer needed server-side, but kept for future use
       const lat = 45.05757247096108;
       const lng = -78.41860331417699;
-      const response = await fetch(`/api/fire-ban?lat=${lat}&lng=${lng}`)
+      
+      // Check for fireban query parameter for UI testing
+      const urlParams = new URLSearchParams(window.location.search);
+      const fireBanTest = urlParams.get('fireban');
+      
+      let apiUrl = `/api/fire-ban?lat=${lat}&lng=${lng}`;
+      if (fireBanTest && ['none', 'restricted', 'total'].includes(fireBanTest)) {
+        apiUrl += `&test=${fireBanTest}`;
+      }
+      
+      const response = await fetch(apiUrl)
       
       if (!response.ok) {
         throw new Error(`API responded with status: ${response.status}`)
