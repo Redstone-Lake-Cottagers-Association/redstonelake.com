@@ -191,12 +191,54 @@ const WaterLevelComponent = () => {
     if (!waterData?.current?.length) return null;
     
     const levels = waterData.current.map(item => parseFloat(item.y));
+    const currentLevel = levels[levels.length - 1];
+    
+    // Get current date info from the latest reading
+    const latestCurrentEntry = waterData.current[waterData.current.length - 1];
+    const currentDate = new Date(latestCurrentEntry.t);
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    
+    // Find historical min/max/average for the current date
+    let historicalMin = null;
+    let historicalMax = null;
+    let historicalAverage = null;
+    
+    if (waterData.min?.length) {
+      const historicalMinForDate = waterData.min.find(item => {
+        const minDate = new Date(item.t);
+        return minDate.getMonth() === currentMonth && minDate.getDate() === currentDay;
+      });
+      if (historicalMinForDate) {
+        historicalMin = parseFloat(historicalMinForDate.y);
+      }
+    }
+    
+    if (waterData.max?.length) {
+      const historicalMaxForDate = waterData.max.find(item => {
+        const maxDate = new Date(item.t);
+        return maxDate.getMonth() === currentMonth && maxDate.getDate() === currentDay;
+      });
+      if (historicalMaxForDate) {
+        historicalMax = parseFloat(historicalMaxForDate.y);
+      }
+    }
+    
+    if (waterData.average?.length) {
+      const historicalAvgForDate = waterData.average.find(item => {
+        const avgDate = new Date(item.t);
+        return avgDate.getMonth() === currentMonth && avgDate.getDate() === currentDay;
+      });
+      if (historicalAvgForDate) {
+        historicalAverage = parseFloat(historicalAvgForDate.y);
+      }
+    }
     
     return {
-      current: levels[levels.length - 1],
-      max: Math.max(...levels),
-      min: Math.min(...levels),
-      average: levels.reduce((a, b) => a + b, 0) / levels.length
+      current: currentLevel,
+      max: historicalMax || currentLevel, // Fallback to current if no historical data
+      min: historicalMin || currentLevel, // Fallback to current if no historical data
+      average: historicalAverage || currentLevel // Fallback to current if no historical data
     };
   };
 
@@ -450,7 +492,7 @@ const WaterLevelComponent = () => {
                     <div className="col-12">
                       <div className="card shadow border-start border-4" style={{borderLeftColor: waterData?.colorAverage || "#f49541", borderLeftWidth: '4px'}}>
                         <div className="card-body p-3">
-                          <h6 className="card-title text-muted mb-2">Year Average</h6>
+                          <h6 className="card-title text-muted mb-2">Historical Average (Today's Date)</h6>
                           <div className="h4 fw-bold mb-0" style={{color: waterData?.colorAverage || "#f49541"}}>
                             {loading ? '-.---' : displayStats.average.toFixed(3)} m
                           </div>
@@ -461,7 +503,7 @@ const WaterLevelComponent = () => {
                     <div className="col-12">
                       <div className="card shadow border-start border-4" style={{borderLeftColor: waterData?.colorMax || "#e8dc37", borderLeftWidth: '4px'}}>
                         <div className="card-body p-3">
-                          <h6 className="card-title text-muted mb-2">Year Maximum</h6>
+                          <h6 className="card-title text-muted mb-2">Historical Max (Today's Date)</h6>
                           <div className="h4 fw-bold mb-0" style={{color: waterData?.colorMax || "#e8dc37"}}>
                             {loading ? '-.---' : displayStats.max.toFixed(3)} m
                           </div>
@@ -472,7 +514,7 @@ const WaterLevelComponent = () => {
                     <div className="col-12">
                       <div className="card shadow border-start border-4" style={{borderLeftColor: waterData?.colorMin || "#b03ef2", borderLeftWidth: '4px'}}>
                         <div className="card-body p-3">
-                          <h6 className="card-title text-muted mb-2">Year Minimum</h6>
+                          <h6 className="card-title text-muted mb-2">Historical Min (Today's Date)</h6>
                           <div className="h4 fw-bold mb-0" style={{color: waterData?.colorMin || "#b03ef2"}}>
                             {loading ? '-.---' : displayStats.min.toFixed(3)} m
                           </div>
