@@ -31,7 +31,12 @@ export default function LakeMap() {
     function initializeMap() {
       if (map.current) return // Initialize map only once
       
-      window.mapboxgl.accessToken = 'pk.eyJ1IjoiY290dGFnZW1hcHMiLCJhIjoiY2tqdTU1Z2Z0MGRwczJ0cDM2ZnpjdHNtdyJ9.zRSIwbTmRr0d7PFv0lf7lQ'
+      if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
+        console.error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not set');
+        return;
+      }
+      
+      window.mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
       
       map.current = new window.mapboxgl.Map({
         container: mapContainer.current,
