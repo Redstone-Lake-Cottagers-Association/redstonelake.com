@@ -276,9 +276,9 @@ const WaterLevelComponent = () => {
           <div className="text-center mb-5">
             <h1 className="display-4 fw-bold text-dark d-flex align-items-center justify-content-center gap-3 mb-4">
               <Droplets className="text-primary" size={48} />
-              Parks Canada Water Level Monitor
+              Water Level & Quality
             </h1>
-            <p className="lead text-muted fs-4">Real-time water level monitoring and historical data</p>
+            <p className="lead text-muted fs-4">Real-time monitoring and comprehensive lake health data</p>
             
 
           </div>

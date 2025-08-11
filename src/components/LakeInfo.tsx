@@ -63,11 +63,7 @@ interface DysartFireBanResponse {
   };
 }
 
-declare global {
-  interface Window {
-    mapboxgl: any;
-  }
-}
+
 
 export default function LakeInfo() {
   const [waterData, setWaterData] = useState<WaterData | null>(null)
@@ -76,8 +72,6 @@ export default function LakeInfo() {
   const [fireBanLoading, setFireBanLoading] = useState(true)
   const [showFireBanModal, setShowFireBanModal] = useState(false)
   const [showWeatherModal, setShowWeatherModal] = useState(false)
-  const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<any>(null)
 
   useEffect(() => {
     // Fetch water level data
@@ -271,90 +265,7 @@ export default function LakeInfo() {
     }
   }
 
-  useEffect(() => {
-    // Load Mapbox GL JS
-    if (!window.mapboxgl) {
-      const script = document.createElement('script')
-      script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'
-      script.onload = initializeMap
-      document.head.appendChild(script)
 
-      const link = document.createElement('link')
-      link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css'
-      link.rel = 'stylesheet'
-      document.head.appendChild(link)
-    } else {
-      initializeMap()
-    }
-
-    function initializeMap() {
-      if (map.current) return // Initialize map only once
-      
-      if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
-        console.error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not set');
-        return;
-      }
-      
-      window.mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-      
-      map.current = new window.mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-78.5434900880115, 45.18726445910608],
-        zoom: 10.8,
-        attributionControl: false,
-        interactive: false,
-        scrollZoom: false,
-        boxZoom: false,
-        dragRotate: false,
-        dragPan: false,
-        keyboard: false,
-        doubleClickZoom: false,
-        touchZoomRotate: false
-      })
-
-      // Lake locations
-      const lakes = [
-        { name: 'Redstone Lake', coordinates: [-78.5434900880115, 45.18726445910608], color: '#0284c7', slug: 'redstone-lake' },
-        { name: 'Little Redstone Lake', coordinates: [-78.5234900880115, 45.19726445910608], color: '#0d9488', slug: 'little-redstone-lake' },
-        { name: 'Bitter Lake', coordinates: [-78.5634900880115, 45.17726445910608], color: '#059669', slug: 'bitter-lake' },
-        { name: 'Burdock Lake', coordinates: [-78.5834900880115, 45.19726445910608], color: '#1e40af', slug: 'burdock-lake' },
-        { name: 'Coleman Lake', coordinates: [-78.5034900880115, 45.17726445910608], color: '#0f172a', slug: 'coleman-lake' },
-        { name: 'Long (Tedious) Lake', coordinates: [-78.5134900880115, 45.20726445910608], color: '#f97316', slug: 'long-tedious-lake' },
-        { name: 'Pelaw Lake', coordinates: [-78.5734900880115, 45.16726445910608], color: '#0d9488', slug: 'pelaw-lake' }
-      ]
-
-      // Add markers for each lake when map loads
-      map.current.on('load', () => {
-        lakes.forEach(lake => {
-          const marker = new window.mapboxgl.Marker({
-            color: lake.color,
-            scale: 0.8
-          })
-          .setLngLat(lake.coordinates)
-          .setPopup(new window.mapboxgl.Popup({ 
-            offset: 25,
-            className: 'lake-popup'
-          }).setHTML(`
-            <div style="color: #334155; font-family: 'Inter', sans-serif; line-height: 1.4;">
-              <strong style="color: #0f172a; font-size: 14px;">${lake.name}</strong><br/>
-              <span style="color: #64748b; font-size: 12px;">Protected by RLCA</span><br/>
-              <a href="/lakes/${lake.slug}" style="color: #0284c7; font-size: 12px; text-decoration: none; font-weight: 500; margin-top: 6px; display: inline-block;">
-                Learn more about this lake →
-              </a>
-            </div>
-          `))
-          .addTo(map.current)
-        })
-      })
-    }
-
-    return () => {
-      if (map.current) {
-        map.current.remove()
-      }
-    }
-  }, [])
 
   return (
     <div className="weather-widget">
@@ -635,56 +546,7 @@ export default function LakeInfo() {
         </div>
       </div>
 
-      {/* Map Section */}
-      <div>
-        
-        
-        <div 
-          ref={mapContainer}
-          style={{
-            height: '200px',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.8)',
-            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.08)'
-          }}
-          className="mapbox-container"
-        />
-        
-        <style jsx>{`
-          .mapbox-container :global(.mapboxgl-ctrl-logo) {
-            display: none !important;
-          }
-          .mapbox-container :global(.mapboxgl-ctrl-attrib) {
-            display: none !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-content) {
-            background: white !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-            padding: 12px !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-tip) {
-            border-top-color: white !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-close-button) {
-            outline: none !important;
-            box-shadow: none !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-close-button):focus {
-            outline: none !important;
-            box-shadow: none !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-content a) {
-            outline: none !important;
-            box-shadow: none !important;
-          }
-          .mapbox-container :global(.mapboxgl-popup-content a):focus {
-            outline: none !important;
-            box-shadow: none !important;
-          }
-        `}</style>
-      </div>
+
 
       {/* Fire Ban Details Modal - Rendered as Portal */}
       {showFireBanModal && typeof document !== 'undefined' && createPortal(

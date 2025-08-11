@@ -22,10 +22,6 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Pass build-time environment variables for Next.js client-side bundling
-ARG NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-ENV NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-
 RUN npm run build
 
 # Production image, copy all the files and run next

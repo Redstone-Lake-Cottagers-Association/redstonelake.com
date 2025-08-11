@@ -7,8 +7,6 @@ app = 'redstonelake-com'
 primary_region = 'yyz'
 
 [build]
-  [build.args]
-    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN = { from_secret = "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN" }
 
 [http_service]
   internal_port = 3000

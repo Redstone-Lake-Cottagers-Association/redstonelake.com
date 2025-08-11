@@ -35,48 +35,19 @@ export default function Header() {
           <div className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`} id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <Link href="/" className="nav-link">Home</Link>
-              </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  Water Quality
-                </a>
-                <ul className="dropdown-menu">
-                  <li><Link href="/water-quality" className="dropdown-item">Water Quality</Link></li>
-                  <li><Link href="/water-level" className="dropdown-item">Water Level</Link></li>
-                  <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>
-                  <li><Link href="/septic-systems" className="dropdown-item">Septic Systems Information</Link></li>
-                </ul>
-              </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  Community
-                </a>
-                <ul className="dropdown-menu">
-                  <li><Link href="/photo-gallery" className="dropdown-item">Photo Gallery</Link></li>
-                  <li><Link href="/municipal-bylaws" className="dropdown-item">Municipal By-laws</Link></li>
-                  <li><Link href="/news" className="dropdown-item">News</Link></li>
-                  <li><Link href="/initiatives" className="dropdown-item">Initiatives</Link></li>
-                  <li><Link href="/contests" className="dropdown-item">RLCA Contests</Link></li>
-                </ul>
-              </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  About RLCA
-                </a>
-                <ul className="dropdown-menu">
-                  <li><Link href="/membership" className="dropdown-item">Membership</Link></li>
-                  <li><Link href="/business-directory" className="dropdown-item">Business Directory</Link></li>
-                  <li><Link href="/board-members" className="dropdown-item">Board Members</Link></li>
-                  <li><Link href="/volunteers" className="dropdown-item">Volunteers</Link></li>
-                  <li><Link href="/governing-docs" className="dropdown-item">Governing Docs</Link></li>
-                  <li><Link href="/annual-meeting" className="dropdown-item">Annual General Meeting</Link></li>
-                  <li><Link href="/newsletters" className="dropdown-item">Newsletters</Link></li>
-                  <li><Link href="/contact" className="dropdown-item">Contact Us</Link></li>
-                </ul>
+                <Link href="/#our-protected-lakes" className="nav-link">About RLCA</Link>
               </li>
               <li className="nav-item">
-                <Link href="/new-cottager-guide" className="nav-link">New Cottager Guide</Link>
+                <Link href="/#water-level-monitor" className="nav-link">Water Level & Quality</Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/#events-news" className="nav-link">Events & News</Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/#essential-lake-protection" className="nav-link">How to Protect Your Lake</Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/contact" className="nav-link">Contact Us</Link>
               </li>
             </ul>
           </div>

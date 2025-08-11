@@ -1,10 +1,333 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 import LakeInfo from '@/components/LakeInfo'
 import WaterLevelComponent from '@/components/WaterLevelComponent'
+import HeroMap from '@/components/HeroMap'
+
+interface Event {
+  id: number;
+  title: string;
+  date: string;
+  day: string;
+  month: string;
+  type: string;
+  status: 'upcoming' | 'past';
+  icon: string;
+  color: string;
+  description: string;
+  details: string;
+  monthName?: string;
+}
 
 export default function Home() {
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [showModal, setShowModal] = useState(false)
+  const [showMoreMonths, setShowMoreMonths] = useState(false)
+  const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
+
+  const events: Event[] = [
+    {
+      id: 1,
+      title: "Spring Lake Cleanup",
+      date: "May 17, 2025",
+      day: "17",
+      month: "MAY",
+      type: "Community Event",
+      status: "upcoming",
+      icon: "🌊",
+      color: "#0ea5e9",
+      description: "Join our annual spring cleanup to maintain the pristine beauty of our lakes. Volunteers will help remove debris, check for invasive species, and prepare our lakes for the summer season.",
+      details: "Meet at the Redstone Lake boat launch at 9:00 AM. We'll provide all cleanup supplies, gloves, and refreshments. Bring sun protection and wear clothes you don't mind getting dirty. Event runs rain or shine until 2:00 PM."
+    },
+    {
+      id: 2,
+      title: "Fishing Derby",
+      date: "June 21, 2025",
+      day: "21",
+      month: "JUN",
+      type: "Competition",
+      status: "upcoming",
+      icon: "🎣",
+      color: "#10b981",
+      description: "Annual fishing competition for all ages with prizes and community fun.",
+      details: "Registration starts at 6:00 AM at the community dock. Entry fee $10 for adults, $5 for children under 12. Prizes for biggest fish, most fish, and best junior angler. BBQ lunch included with registration. Weigh-in closes at 4:00 PM."
+    },
+    {
+      id: 3,
+      title: "RLCA Annual General Meeting",
+      date: "July 12, 2025",
+      day: "12",
+      month: "JUL",
+      type: "Annual Meeting",
+      status: "upcoming",
+      icon: "📅",
+      color: "#f59e0b",
+      description: "Review the year's activities and plan for the future of our lake community.",
+      details: "Held at the Haliburton Forest Center starting at 9:00 AM. Agenda includes financial reports, water quality updates, new member welcome, and planning for 2026 initiatives. Coffee and light refreshments provided. All members encouraged to attend."
+    },
+    {
+      id: 10,
+      title: "Summer Solstice Paddle",
+      date: "July 21, 2025",
+      day: "21",
+      month: "JUL",
+      type: "Recreation",
+      status: "upcoming",
+      icon: "🛶",
+      color: "#06b6d4",
+      description: "Evening paddle to celebrate the longest day of summer with fellow lake enthusiasts.",
+      details: "Meet at the main dock at 7:00 PM for a leisurely group paddle around Redstone Lake. We'll watch the sunset from the water and enjoy the peaceful summer evening. Bring your own canoe/kayak or arrange to borrow one. Hot chocolate and snacks provided afterward."
+    },
+    {
+      id: 11,
+      title: "Water Safety Workshop",
+      date: "July 28, 2025",
+      day: "28",
+      month: "JUL",
+      type: "Educational",
+      status: "upcoming",
+      icon: "🏊",
+      color: "#8b5cf6",
+      description: "Essential water safety skills for families and children around the lake.",
+      details: "Certified instructor will cover swimming safety, boating basics, and emergency procedures. Perfect for families with children or new cottagers. Includes hands-on practice with life jackets and basic rescue techniques. Registration required, limited to 20 participants."
+    },
+    {
+      id: 4,
+      title: "Shoreline Restoration Workshop",
+      date: "August 9, 2025",
+      day: "09",
+      month: "AUG",
+      type: "Educational",
+      status: "upcoming",
+      icon: "🌿",
+      color: "#8b5cf6",
+      description: "Learn about native plants and techniques for natural shoreline protection.",
+      details: "Expert-led workshop covering native plant selection, erosion control, and naturalization techniques. Includes hands-on planting demonstration and take-home native plant starter kit. Limited to 25 participants, advance registration required."
+    },
+    {
+      id: 12,
+      title: "Loon Watch Evening",
+      date: "August 15, 2025",
+      day: "15",
+      month: "AUG",
+      type: "Wildlife",
+      status: "upcoming",
+      icon: "🦆",
+      color: "#059669",
+      description: "Guided evening to observe and learn about the common loons on our lakes.",
+      details: "Join our wildlife expert for an evening of loon watching and education. Learn about loon behavior, calls, and conservation efforts. Bring binoculars if you have them (extras provided). Meet at the north shore observation point at 7:30 PM. Weather dependent event."
+    },
+    {
+      id: 13,
+      title: "Kids' Nature Scavenger Hunt",
+      date: "August 22, 2025",
+      day: "22",
+      month: "AUG",
+      type: "Family Event",
+      status: "upcoming",
+      icon: "🔍",
+      color: "#dc2626",
+      description: "Fun nature exploration activity for children and families around the lake area.",
+      details: "Interactive scavenger hunt designed for kids ages 5-12 with their families. Explore the shoreline and forest while learning about local plants, animals, and ecosystems. Prizes for all participants and healthy snacks provided. Meet at the community pavilion at 10:00 AM."
+    },
+    {
+      id: 5,
+      title: "Fall Community BBQ",
+      date: "September 14, 2025",
+      day: "14",
+      month: "SEP",
+      type: "Social Event",
+      status: "upcoming",
+      icon: "🍂",
+      color: "#ef4444",
+      description: "End-of-season celebration with food, fellowship, and lake community spirit.",
+      details: "Potluck-style BBQ at the community beach. RLCA provides burgers, hot dogs, and beverages. Please bring a side dish to share. Games and activities for all ages. Sunset canoe paddle for interested participants."
+    },
+    {
+      id: 14,
+      title: "Fall Photography Contest",
+      date: "September 7, 2025",
+      day: "07",
+      month: "SEP",
+      type: "Competition",
+      status: "upcoming",
+      icon: "📸",
+      color: "#7c3aed",
+      description: "Capture the beauty of autumn around our lakes in this friendly photography competition.",
+      details: "Submit your best fall photos of the lake area taken during September. Categories include landscape, wildlife, and people enjoying the lake. Entry fee $5, with prizes for each category. Deadline for submissions is September 30th. Voting by community members."
+    },
+    {
+      id: 15,
+      title: "Dock Removal Workshop",
+      date: "September 28, 2025",
+      day: "28",
+      month: "SEP",
+      type: "Maintenance",
+      status: "upcoming",
+      icon: "🔧",
+      color: "#0891b2",
+      description: "Learn proper techniques for seasonal dock removal and winter storage.",
+      details: "Hands-on workshop covering safe dock removal, hardware maintenance, and proper winter storage techniques. Bring your dock hardware questions! Experienced cottagers will share tips and tricks. Tools and refreshments provided. Meet at the boat launch at 9:00 AM."
+    },
+    {
+      id: 6,
+      title: "FOCA AGM & Spring Seminar",
+      date: "March 1, 2025",
+      day: "01",
+      month: "MAR",
+      type: "External Event",
+      status: "past",
+      icon: "📊",
+      color: "#6b7280",
+      description: "Event summary with session overviews and presentation materials.",
+      details: "The Federation of Ontario Cottagers' Associations annual meeting covered lake health monitoring, policy updates, and best practices for cottage associations. Presentation materials and session recordings are available on the FOCA website."
+    },
+    {
+      id: 7,
+      title: "RLCA Annual General Meeting",
+      date: "July 12, 2024",
+      day: "12",
+      month: "JUL",
+      type: "Annual Meeting",
+      status: "past",
+      icon: "📅",
+      color: "#6b7280",
+      description: "Community members discussed lake stewardship and future planning.",
+      details: "Well-attended meeting with 45 members present. Key topics included water quality improvements, invasive species monitoring, and budget approval for 2025. Meeting minutes available to all members."
+    },
+    {
+      id: 8,
+      title: "Fishing Derby 2024",
+      date: "June 22, 2024",
+      day: "22",
+      month: "JUN",
+      type: "Competition",
+      status: "past",
+      icon: "🎣",
+      color: "#6b7280",
+      description: "Successful community fishing competition with great participation.",
+      details: "Record turnout with 78 participants! Winning fish: 4.2 lb bass caught by Sarah Chen. Junior winner: 2.1 lb pike by 8-year-old Marcus Thompson. Raised $850 for lake conservation efforts."
+    },
+    {
+      id: 9,
+      title: "Spring Lake Cleanup 2024",
+      date: "May 18, 2024",
+      day: "18",
+      month: "MAY",
+      type: "Community Event",
+      status: "past",
+      icon: "🌊",
+      color: "#6b7280",
+      description: "Volunteers helped maintain the pristine beauty of our lakes.",
+      details: "Amazing volunteer turnout with 52 community members participating. Collected 340 lbs of debris and identified 3 small areas of invasive plant growth for targeted removal. Thank you to all volunteers!"
+    }
+  ]
+
+  // Filter and group events by month and year
+  const getFilteredAndGroupedEvents = (events: Event[], showMore: boolean) => {
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1
+    const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear
+    
+    // Calculate previous month for limiting past events
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear
+
+    // Filter events based on display options
+    const filtered = events.filter(event => {
+      const eventDate = new Date(event.date)
+      const eventMonth = eventDate.getMonth()
+      const eventYear = eventDate.getFullYear()
+      
+      // Always show the 3-month window: previous, current, next
+      const inThreeMonthWindow = (eventYear === prevYear && eventMonth === prevMonth) ||
+                                (eventYear === currentYear && eventMonth === currentMonth) ||
+                                (eventYear === nextYear && eventMonth === nextMonth)
+      
+      if (inThreeMonthWindow) {
+        return true
+      }
+      
+      // If showing more months, include future events up to 6 months ahead (but keep past events limited to previous month only)
+      if (showMore) {
+        const sixMonthsAhead = new Date(currentYear, currentMonth + 6, 31)
+        // For future events, expand to 6 months ahead
+        if (eventDate > new Date(nextYear, nextMonth, 31)) {
+          return eventDate <= sixMonthsAhead
+        }
+      }
+      
+
+      
+      return false
+    })
+
+    // Sort chronologically
+    const sorted = filtered.sort((a, b) => {
+      const dateA = new Date(a.date)
+      const dateB = new Date(b.date)
+      return dateA.getTime() - dateB.getTime()
+    })
+
+    // Group by month
+    const grouped: { [key: string]: Event[] } = {}
+    
+    sorted.forEach(event => {
+      const date = new Date(event.date)
+      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      
+      if (!grouped[monthYear]) {
+        grouped[monthYear] = []
+      }
+      grouped[monthYear].push({ ...event, monthName })
+    })
+    
+    return grouped
+  }
+
+  const groupedEvents = getFilteredAndGroupedEvents(events, showMoreMonths)
+  
+
+
+  // Check if there are more future months beyond the 3-month window
+  const hasMoreMonths = () => {
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1
+    const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear
+    
+    return events.some(event => {
+      const eventDate = new Date(event.date)
+      
+      // Check if there are future events beyond next month (within 6 months)
+      const sixMonthsAhead = new Date(currentYear, currentMonth + 6, 31)
+      return eventDate > new Date(nextYear, nextMonth, 31) && eventDate <= sixMonthsAhead
+    })
+  }
+
+  const openEventModal = (event: Event) => {
+    setSelectedEvent(event)
+    setShowModal(true)
+  }
   return (
     <>
+      <style jsx>{`
+        .hover-lift {
+          transition: transform 0.2s ease-in-out;
+        }
+        .hover-lift:hover {
+          transform: translateY(-2px);
+        }
+        .cursor-pointer {
+          cursor: pointer;
+        }
+      `}</style>
       {/* Hero Section */}
       <section className="hero-section">
         <div className="container">
@@ -39,13 +362,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Main Content Sections */}
+      {/* Lakes Overview Map Section */}
+      <section id="our-protected-lakes" className="py-5 bg-light">
+        <div className="container">
+        <div className="row justify-content-center">
+            <div className="col-lg-10">
+              <div className="text-center mb-5">
+                <h2 className="display-5 mb-4">About the Redstone Lake Cottage Association</h2>
+                <p className="lead text-muted mb-4">
+                  For over 60 years, the RLCA has been the dedicated guardian of pristine lakes nestled in the heart of Haliburton's wilderness. Our volunteer-driven community is united by a shared commitment to preserving these natural treasures for current and future generations.
+                </p>
+                
+              </div>
+            </div>
+          </div>
+
+          <div className="row justify-content-center">
+            <div className="col-lg-10">
+              <div className="text-center mb-4">
+                <h2 className="h4 mb-2 text-primary">Our Protected Lakes</h2>
+                <p className="lead text-muted">
+                  From Redstone Lake to Little Redstone, Pelaw, Bitter, Tedious (Long), Burdock, and Coleman Lakes, our stewardship extends across seven pristine waters that form a remarkable ecosystem in the heart of Haliburton's wilderness.
+                </p>
+              </div>
+              <HeroMap />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About RLCA Section */}
       <section className="py-6">
         <div className="container">
+         
+
           <div className="text-center mb-5">
-            <h2 className="display-5 mb-3">Excellence in Lake Stewardship</h2>
-            <p className="lead text-muted">Discover how we're preserving Haliburton's natural treasures</p>
+            <h3 className="h4 mb-3 text-primary">Our Mission in Action</h3>
+            <p className="lead text-muted">Three pillars that drive our conservation efforts</p>
           </div>
+
           <div className="row g-4">
             <div className="col-lg-4">
               <div className="card lake-card h-100">
@@ -55,21 +410,21 @@ export default function Home() {
                   backgroundPosition: 'center'
                 }}></div>
                 <div className="card-body d-flex flex-column">
-                  <h3 className="card-title h4">Make A Difference</h3>
+                  <h4 className="card-title">Making a Difference</h4>
                   <p className="card-text text-muted mb-4">
-                    For 60 years, the RLCA has worked as a volunteer-based organization to ensure the quality of our water and the natural environment surrounding our lakes. Join our mission to preserve these pristine waters for future generations to enjoy.
+                    Every volunteer hour, every conservation initiative, and every community action contributes to our lakes' protection. From organizing lake cleanups to advocating for environmental policies, our members actively shape the future of these waters.
                   </p>
                   <p className="card-text mb-4">
-                    <strong className="text-primary">Ready to get involved? We'd love to hear from you.</strong>
+                    <strong className="text-primary">Join a community that believes individual actions create collective impact.</strong>
                   </p>
                   <div className="mt-auto">
-                    <Link href="/volunteers" className="btn btn-lake-primary">
+                    <Link href="/membership" className="btn btn-lake-primary">
                       Get Involved
                     </Link>
                   </div>
                 </div>
               </div>
-      </div>
+            </div>
 
             <div className="col-lg-4">
               <div className="card lake-card h-100">
@@ -79,13 +434,16 @@ export default function Home() {
                   backgroundPosition: 'center'
                 }}></div>
                 <div className="card-body d-flex flex-column">
-                  <h3 className="card-title h4">Water Quality Excellence</h3>
+                  <h4 className="card-title">Water Quality Excellence</h4>
                   <p className="card-text text-muted mb-4">
-                    Our comprehensive water quality monitoring program ensures the health and sustainability of Haliburton's lake ecosystem. Through scientific testing and environmental stewardship, we maintain the highest standards of water purity.
+                    Our comprehensive monitoring program tracks the health of all seven lakes through regular testing, scientific analysis, and collaboration with environmental experts. We measure everything from phosphorus levels to invasive species presence.
+                  </p>
+                  <p className="card-text mb-4">
+                    <strong className="text-primary">Transparency and science guide our conservation decisions.</strong>
                   </p>
                   <div className="mt-auto">
                     <Link href="/water-quality" className="btn btn-lake-primary">
-                      Learn More
+                      View Reports
                     </Link>
                   </div>
                 </div>
@@ -100,9 +458,12 @@ export default function Home() {
                   backgroundPosition: 'center'
                 }}></div>
                 <div className="card-body d-flex flex-column">
-                  <h3 className="card-title h4">New Cottager Welcome</h3>
+                  <h4 className="card-title">Welcoming New Cottagers</h4>
                   <p className="card-text text-muted mb-4">
-                    Welcome to our exclusive cottage community! Our comprehensive guide will help you seamlessly integrate into lake life while understanding the important environmental practices that keep our waters pristine.
+                    New to lake life? We're here to help you become an environmental steward from day one. Our comprehensive guide covers everything from septic system care to invasive species prevention, ensuring you can enjoy and protect these waters.
+                  </p>
+                  <p className="card-text mb-4">
+                    <strong className="text-primary">Every new cottager is a potential lake champion.</strong>
                   </p>
                   <div className="mt-auto">
                     <Link href="/new-cottager-guide" className="btn btn-lake-primary">
@@ -124,7 +485,7 @@ export default function Home() {
       </section>
 
       {/* Important Environmental Guidelines */}
-      <section className="py-6 bg-light">
+      <section id="essential-lake-protection" className="py-6 bg-light">
         <div className="container">
           <div className="text-center mb-5">
             <h2 className="display-5 mb-3">Essential Lake Protection Guidelines</h2>
@@ -257,39 +618,123 @@ export default function Home() {
       </section>
 
 
-      {/* Recent News */}
-      <section className="py-6">
+      {/* Events & News Section */}
+      <section id="events-news" className="py-6">
         <div className="container">
           <div className="text-center mb-5">
-            <h2 className="display-5 mb-3">Latest News & Updates</h2>
-            <p className="lead text-muted">Stay informed about lake conservation efforts and community initiatives</p>
+            <h2 className="display-5 mb-3">Events & News</h2>
+            <p className="lead text-muted">Stay connected with community events and conservation insights</p>
+          </div>
+
+          {/* Compact Events Section */}
+          <div className="row mb-5">
+            <div className="col-12">
+                                      <div className="text-center mb-4">
+                          <h3 className="h4 mb-3 text-primary"> Community Events</h3>
+                        </div>
+              
+              {Object.entries(groupedEvents).map(([monthKey, monthEvents]) => {
+                const firstEvent = monthEvents[0]
+                const eventDate = new Date(firstEvent.date)
+                const now = new Date()
+                const currentMonth = now.getMonth()
+                const currentYear = now.getFullYear()
+                
+                // Check if this is the previous month
+                const isPreviousMonth = eventDate.getFullYear() < currentYear || 
+                                       (eventDate.getFullYear() === currentYear && eventDate.getMonth() < currentMonth)
+                
+                return (
+                  <div key={monthKey} className="mb-4">
+                    <div className="d-flex align-items-center mb-3">
+                      <h5 className={`mb-0 me-3 ${isPreviousMonth ? 'text-muted' : 'text-success'}`}>
+                        {firstEvent.monthName}
+                      </h5>
+                      <div className="flex-grow-1" style={{height: '1px', backgroundColor: isPreviousMonth ? '#e5e7eb' : '#d1fae5'}}></div>
+                    </div>
+                    
+                    <div className="row g-2 mb-4">
+                      {monthEvents.map(event => {
+                        const eventDate = new Date(event.date)
+                        const isEventInPreviousMonth = eventDate.getFullYear() < currentYear || 
+                                                      (eventDate.getFullYear() === currentYear && eventDate.getMonth() < currentMonth)
+                        
+                        return (
+                          <div key={event.id} className="col-lg-3 col-md-4 col-sm-6">
+                            <div 
+                              className={`card border-0 shadow-sm h-100 cursor-pointer hover-lift ${isEventInPreviousMonth ? 'opacity-75' : ''}`}
+                              style={{
+                                borderLeft: `4px solid ${isEventInPreviousMonth ? '#6b7280' : event.color}`, 
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => openEventModal(event)}
+                            >
+                              <div className="card-body p-3">
+                                <div className="d-flex align-items-center mb-2">
+                                  <div className="me-2 text-center" style={{minWidth: '35px'}}>
+                                    <div 
+                                      className="fw-bold" 
+                                      style={{
+                                        fontSize: '1.2rem', 
+                                        lineHeight: '1', 
+                                        color: isEventInPreviousMonth ? '#6b7280' : event.color
+                                      }}
+                                    >
+                                      {event.day}
+                                    </div>
+                                    <small className="text-muted text-uppercase" style={{fontSize: '0.65rem', letterSpacing: '0.5px'}}>
+                                      {event.month}
+                                    </small>
+                                  </div>
+                                  <span 
+                                    style={{
+                                      fontSize: '1rem', 
+                                      filter: isEventInPreviousMonth ? 'grayscale(0.5)' : 'none'
+                                    }}
+                                  >
+                                    {event.icon}
+                                  </span>
+                                </div>
+                                <h6 
+                                  className={`mb-1 fw-semibold ${isEventInPreviousMonth ? 'text-muted' : ''}`} 
+                                  style={{fontSize: '0.9rem', lineHeight: '1.2'}}
+                                >
+                                  {event.title}
+                                </h6>
+                                <small className="text-muted">{event.type}</small>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+              
+              {/* Show More Buttons - positioned at bottom center */}
+              <div className="text-center mt-4">
+                <div className="d-flex justify-content-center">
+                  <button 
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => {
+                      setShowMoreMonths(!showMoreMonths)
+                      if (!showMoreMonths) setHasClickedShowMore(true)
+                    }}
+                    disabled={!hasMoreMonths() && !showMoreMonths}
+                  >
+                    {showMoreMonths && hasClickedShowMore ? 'Show Less' : 'Show More'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* News Articles */}
+          <div className="text-center mb-4">
+            <h3 className="h4 mb-3 text-primary">News & Articles</h3>
           </div>
           <div className="row g-4">
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(30, 64, 175, 0.15)',
-                      border: '2px solid rgba(30, 64, 175, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>📅</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">RLCA Annual General Meeting - July 12th</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>July 12, 2024</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">The Redstone Lake Cottage Association held its Annual General Meeting on July 12th at 9:00 AM at the Haliburton Forest Center. Community members gathered to discuss lake stewardship initiatives, review the year's activities, and plan for the future of our lake community.</p>
-                <Link href="/news/agm-2024" className="fw-semibold">Read AGM Summary →</Link>
-              </article>
-            </div>
-
             <div className="col-lg-6">
               <article className="news-card h-100">
                 <div className="d-flex align-items-start mb-3">
@@ -312,31 +757,6 @@ export default function Home() {
                 </div>
                 <p className="text-muted mb-3">A small amount of lead will cause massive fatal lead poisoning in a loon. It's a terrible death for these legendary birds - and it is so easily avoidable. Learn about our tackle exchange program and get a FREE limited edition custom lure.</p>
                 <Link href="/news/lead-fishing-tackle-loons" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
-
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(5, 150, 105, 0.15)',
-                      border: '2px solid rgba(5, 150, 105, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>📊</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">2025 FOCA AGM & Spring Seminar</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>March 14, 2025</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">The FOCA AGM & Spring Seminar was held on March 1, 2025. Here is a copy of the Event Summary which includes session overviews and links to PDF copies of all the slides shown during the presentations.</p>
-                <Link href="/news/foca-agm-2025" className="fw-semibold">Read Full Article →</Link>
               </article>
             </div>
             
@@ -414,6 +834,56 @@ export default function Home() {
                 <Link href="/news/fire-ban-fireworks" className="fw-semibold">Read Full Article →</Link>
               </article>
             </div>
+
+            <div className="col-lg-6">
+              <article className="news-card h-100">
+                <div className="d-flex align-items-start mb-3">
+                  <div className="me-3">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
+                      width: '48px', 
+                      height: '48px', 
+                      backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                      border: '2px solid rgba(168, 85, 247, 0.3)'
+                    }}>
+                      <span style={{fontSize: '1.4rem'}}>🧪</span>
+                    </div>
+                  </div>
+                  <div className="flex-grow-1">
+                    <h5 className="mb-2">Understanding Phosphorus in Lake Ecosystems</h5>
+                    <div className="d-flex align-items-center text-muted mb-3">
+                      <small>September 15, 2023</small>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted mb-3">Phosphorus is a key nutrient that affects lake health, but too much can lead to harmful algae blooms. Learn about the sources of phosphorus pollution and how cottagers can help maintain healthy phosphorus levels in our lakes.</p>
+                <Link href="/news/phosphorus-lake-ecosystems" className="fw-semibold">Read Full Article →</Link>
+              </article>
+            </div>
+
+            <div className="col-lg-6">
+              <article className="news-card h-100">
+                <div className="d-flex align-items-start mb-3">
+                  <div className="me-3">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
+                      width: '48px', 
+                      height: '48px', 
+                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                      border: '2px solid rgba(34, 197, 94, 0.3)'
+                    }}>
+                      <span style={{fontSize: '1.4rem'}}>🌿</span>
+                    </div>
+                  </div>
+                  <div className="flex-grow-1">
+                    <h5 className="mb-2">Native Plants for Shoreline Restoration</h5>
+                    <div className="d-flex align-items-center text-muted mb-3">
+                      <small>May 20, 2023</small>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted mb-3">Discover which native plants are best for creating natural shoreline buffers that prevent erosion, filter runoff, and provide habitat for local wildlife. A comprehensive guide for cottagers looking to naturalize their waterfront.</p>
+                <Link href="/news/native-plants-shoreline" className="fw-semibold">Read Full Article →</Link>
+              </article>
+            </div>
           </div>
         </div>
       </section>
@@ -426,8 +896,61 @@ export default function Home() {
           <Link href="/membership" className="btn btn-lake-primary btn-lg">
             Join RLCA
           </Link>
-      </div>
+        </div>
       </section>
+
+      {/* Event Details Modal */}
+      {showModal && selectedEvent && (
+        <div className="modal show d-block" tabIndex={-1} style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header" style={{borderBottom: `4px solid ${selectedEvent.color}`}}>
+                <div className="d-flex align-items-center">
+                  <div className="me-3 text-center" style={{minWidth: '60px'}}>
+                    <div className="fw-bold" style={{fontSize: '2rem', lineHeight: '1', color: selectedEvent.color}}>
+                      {selectedEvent.day}
+                    </div>
+                    <small className="text-muted text-uppercase" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>
+                      {selectedEvent.month}
+                    </small>
+                  </div>
+                  <div>
+                    <h4 className="modal-title mb-1">{selectedEvent.title}</h4>
+                    <div className="d-flex align-items-center text-muted">
+                      <span style={{fontSize: '1.2rem', marginRight: '0.5rem'}}>{selectedEvent.icon}</span>
+                      <small>{selectedEvent.type} • {selectedEvent.date}</small>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <h6 className="text-primary mb-2">Overview</h6>
+                  <p className="text-muted">{selectedEvent.description}</p>
+                </div>
+                <div>
+                  <h6 className="text-primary mb-2">Details</h6>
+                  <p className="text-muted mb-0">{selectedEvent.details}</p>
+                </div>
+              </div>
+                                        <div className="modal-footer">
+                            <button 
+                              type="button" 
+                              className="btn btn-secondary" 
+                              onClick={() => setShowModal(false)}
+                            >
+                              Close
+                            </button>
+                          </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

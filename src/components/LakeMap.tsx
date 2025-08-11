@@ -17,7 +17,7 @@ export default function LakeMap() {
     if (!window.mapboxgl) {
       const script = document.createElement('script')
       script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'
-      script.onload = initializeMap
+      script.onload = fetchMapboxTokenAndInitialize
       document.head.appendChild(script)
 
       const link = document.createElement('link')
@@ -25,18 +25,29 @@ export default function LakeMap() {
       link.rel = 'stylesheet'
       document.head.appendChild(link)
     } else {
-      initializeMap()
+      fetchMapboxTokenAndInitialize()
+    }
+
+    async function fetchMapboxTokenAndInitialize() {
+      if (map.current) return // Initialize map only once
+      
+      try {
+        const response = await fetch('/api/mapbox-token');
+        const data = await response.json();
+        
+        if (!response.ok || !data.token) {
+          console.error('Failed to fetch Mapbox token:', data.error);
+          return;
+        }
+        
+        window.mapboxgl.accessToken = data.token;
+        initializeMap();
+      } catch (error) {
+        console.error('Error fetching Mapbox token:', error);
+      }
     }
 
     function initializeMap() {
-      if (map.current) return // Initialize map only once
-      
-      if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
-        console.error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not set');
-        return;
-      }
-      
-      window.mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
       
       map.current = new window.mapboxgl.Map({
         container: mapContainer.current,
