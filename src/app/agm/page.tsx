@@ -50,14 +50,12 @@ const agmYears: { year: string; items: AgmItem[] }[] = [
     year: '2021',
     items: [
       { title: 'RLCA 2021 AGM Presentation (July 7, 2021)', href: '/documents/agm/2021_RLCA_AGM_July_7_2021.pdf' },
-      { title: 'RLCA 2021 AGM Video Recording', href: 'https://www.redstonelake.com/association_Docs/2021_RLCA_AGM.mp4', external: true },
     ],
   },
   {
     year: '2020',
     items: [
       { title: 'RLCA 2020 AGM Minutes', href: '/documents/agm/RLCA-2020-AGM-Minutes.pdf' },
-      { title: 'RLCA 2020 AGM Video Recording', href: 'https://www.redstonelake.com/Association_Docs/RLCA%202020%20AGM.mp4', external: true },
     ],
   },
 ]

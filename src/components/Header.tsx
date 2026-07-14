@@ -1,14 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 60)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <header>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <header className="site-header">
+      <nav className={`navbar navbar-expand-lg navbar-light bg-white shadow-sm ${isScrolled ? 'navbar-scrolled' : ''}`}>
         <div className="container">
           <Link href="/" className="navbar-brand d-flex align-items-center">
           <svg width="40" height="40" viewBox="0 0 300 200">
@@ -101,6 +109,7 @@ export default function Header() {
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li><Link href="/#essential-lake-protection" className="dropdown-item">How to Protect Your Lake</Link></li>
                   <li><Link href="/make-a-difference" className="dropdown-item">Make a Difference</Link></li>
+                  <li><Link href="/lake-health" className="dropdown-item">Lake Health Data</Link></li>
                   <li><Link href="/water-quality-program" className="dropdown-item">Water Quality Program</Link></li>
                   <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>
                   <li><Link href="/septic-systems" className="dropdown-item">Septic Systems</Link></li>

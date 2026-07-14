@@ -326,6 +326,11 @@ export default function Home() {
       <section id="water-level-monitor" className="py-6 bg-light">
         <div className="container">
           <WaterLevelComponent />
+          <div className="text-center mt-4">
+            <Link href="/lake-health" className="btn btn-outline-primary">
+              Explore Decades of Lake Health Data →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -379,8 +384,8 @@ export default function Home() {
                     <p className="mb-3 text-muted">
                       The wave action created by boats moving at high speeds can wash away shoreline soils, which can harm fish and their habitat. Protect our delicate shoreline ecosystem by maintaining appropriate speeds and distances from shore.
                     </p>
-                    <Link href="/healthy-shoreline" className="btn btn-outline-primary btn-sm">
-                      Watch Protection Video →
+                    <Link href="/news/watch-your-wake-to-protect-our-shorelines" className="btn btn-outline-primary btn-sm">
+                      Learn About Wake Safety →
                     </Link>
                   </div>
                 </div>

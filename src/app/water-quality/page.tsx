@@ -88,6 +88,7 @@ export default function WaterQuality() {
             <div className="card-body">
               <h5>Quick Links</h5>
               <ul className="list-unstyled">
+                <li><a href="/lake-health" className="text-decoration-none">Lake Health Data Explorer</a></li>
                 <li><a href="/#water-level-monitor" className="text-decoration-none">Live Water Level Monitoring</a></li>
                 <li><a href="/healthy-shoreline" className="text-decoration-none">Healthy Shoreline Guide</a></li>
                 <li><a href="/septic-systems" className="text-decoration-none">Septic Systems Information</a></li>

@@ -333,5 +333,10 @@
     "source": "/category/news",
     "destination": "/news",
     "permanent": true
+  },
+  {
+    "source": "/shoreline-naturalization",
+    "destination": "/news/shoreline-naturalization-with-abbey-gardens",
+    "permanent": true
   }
 ]

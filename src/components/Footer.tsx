@@ -49,6 +49,7 @@ export default function Footer() {
             <h5>Lake Stewardship</h5>
             <ul className="list-unstyled">
               <li><Link href="/make-a-difference" className="text-white-50">Make a Difference</Link></li>
+              <li><Link href="/lake-health" className="text-white-50">Lake Health Data</Link></li>
               <li><Link href="/water-quality-program" className="text-white-50">Water Quality Program</Link></li>
               <li><Link href="/healthy-shoreline" className="text-white-50">Healthy Shoreline</Link></li>
               <li><Link href="/septic-systems" className="text-white-50">Septic Systems</Link></li>

@@ -53,6 +53,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Navigation */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+}
+
 .navbar {
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.98) !important;
@@ -976,4 +982,21 @@ h1, h2, h3, h4, h5, h6 {
 .newsletter-row:hover {
   border-color: var(--lake-blue) !important;
   background-color: var(--light-blue) !important;
+}
+
+
+/* Condensed state once the page is scrolled */
+.navbar-scrolled {
+  padding: 0.15rem 0 !important;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.12) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+}
+
+.navbar-scrolled .navbar-brand {
+  font-size: 1.05rem;
+}
+
+.navbar-scrolled .navbar-brand svg {
+  width: 30px;
+  height: 30px;
 }
