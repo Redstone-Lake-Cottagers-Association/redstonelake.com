@@ -88,9 +88,10 @@ export default function WaterQuality() {
             <div className="card-body">
               <h5>Quick Links</h5>
               <ul className="list-unstyled">
-                <li><a href="/water-level" className="text-decoration-none">Water Level Monitoring</a></li>
+                <li><a href="/#water-level-monitor" className="text-decoration-none">Live Water Level Monitoring</a></li>
                 <li><a href="/healthy-shoreline" className="text-decoration-none">Healthy Shoreline Guide</a></li>
                 <li><a href="/septic-systems" className="text-decoration-none">Septic Systems Information</a></li>
+                <li><a href="/get-the-lead-out" className="text-decoration-none">Get the Lead Out (protect our loons)</a></li>
                 <li><a href="/contact" className="text-decoration-none">Report Water Quality Issues</a></li>
               </ul>
             </div>
@@ -98,9 +99,10 @@ export default function WaterQuality() {
 
           <div className="card lake-card">
             <div className="card-body">
-              <h5>Latest Water Quality Report</h5>
-              <p>Our 2024 water quality summary shows continued excellent conditions across all monitored lakes.</p>
-              <a href="#" className="btn btn-lake-primary">Download Report</a>
+              <h5>Latest Lake Health Data</h5>
+              <p>Environmental monitoring and research findings for our lakes were presented at the 2026 Annual General Meeting.</p>
+              <a href="/documents/agm/AGM_2026Presentation_JKidd.pptx" className="btn btn-lake-primary mb-2">Download 2026 Presentation</a>
+              <div><a href="/agm" className="small">Past years&apos; reports →</a></div>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import EnhancedWeatherWidget from './EnhancedWeatherWidget'
 import WeatherModal from './WeatherModal'
 import { createPortal } from 'react-dom'
@@ -280,18 +281,19 @@ export default function LakeInfo() {
         {(() => {
           const fireBanStatus = getFireBanStatus()
           const hasDetails = Boolean(fireBanStatus.data && (fireBanStatus.data.hasActiveBan || fireBanStatus.data.aiAnalysis?.hasFireBan))
-          
+          const isLoaded = fireBanStatus.status !== 'loading'
+
           return (
             <div>
               <div
-                className={`fireban-banner d-flex align-items-center ${hasDetails ? 'is-clickable' : ''}`}
+                className={`fireban-banner d-flex align-items-center ${isLoaded ? 'is-clickable' : ''}`}
                 style={{
                   // CSS custom properties consumed in globals.css
                   ['--fb-bg' as any]: fireBanStatus.color + '16',
                   ['--fb-border' as any]: fireBanStatus.color + '40',
                   ['--fb-color' as any]: fireBanStatus.color
                 }}
-                onClick={() => hasDetails && setShowFireBanModal(true)}
+                onClick={() => isLoaded && setShowFireBanModal(true)}
               >
                 <div className="fireban-icon me-2" style={{ filter: fireBanStatus.status === 'loading' ? 'grayscale(1)' : 'none' }}>
                   {fireBanStatus.status === 'banned' ? (
@@ -309,6 +311,11 @@ export default function LakeInfo() {
                     <span className="fireban-title me-2">{fireBanStatus.message}</span>
                   </div>
 
+                  {fireBanStatus.status === 'safe' && (
+                    <div className="small" style={{ opacity: 0.85 }}>
+                      Daytime burning still prohibited in fire season — details ›
+                    </div>
+                  )}
 
                   <div className="mt-1" style={{ minHeight: '18px' }}>
                     {(() => {
@@ -584,26 +591,23 @@ export default function LakeInfo() {
               <div className="modal-body">
                 {(() => {
                   const fireBanStatus = getFireBanStatus()
-                  if (!fireBanStatus.data) {
-                    return <div className="text-center text-muted">No fire ban information available.</div>
-                  }
 
                   return (
                     <div>
                       {/* Overall Status */}
                       <div className="text-center mb-2">
-                        <div className="fireban-status-badge">{fireBanStatus.message.toUpperCase()}</div>
+                        <div className="fireban-status-badge" style={{ background: fireBanStatus.color }}>{fireBanStatus.message.toUpperCase()}</div>
                       </div>
                       <div className="text-center mb-4 small text-muted">
                         {(() => {
                           const asOf = fireBanStatus.data?.cachedAt || fireBanStatus.data?.summary?.lastUpdated
                           const label = formatAsOf(asOf)
-                          return label ? `As of ${label}` : ''
+                          return label ? `As of ${label}` : 'Live status unavailable — standing rules below still apply.'
                         })()}
                       </div>
 
                       {/* Fire Ban Details */}
-                      {fireBanStatus.data.hasActiveBan && fireBanStatus.alert && (
+                      {fireBanStatus.data?.hasActiveBan && fireBanStatus.alert && (
                         <div className="mb-4">
                           <div className="d-flex align-items-center mb-3">
                             <h6 className="mb-0 text-danger fw-bold">Local Fire Ban</h6>
@@ -626,7 +630,7 @@ export default function LakeInfo() {
                       )}
 
                       {/* AI Summary */}
-                      {fireBanStatus.data.aiAnalysis?.summary && (
+                      {fireBanStatus.data?.aiAnalysis?.summary && (
                         <div className="mb-4">
                           <div className="fireban-summary-card">
                             <div className="p-3">
@@ -637,7 +641,50 @@ export default function LakeInfo() {
                         </div>
                       )}
 
-                      
+                      {/* Standing rules: apply even when no ban is active */}
+                      <div className="mb-4">
+                        <h6 className="fw-bold mb-2">Open-Air Burning Rules (always in effect)</h6>
+                        <p className="small text-muted mb-2">
+                          Under the Haliburton County-wide Open Air Burning By-Law (2024), these rules apply
+                          across Dysart et al even when no fire ban has been declared:
+                        </p>
+                        <ul className="mb-2" style={{ lineHeight: 1.7 }}>
+                          <li><strong>No daytime burning during fire season</strong> (April 1 – October 31). Open-air fires are permitted only between <strong>7:00 p.m. and 7:00 a.m.</strong></li>
+                          <li>Fires must be attended at all times, with a means of extinguishing on hand.</li>
+                          <li>Campfires for cooking and warmth must be small (contained, well clear of anything combustible).</li>
+                          <li>Fireworks and any open flame are prohibited entirely during a total fire ban.</li>
+                        </ul>
+                        <p className="small text-muted mb-0">
+                          Always check the current status before you burn — conditions and restrictions can change the same day.
+                        </p>
+                      </div>
+
+                      {/* Learn more */}
+                      <div className="mb-2">
+                        <h6 className="fw-bold mb-2">Learn More</h6>
+                        <ul className="list-unstyled mb-0" style={{ lineHeight: 2 }}>
+                          <li>
+                            <a href="https://www.dysartetal.ca/living-in-our-community/fire-and-emergency-services/" target="_blank" rel="noopener noreferrer">
+                              Dysart et al Fire &amp; Emergency Services (official fire ban status) →
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://www.dysartetal.ca/media/gqdjapkg/by-law-2024-26-open-air-burning-bylaw.pdf" target="_blank" rel="noopener noreferrer">
+                              Open Air Burning By-Law 2024-26 (full text, PDF) →
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://www.ontario.ca/page/outdoor-fire-restrictions" target="_blank" rel="noopener noreferrer">
+                              Ontario outdoor fire restrictions (provincial) →
+                            </a>
+                          </li>
+                          <li>
+                            <Link href="/news/fire-ban-fireworks" onClick={() => setShowFireBanModal(false)}>
+                              RLCA: Fire Ban &amp; Fireworks — what it means for cottagers →
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   )
                 })()}
@@ -648,13 +695,13 @@ export default function LakeInfo() {
                     const fireBanStatus = getFireBanStatus()
                     return (
                       <>
-                        <a 
-                            href={'https://www.dysartetal.ca/en/index.aspx'} 
-                            target="_blank" 
+                        <a
+                            href={'https://www.dysartetal.ca/living-in-our-community/fire-and-emergency-services/'}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-outline-danger"
                           >
-                            Source: Dysart et al →
+                            Source: Dysart et al Fire Services →
                           </a>
                         <button 
                           type="button" 

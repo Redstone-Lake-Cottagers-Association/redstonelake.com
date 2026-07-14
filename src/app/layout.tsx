@@ -8,7 +8,7 @@ import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Redstone Lake Cottagers Association',
+  title: 'Redstone Area Lakes Association',
   description: 'Protecting our lakes today and for future generations – Bitter, Burdock, Coleman, Little Redstone, Long (Tedious), Pelaw and Redstone Lakes.',
 }
 

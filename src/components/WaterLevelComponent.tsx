@@ -413,7 +413,14 @@ const WaterLevelComponent = () => {
                           textAnchor="end"
                           height={80}
                         />
-                        <YAxis 
+                        <YAxis
+                          domain={[
+                            (dataMin: number) => Math.floor((dataMin - 0.1) * 10) / 10,
+                            (dataMax: number) => Math.ceil((dataMax + 0.1) * 10) / 10,
+                          ]}
+                          tickFormatter={(value: number) => value.toFixed(1)}
+                          tick={{ fontSize: 12 }}
+                          tickCount={7}
                           label={{ value: waterData?.yAxisLabel || 'Water Level (m)', angle: -90, position: 'insideLeft' }}
                         />
                         <Tooltip 

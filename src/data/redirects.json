@@ -1,0 +1,337 @@
+[
+  {
+    "source": "/concert-on-the-lake",
+    "destination": "/news/concert-on-the-lake",
+    "permanent": true
+  },
+  {
+    "source": "/the-redstone-sandbar-and-blueberry-island",
+    "destination": "/news/the-redstone-sandbar-and-blueberry-island",
+    "permanent": true
+  },
+  {
+    "source": "/off-season-storage-of-docks-on-public-land",
+    "destination": "/news/off-season-storage-of-docks-on-public-land",
+    "permanent": true
+  },
+  {
+    "source": "/2025-foca-agm-spring-seminar",
+    "destination": "/news/2025-foca-agm-spring-seminar",
+    "permanent": true
+  },
+  {
+    "source": "/shoreline-naturalization-with-abbey-gardens",
+    "destination": "/news/shoreline-naturalization-with-abbey-gardens",
+    "permanent": true
+  },
+  {
+    "source": "/2024-photo-contest",
+    "destination": "/news/2024-photo-contest",
+    "permanent": true
+  },
+  {
+    "source": "/what-do-warmer-temperatures-mean-for-the-health-of-our-lakes",
+    "destination": "/news/warmer-temperatures-lake-health",
+    "permanent": true
+  },
+  {
+    "source": "/news/what-do-warmer-temperatures-mean-for-the-health-of-our-lakes",
+    "destination": "/news/warmer-temperatures-lake-health",
+    "permanent": true
+  },
+  {
+    "source": "/clean-drain-and-dry-your-boat",
+    "destination": "/news/clean-drain-and-dry-your-boat",
+    "permanent": true
+  },
+  {
+    "source": "/exciting-programs-and-events-planned-at-kennisis-lake-marina-this-summer",
+    "destination": "/news/kennisis-lake-marina-programs",
+    "permanent": true
+  },
+  {
+    "source": "/news/exciting-programs-and-events-planned-at-kennisis-lake-marina-this-summer",
+    "destination": "/news/kennisis-lake-marina-programs",
+    "permanent": true
+  },
+  {
+    "source": "/fire-ban-fireworks",
+    "destination": "/news/fire-ban-fireworks",
+    "permanent": true
+  },
+  {
+    "source": "/2023-annual-general-meeting",
+    "destination": "/news/2023-annual-general-meeting",
+    "permanent": true
+  },
+  {
+    "source": "/propane-group-buy-klcoa-rlca-video-conference",
+    "destination": "/news/propane-group-buy-klcoa-rlca-video-conference",
+    "permanent": true
+  },
+  {
+    "source": "/shoreline-restoration",
+    "destination": "/news/shoreline-restoration",
+    "permanent": true
+  },
+  {
+    "source": "/its-time-to-start-thinking-about-planting",
+    "destination": "/news/its-time-to-start-thinking-about-planting",
+    "permanent": true
+  },
+  {
+    "source": "/five-reasons-climate-change-is-bad-news-for-pond-hockey-fans",
+    "destination": "/news/climate-change-and-pond-hockey",
+    "permanent": true
+  },
+  {
+    "source": "/news/five-reasons-climate-change-is-bad-news-for-pond-hockey-fans",
+    "destination": "/news/climate-change-and-pond-hockey",
+    "permanent": true
+  },
+  {
+    "source": "/rewilding-at-our-cottage",
+    "destination": "/news/rewilding-at-our-cottage",
+    "permanent": true
+  },
+  {
+    "source": "/sirch-community-services",
+    "destination": "/news/sirch-community-services",
+    "permanent": true
+  },
+  {
+    "source": "/two-cell-towers",
+    "destination": "/news/two-cell-towers",
+    "permanent": true
+  },
+  {
+    "source": "/dont-miss-sir-sams-annual-open-house-fall-festival",
+    "destination": "/news/sir-sams-fall-festival",
+    "permanent": true
+  },
+  {
+    "source": "/news/dont-miss-sir-sams-annual-open-house-fall-festival",
+    "destination": "/news/sir-sams-fall-festival",
+    "permanent": true
+  },
+  {
+    "source": "/shoreline-by-law-approval",
+    "destination": "/news/shoreline-by-law-approval",
+    "permanent": true
+  },
+  {
+    "source": "/vote-for-your-future-municipal-elections",
+    "destination": "/news/vote-for-your-future-municipal-elections",
+    "permanent": true
+  },
+  {
+    "source": "/want-to-restore-your-shoreline-but-dont-know-where-to-start",
+    "destination": "/news/shoreline-restoration-getting-started",
+    "permanent": true
+  },
+  {
+    "source": "/news/want-to-restore-your-shoreline-but-dont-know-where-to-start",
+    "destination": "/news/shoreline-restoration-getting-started",
+    "permanent": true
+  },
+  {
+    "source": "/do-you-know-algae",
+    "destination": "/news/do-you-know-algae",
+    "permanent": true
+  },
+  {
+    "source": "/pretty-going-up-toxic-coming-down",
+    "destination": "/news/pretty-going-up-toxic-coming-down",
+    "permanent": true
+  },
+  {
+    "source": "/klcoa-rlca-propane-buying-group",
+    "destination": "/news/klcoa-rlca-propane-buying-group",
+    "permanent": true
+  },
+  {
+    "source": "/are-lakes-natures-bathtub",
+    "destination": "/news/are-lakes-natures-bathtub",
+    "permanent": true
+  },
+  {
+    "source": "/no-mow-may-or-do-nothing-to-help-the-bees",
+    "destination": "/news/no-mow-may-or-do-nothing-to-help-the-bees",
+    "permanent": true
+  },
+  {
+    "source": "/what-is-that-slime",
+    "destination": "/news/what-is-that-slime",
+    "permanent": true
+  },
+  {
+    "source": "/is-your-boat-ready",
+    "destination": "/news/is-your-boat-ready",
+    "permanent": true
+  },
+  {
+    "source": "/haliburton-county-take-daily-for-a-better-life",
+    "destination": "/news/haliburton-county-take-daily",
+    "permanent": true
+  },
+  {
+    "source": "/news/haliburton-county-take-daily-for-a-better-life",
+    "destination": "/news/haliburton-county-take-daily",
+    "permanent": true
+  },
+  {
+    "source": "/get-those-geese-off-your-lawn",
+    "destination": "/news/get-those-geese-off-your-lawn",
+    "permanent": true
+  },
+  {
+    "source": "/rlca-celebrating-60-years-anniversay",
+    "destination": "/news/rlca-60th-anniversary",
+    "permanent": true
+  },
+  {
+    "source": "/news/rlca-celebrating-60-years-anniversay",
+    "destination": "/news/rlca-60th-anniversary",
+    "permanent": true
+  },
+  {
+    "source": "/fishing-around-the-lake",
+    "destination": "/news/fishing-around-the-lake",
+    "permanent": true
+  },
+  {
+    "source": "/nature-watch-club",
+    "destination": "/news/nature-watch-club",
+    "permanent": true
+  },
+  {
+    "source": "/photo-contest-2",
+    "destination": "/news/2021-photo-contest",
+    "permanent": true
+  },
+  {
+    "source": "/news/photo-contest-2",
+    "destination": "/news/2021-photo-contest",
+    "permanent": true
+  },
+  {
+    "source": "/in-case-you-missed-them",
+    "destination": "/news/in-case-you-missed-them",
+    "permanent": true
+  },
+  {
+    "source": "/dont-spread-invasive-species",
+    "destination": "/news/dont-spread-invasive-species",
+    "permanent": true
+  },
+  {
+    "source": "/watch-your-wake-to-protect-our-shorelines",
+    "destination": "/news/watch-your-wake-to-protect-our-shorelines",
+    "permanent": true
+  },
+  {
+    "source": "/concert-at-the-lake",
+    "destination": "/news/concert-at-the-lake",
+    "permanent": true
+  },
+  {
+    "source": "/healthy-shoreline-contest",
+    "destination": "/news/healthy-shoreline-contest",
+    "permanent": true
+  },
+  {
+    "source": "/news/news",
+    "destination": "/news/safe-boating-awareness-week",
+    "permanent": true
+  },
+  {
+    "source": "/private-hazard-buoy-initiative",
+    "destination": "/news/private-hazard-buoy-initiative",
+    "permanent": true
+  },
+  {
+    "source": "/ladies-of-the-lake",
+    "destination": "/news/ladies-of-the-lake",
+    "permanent": true
+  },
+  {
+    "source": "/about-rlca",
+    "destination": "/about",
+    "permanent": true
+  },
+  {
+    "source": "/about-rlca/governing-docs",
+    "destination": "/governance",
+    "permanent": true
+  },
+  {
+    "source": "/about-rlca/board-members",
+    "destination": "/board-members",
+    "permanent": true
+  },
+  {
+    "source": "/about-rlca/volunteers",
+    "destination": "/volunteers",
+    "permanent": true
+  },
+  {
+    "source": "/annual-general-meeting",
+    "destination": "/agm",
+    "permanent": true
+  },
+  {
+    "source": "/contact-us",
+    "destination": "/contact",
+    "permanent": true
+  },
+  {
+    "source": "/media-galleries",
+    "destination": "/galleries",
+    "permanent": true
+  },
+  {
+    "source": "/septic-systems-information",
+    "destination": "/septic-systems",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/water-quality",
+    "destination": "/water-quality-program",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/new-cottager-guide",
+    "destination": "/new-cottager-guide",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/community-connection",
+    "destination": "/community-connection",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/community-connection/municipal-by-laws",
+    "destination": "/municipal-bylaws",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/community-connection/rlca-contests",
+    "destination": "/contests",
+    "permanent": true
+  },
+  {
+    "source": "/make-a-difference/community-connection/nature-watch",
+    "destination": "/nature-watch",
+    "permanent": true
+  },
+  {
+    "source": "/2024-photo-contest",
+    "destination": "/news/2024-photo-contest",
+    "permanent": true
+  },
+  {
+    "source": "/category/news",
+    "destination": "/news",
+    "permanent": true
+  }
+]

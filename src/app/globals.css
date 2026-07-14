@@ -1,20 +1,22 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-blue: #0f172a;
-  --secondary-blue: #1e40af;
-  --lake-blue: #0284c7;
-  --forest-green: #059669;
-  --warm-orange: #f97316;
-  --accent-teal: #0d9488;
-  --cream: #fefce8;
-  --light-blue: #f0f9ff;
+  /* Lake-inspired palette: deep pine-slate, calm lake blues, muted natural accents */
+  --primary-blue: #102e40;
+  --secondary-blue: #14536b;
+  --lake-blue: #0369a1;
+  --forest-green: #2f7d5c;
+  --warm-orange: #c2703d;
+  --accent-teal: #0f766e;
+  --cream: #faf8f4;
+  --light-blue: #f2f7fa;
   --medium-gray: #64748b;
   --dark-gray: #334155;
   --white: #ffffff;
-  --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #0284c7 100%);
-  --gradient-hero: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 50%, rgba(15, 23, 42, 0.3) 100%);
+  --gradient-primary: linear-gradient(135deg, #102e40 0%, #14536b 55%, #0369a1 100%);
+  --gradient-secondary: linear-gradient(90deg, #0369a1 0%, #0f766e 100%);
+  --gradient-hero: linear-gradient(135deg, rgba(16, 46, 64, 0.6) 0%, rgba(16, 46, 64, 0.4) 50%, rgba(16, 46, 64, 0.3) 100%);
   --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   --shadow-soft: 0 1px 3px 0 rgba(15, 23, 42, 0.1), 0 1px 2px 0 rgba(15, 23, 42, 0.06);
   --shadow-medium: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
@@ -38,9 +40,10 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 600;
-  line-height: 1.3;
+  font-family: 'Manrope', 'Inter', sans-serif;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
   color: var(--primary-blue);
 }
 
@@ -58,36 +61,38 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
   z-index: 1050 !important;
   position: relative;
+  padding: 0.4rem 0;
 }
 
 .navbar-brand {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  font-size: 1.6rem;
+  font-family: 'Manrope', 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
   color: var(--primary-blue) !important;
   letter-spacing: -0.02em;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
+  margin-right: 1.5rem;
 }
 
 .navbar-brand:hover {
   color: var(--lake-blue) !important;
-  transform: scale(1.05);
 }
 
 .nav-link {
   font-weight: 500;
   color: var(--dark-gray) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 0.2s ease, background-color 0.2s ease;
   position: relative;
-  padding: 0.75rem 1rem !important;
-  border-radius: 8px;
-  margin: 0 0.25rem;
+  padding: 0.4rem 0.7rem !important;
+  border-radius: 6px;
+  margin: 0 0.15rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
   color: var(--primary-blue) !important;
-  background: rgba(2, 132, 199, 0.1) !important;
-  transform: translateY(-1px);
+  background: rgba(2, 132, 199, 0.08) !important;
 }
 
 .dropdown-menu {
@@ -102,16 +107,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .dropdown-item {
   color: var(--dark-gray) !important;
-  transition: all 0.3s ease !important;
-  border-radius: 8px !important;
-  margin: 0.25rem 0.5rem !important;
-  padding: 0.75rem 1rem !important;
+  transition: color 0.2s ease, background-color 0.2s ease !important;
+  border-radius: 6px !important;
+  margin: 0.1rem 0.4rem !important;
+  padding: 0.45rem 0.75rem !important;
+  width: auto !important;
 }
 
 .dropdown-item:hover {
-  background: rgba(2, 132, 199, 0.1) !important;
+  background: rgba(2, 132, 199, 0.08) !important;
   color: var(--primary-blue) !important;
-  transform: translateX(4px) !important;
 }
 
 /* Hero Section */
@@ -126,7 +131,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
   position: relative;
   overflow: hidden;
-  min-height: 85vh;
+  min-height: 64vh;
   display: flex;
   align-items: flex-start;
   padding-top: 3rem;
@@ -170,19 +175,19 @@ h1, h2, h3, h4, h5, h6 {
     0 2px 4px rgba(0, 0, 0, 0.8),
     0 4px 8px rgba(0, 0, 0, 0.6),
     0 8px 16px rgba(0, 0, 0, 0.4);
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   margin-top: 0;
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(2.4rem, 4.5vw, 3.5rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
 .hero-section .lead {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 400;
   opacity: 0.98;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   text-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.8),
     0 2px 4px rgba(0, 0, 0, 0.6),
@@ -194,7 +199,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Cards */
 .lake-card {
   border: none !important;
-  border-radius: 24px;
+  border-radius: 14px;
   box-shadow: var(--shadow-medium);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--gradient-card);
@@ -230,8 +235,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .lake-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-large);
   border-color: rgba(255, 255, 255, 1);
 }
 
@@ -240,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .lake-card .card-body {
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .lake-card .card-title {
@@ -252,12 +257,12 @@ h1, h2, h3, h4, h5, h6 {
 /* Buttons */
 .btn {
   font-weight: 600;
-  border-radius: 12px;
-  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: none;
-  letter-spacing: 0.025em;
-  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+  font-size: 0.95rem;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -270,10 +275,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-lake-primary {
-  background: linear-gradient(135deg, var(--warm-orange) 0%, #ef4444 100%) !important;
+  background: linear-gradient(135deg, var(--lake-blue) 0%, var(--secondary-blue) 100%) !important;
   color: #ffffff !important;
   border: none !important;
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(3, 105, 161, 0.3) !important;
   font-weight: 700 !important;
 }
 
@@ -295,16 +300,16 @@ h1, h2, h3, h4, h5, h6 {
 .btn-lake-primary:hover,
 .btn-lake-primary:focus,
 .btn-lake-primary:active {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%) !important;
   color: #ffffff !important;
-  transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 0 12px 40px rgba(239, 68, 68, 0.6) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 28px rgba(16, 46, 64, 0.35) !important;
 }
 
 .btn-lg.btn-lake-primary {
-  padding: 1.25rem 3rem;
-  font-size: 1.2rem;
-  border-radius: 16px;
+  padding: 0.8rem 1.9rem;
+  font-size: 1.05rem;
+  border-radius: 10px;
 }
 
 .btn-outline-light {
@@ -340,8 +345,8 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.25) !important;
   color: var(--white) !important;
   border-color: rgba(255, 255, 255, 1) !important;
-  transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15) !important;
 }
 
 .btn-outline-primary {
@@ -362,8 +367,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Weather Widget */
 .weather-widget {
   background: var(--gradient-card);
-  border-radius: 24px;
-  padding: 1.75rem;
+  border-radius: 14px;
+  padding: 1.5rem;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: none; /* drop default shadow */
@@ -763,8 +768,16 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Custom Spacing */
 .py-6 {
-  padding-top: 4rem !important;
-  padding-bottom: 4rem !important;
+  padding-top: 3.25rem !important;
+  padding-bottom: 3.25rem !important;
+}
+
+.display-4 {
+  font-size: clamp(2rem, 3.5vw, 2.6rem) !important;
+}
+
+.display-5 {
+  font-size: clamp(1.7rem, 3vw, 2.1rem) !important;
 }
 
 /* Text Gradient Fix */
@@ -840,3 +853,127 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Loading Animation disabled to prevent layout shift during hydration */
 .fade-in-up { animation: none !important; }
+
+/* News article content (imported from legacy site posts) */
+.article-content {
+  line-height: 1.7;
+}
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.article-content figure {
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+
+.article-content figcaption {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.article-content iframe,
+.article-content video {
+  max-width: 100%;
+}
+
+.article-content blockquote {
+  border-left: 4px solid #0ea5e9;
+  padding-left: 1rem;
+  color: #6b7280;
+  margin: 1.5rem 0;
+}
+
+.article-content table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.article-content table td,
+.article-content table th {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+}
+
+/* WordPress Gutenberg block compatibility for migrated legacy content */
+.article-content .wp-block-button__link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  background-color: #0284c7;
+  color: #fff !important;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.article-content .wp-block-button__link:hover {
+  opacity: 0.85;
+  color: #fff;
+}
+
+.article-content .wp-block-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.article-content .wp-block-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.article-content .wp-block-column {
+  flex: 1 1 0;
+  min-width: 250px;
+}
+
+.article-content .wp-block-spacer {
+  clear: both;
+}
+
+.article-content .wp-block-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+.article-content .wp-block-gallery .wp-block-image {
+  flex: 1 1 280px;
+  max-width: 400px;
+  margin: 0;
+}
+
+.article-content .wp-block-gallery img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  margin: 0;
+}
+
+.article-content .wp-block-embed iframe {
+  width: 100%;
+  min-height: 400px;
+  border: 0;
+}
+
+/* Newsletter archive rows */
+.newsletter-row {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.newsletter-row:hover {
+  border-color: var(--lake-blue) !important;
+  background-color: var(--light-blue) !important;
+}

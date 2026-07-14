@@ -1,0 +1,13 @@
+{
+  "year": 2026,
+  "sponsors": [
+    { "name": "Team Cottage Country — Shirley Rule & Samantha Miller, Chestnut Park Real Estate", "image": "/images/sponsors/team-cottage-country.png", "website": "https://haliburtoncottagecountry.com/" },
+    { "name": "Vince Duchene — Re/Max Professionals North", "image": "/images/sponsors/vince-duchene.png", "website": "https://www.vinceduchene.ca/" },
+    { "name": "Walsten Marine", "image": "/images/sponsors/walsten-marine.png", "website": "https://walstenmarine.com/" },
+    { "name": "Troy Austen Real Estate Team — Re/Max Professionals North", "image": "/images/sponsors/troy-austen.png", "website": "https://www.troyausten.ca/" },
+    { "name": "Amanda Tancredi — Troy Austen Real Estate Team", "image": "/images/sponsors/amanda-tancredi.jpg", "website": "https://www.troyausten.ca/" },
+    { "name": "Norm Barry Hot Tub & Cottage Maintenance", "image": "/images/sponsors/norm-barry.png", "website": "https://www.normbarry.ca/" },
+    { "name": "Paisley Partners | Navacord", "image": "/images/sponsors/paisley-partners.png", "website": "https://www.paisley-partners.com/" },
+    { "name": "K and R Self Storage", "image": "/images/sponsors/k-and-r-self-storage.png", "website": null }
+  ]
+}

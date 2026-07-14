@@ -5,6 +5,20 @@ import { useState } from 'react'
 import LakeInfo from '@/components/LakeInfo'
 import WaterLevelComponent from '@/components/WaterLevelComponent'
 import HeroMap from '@/components/HeroMap'
+import newsIndex from '@/data/news-index.json'
+import sponsorData from '@/data/sponsors.json'
+
+const sponsors = sponsorData.sponsors
+
+const latestPosts = newsIndex.slice(0, 6)
+const newsAccents = [
+  { icon: '\uD83D\uDCF0', bg: 'rgba(2, 132, 199, 0.15)', border: 'rgba(2, 132, 199, 0.3)' },
+  { icon: '\uD83C\uDF0A', bg: 'rgba(13, 148, 136, 0.15)', border: 'rgba(13, 148, 136, 0.3)' },
+  { icon: '\uD83C\uDF3F', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.3)' },
+  { icon: '\uD83C\uDFD5\uFE0F', bg: 'rgba(249, 115, 22, 0.15)', border: 'rgba(249, 115, 22, 0.3)' },
+  { icon: '\uD83D\uDEF6', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.3)' },
+  { icon: '\uD83D\uDC1F', bg: 'rgba(15, 23, 42, 0.15)', border: 'rgba(15, 23, 42, 0.3)' },
+]
 
 interface Event {
   id: number;
@@ -30,198 +44,29 @@ export default function Home() {
   const events: Event[] = [
     {
       id: 1,
-      title: "Spring Lake Cleanup",
-      date: "May 17, 2025",
-      day: "17",
-      month: "MAY",
+      title: "Concert on the Lake",
+      date: "July 4, 2026",
+      day: "04",
+      month: "JUL",
       type: "Community Event",
-      status: "upcoming",
-      icon: "🌊",
-      color: "#0ea5e9",
-      description: "Join our annual spring cleanup to maintain the pristine beauty of our lakes. Volunteers will help remove debris, check for invasive species, and prepare our lakes for the summer season.",
-      details: "Meet at the Redstone Lake boat launch at 9:00 AM. We'll provide all cleanup supplies, gloves, and refreshments. Bring sun protection and wear clothes you don't mind getting dirty. Event runs rain or shine until 2:00 PM."
+      status: "past",
+      icon: "🎸",
+      color: "#0369a1",
+      description: "Riff Raff performed classic 80s–90s pop rock from the dock of Brian & Kristina Davidson on Redstone Lake.",
+      details: "Held July 4, 2026 at 1:30 pm from the dock of Brian & Kristina Davidson on Redstone Lake, featuring Riff Raff with Rick Litwin, who cottages on Kelly Lake in the Haliburton Forest. Thank you to everyone who came out by boat and dock to enjoy the music."
     },
     {
       id: 2,
-      title: "Fishing Derby",
-      date: "June 21, 2025",
-      day: "21",
-      month: "JUN",
-      type: "Competition",
-      status: "upcoming",
-      icon: "🎣",
-      color: "#10b981",
-      description: "Annual fishing competition for all ages with prizes and community fun.",
-      details: "Registration starts at 6:00 AM at the community dock. Entry fee $10 for adults, $5 for children under 12. Prizes for biggest fish, most fish, and best junior angler. BBQ lunch included with registration. Weigh-in closes at 4:00 PM."
-    },
-    {
-      id: 3,
-      title: "RLCA Annual General Meeting",
-      date: "July 12, 2025",
-      day: "12",
-      month: "JUL",
-      type: "Annual Meeting",
-      status: "upcoming",
-      icon: "📅",
-      color: "#f59e0b",
-      description: "Review the year's activities and plan for the future of our lake community.",
-      details: "Held at the Haliburton Forest Center starting at 9:00 AM. Agenda includes financial reports, water quality updates, new member welcome, and planning for 2026 initiatives. Coffee and light refreshments provided. All members encouraged to attend."
-    },
-    {
-      id: 10,
-      title: "Summer Solstice Paddle",
-      date: "July 21, 2025",
-      day: "21",
-      month: "JUL",
-      type: "Recreation",
-      status: "upcoming",
-      icon: "🛶",
-      color: "#06b6d4",
-      description: "Evening paddle to celebrate the longest day of summer with fellow lake enthusiasts.",
-      details: "Meet at the main dock at 7:00 PM for a leisurely group paddle around Redstone Lake. We'll watch the sunset from the water and enjoy the peaceful summer evening. Bring your own canoe/kayak or arrange to borrow one. Hot chocolate and snacks provided afterward."
-    },
-    {
-      id: 11,
-      title: "Water Safety Workshop",
-      date: "July 28, 2025",
-      day: "28",
-      month: "JUL",
-      type: "Educational",
-      status: "upcoming",
-      icon: "🏊",
-      color: "#8b5cf6",
-      description: "Essential water safety skills for families and children around the lake.",
-      details: "Certified instructor will cover swimming safety, boating basics, and emergency procedures. Perfect for families with children or new cottagers. Includes hands-on practice with life jackets and basic rescue techniques. Registration required, limited to 20 participants."
-    },
-    {
-      id: 4,
-      title: "Shoreline Restoration Workshop",
-      date: "August 9, 2025",
-      day: "09",
-      month: "AUG",
-      type: "Educational",
-      status: "upcoming",
-      icon: "🌿",
-      color: "#8b5cf6",
-      description: "Learn about native plants and techniques for natural shoreline protection.",
-      details: "Expert-led workshop covering native plant selection, erosion control, and naturalization techniques. Includes hands-on planting demonstration and take-home native plant starter kit. Limited to 25 participants, advance registration required."
-    },
-    {
-      id: 12,
-      title: "Loon Watch Evening",
-      date: "August 15, 2025",
-      day: "15",
-      month: "AUG",
-      type: "Wildlife",
-      status: "upcoming",
-      icon: "🦆",
-      color: "#059669",
-      description: "Guided evening to observe and learn about the common loons on our lakes.",
-      details: "Join our wildlife expert for an evening of loon watching and education. Learn about loon behavior, calls, and conservation efforts. Bring binoculars if you have them (extras provided). Meet at the north shore observation point at 7:30 PM. Weather dependent event."
-    },
-    {
-      id: 13,
-      title: "Kids' Nature Scavenger Hunt",
-      date: "August 22, 2025",
-      day: "22",
-      month: "AUG",
-      type: "Family Event",
-      status: "upcoming",
-      icon: "🔍",
-      color: "#dc2626",
-      description: "Fun nature exploration activity for children and families around the lake area.",
-      details: "Interactive scavenger hunt designed for kids ages 5-12 with their families. Explore the shoreline and forest while learning about local plants, animals, and ecosystems. Prizes for all participants and healthy snacks provided. Meet at the community pavilion at 10:00 AM."
-    },
-    {
-      id: 5,
-      title: "Fall Community BBQ",
-      date: "September 14, 2025",
-      day: "14",
-      month: "SEP",
-      type: "Social Event",
-      status: "upcoming",
-      icon: "🍂",
-      color: "#ef4444",
-      description: "End-of-season celebration with food, fellowship, and lake community spirit.",
-      details: "Potluck-style BBQ at the community beach. RLCA provides burgers, hot dogs, and beverages. Please bring a side dish to share. Games and activities for all ages. Sunset canoe paddle for interested participants."
-    },
-    {
-      id: 14,
-      title: "Fall Photography Contest",
-      date: "September 7, 2025",
-      day: "07",
-      month: "SEP",
-      type: "Competition",
-      status: "upcoming",
-      icon: "📸",
-      color: "#7c3aed",
-      description: "Capture the beauty of autumn around our lakes in this friendly photography competition.",
-      details: "Submit your best fall photos of the lake area taken during September. Categories include landscape, wildlife, and people enjoying the lake. Entry fee $5, with prizes for each category. Deadline for submissions is September 30th. Voting by community members."
-    },
-    {
-      id: 15,
-      title: "Dock Removal Workshop",
-      date: "September 28, 2025",
-      day: "28",
-      month: "SEP",
-      type: "Maintenance",
-      status: "upcoming",
-      icon: "🔧",
-      color: "#0891b2",
-      description: "Learn proper techniques for seasonal dock removal and winter storage.",
-      details: "Hands-on workshop covering safe dock removal, hardware maintenance, and proper winter storage techniques. Bring your dock hardware questions! Experienced cottagers will share tips and tricks. Tools and refreshments provided. Meet at the boat launch at 9:00 AM."
-    },
-    {
-      id: 6,
-      title: "FOCA AGM & Spring Seminar",
-      date: "March 1, 2025",
-      day: "01",
-      month: "MAR",
-      type: "External Event",
-      status: "past",
-      icon: "📊",
-      color: "#6b7280",
-      description: "Event summary with session overviews and presentation materials.",
-      details: "The Federation of Ontario Cottagers' Associations annual meeting covered lake health monitoring, policy updates, and best practices for cottage associations. Presentation materials and session recordings are available on the FOCA website."
-    },
-    {
-      id: 7,
-      title: "RLCA Annual General Meeting",
-      date: "July 12, 2024",
-      day: "12",
+      title: "2026 Annual General Meeting",
+      date: "July 11, 2026",
+      day: "11",
       month: "JUL",
       type: "Annual Meeting",
       status: "past",
       icon: "📅",
-      color: "#6b7280",
-      description: "Community members discussed lake stewardship and future planning.",
-      details: "Well-attended meeting with 45 members present. Key topics included water quality improvements, invasive species monitoring, and budget approval for 2025. Meeting minutes available to all members."
-    },
-    {
-      id: 8,
-      title: "Fishing Derby 2024",
-      date: "June 22, 2024",
-      day: "22",
-      month: "JUN",
-      type: "Competition",
-      status: "past",
-      icon: "🎣",
-      color: "#6b7280",
-      description: "Successful community fishing competition with great participation.",
-      details: "Record turnout with 78 participants! Winning fish: 4.2 lb bass caught by Sarah Chen. Junior winner: 2.1 lb pike by 8-year-old Marcus Thompson. Raised $850 for lake conservation efforts."
-    },
-    {
-      id: 9,
-      title: "Spring Lake Cleanup 2024",
-      date: "May 18, 2024",
-      day: "18",
-      month: "MAY",
-      type: "Community Event",
-      status: "past",
-      icon: "🌊",
-      color: "#6b7280",
-      description: "Volunteers helped maintain the pristine beauty of our lakes.",
-      details: "Amazing volunteer turnout with 52 community members participating. Collected 340 lbs of debris and identified 3 small areas of invasive plant growth for targeted removal. Thank you to all volunteers!"
+      color: "#14536b",
+      description: "Members approved the name change to Redstone Area Lakes Association, affirmed the board, and heard from guest speakers.",
+      details: "Highlights: the special resolution renaming the association to Redstone Area Lakes Association (RALA) passed; directors were affirmed for 2026–27; presentations from Tegan Legge (Haliburton Forest), Jess Kidd (environmental monitoring on our lakes) and keynote speaker Dani Lindamood (Water Watchers). See the News section for a full recap and the presentation downloads."
     }
   ]
 
@@ -370,7 +215,7 @@ export default function Home() {
               <div className="text-center mb-5">
                 <h2 className="display-5 mb-4">About the Redstone Lake Cottage Association</h2>
                 <p className="lead text-muted mb-4">
-                  For over 60 years, the RLCA has been the dedicated guardian of pristine lakes nestled in the heart of Haliburton's wilderness. Our volunteer-driven community is united by a shared commitment to preserving these natural treasures for current and future generations.
+                  For over 60 years, the association (founded as the Redstone Lake Cottagers Association, now the Redstone Area Lakes Association) has been the dedicated guardian of pristine lakes nestled in the heart of Haliburton's wilderness. Our volunteer-driven community is united by a shared commitment to preserving these natural treasures for current and future generations.
                 </p>
                 
               </div>
@@ -510,7 +355,7 @@ export default function Home() {
                     <p className="mb-3 text-muted">
                       Motors, boats, and Ontario's ecosystems can be ruined by zebra mussels and other aquatic invasive species. Take a few simple steps to preserve our lakes and fisheries: <strong>CLEAN</strong> off any plants or debris, <strong>DRAIN</strong> bilges and ballast water, and <strong>DRY</strong> any wet areas of your boat.
                     </p>
-                    <Link href="/clean-drain-dry" className="btn btn-outline-primary btn-sm">
+                    <Link href="/news/clean-drain-and-dry-your-boat" className="btn btn-outline-primary btn-sm">
                       Learn More About Prevention →
                     </Link>
                   </div>
@@ -534,7 +379,7 @@ export default function Home() {
                     <p className="mb-3 text-muted">
                       The wave action created by boats moving at high speeds can wash away shoreline soils, which can harm fish and their habitat. Protect our delicate shoreline ecosystem by maintaining appropriate speeds and distances from shore.
                     </p>
-                    <Link href="/shoreline-protection" className="btn btn-outline-primary btn-sm">
+                    <Link href="/healthy-shoreline" className="btn btn-outline-primary btn-sm">
                       Watch Protection Video →
                     </Link>
                   </div>
@@ -558,7 +403,7 @@ export default function Home() {
                     <p className="mb-3 text-muted">
                       A failing septic system is one of the biggest threats to lake water quality. Have your system inspected every 3 years and pumped every 3-5 years. Use phosphate-free detergents and avoid flushing harmful chemicals that can kill beneficial bacteria.
                     </p>
-                    <Link href="/septic-maintenance" className="btn btn-outline-primary btn-sm">
+                    <Link href="/septic-systems" className="btn btn-outline-primary btn-sm">
                       Septic Care Guide →
                     </Link>
                   </div>
@@ -606,7 +451,7 @@ export default function Home() {
                     <p className="mb-3 text-muted">
                       Use lead-free tackle to protect loons and other wildlife from poisoning. Follow catch limits and seasonal restrictions. Practice catch-and-release for breeding fish, and never transport live fish between water bodies to prevent species introduction.
                     </p>
-                    <Link href="/responsible-fishing" className="btn btn-outline-primary btn-sm">
+                    <Link href="/news/fishing-around-the-lake" className="btn btn-outline-primary btn-sm">
                       Fishing Guidelines →
                     </Link>
                   </div>
@@ -633,6 +478,17 @@ export default function Home() {
                           <h3 className="h4 mb-3 text-primary"> Community Events</h3>
                         </div>
               
+              {!events.some(e => new Date(e.date) >= new Date()) && (
+                <div className="card lake-card mb-4">
+                  <div className="card-body text-center py-4">
+                    <h5 className="mb-2">No upcoming community events on file</h5>
+                    <p className="text-muted mb-3">
+                      Hosting a lake event — a concert, cleanup, workshop or get-together? We&apos;d love to help spread the word.
+                    </p>
+                    <Link href="/contact" className="btn btn-outline-primary btn-sm">Contact us to get your event published</Link>
+                  </div>
+                </div>
+              )}
               {Object.entries(groupedEvents).map(([monthKey, monthEvents]) => {
                 const firstEvent = monthEvents[0]
                 const eventDate = new Date(firstEvent.date)
@@ -735,166 +591,63 @@ export default function Home() {
             <h3 className="h4 mb-3 text-primary">News & Articles</h3>
           </div>
           <div className="row g-4">
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(249, 115, 22, 0.15)',
-                      border: '2px solid rgba(249, 115, 22, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🦆</span>
+            {latestPosts.map((post, i) => (
+              <div key={post.slug} className="col-lg-6">
+                <article className="news-card h-100">
+                  <div className="d-flex align-items-start mb-3">
+                    <div className="me-3">
+                      <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
+                        width: '48px',
+                        height: '48px',
+                        backgroundColor: newsAccents[i % newsAccents.length].bg,
+                        border: `2px solid ${newsAccents[i % newsAccents.length].border}`
+                      }}>
+                        <span style={{fontSize: '1.4rem'}}>{newsAccents[i % newsAccents.length].icon}</span>
+                      </div>
+                    </div>
+                    <div className="flex-grow-1">
+                      <h5 className="mb-2">{post.title}</h5>
+                      <div className="d-flex align-items-center text-muted mb-3">
+                        <small>{new Date(post.date).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</small>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">Lead Fishing Tackle Endangers Common Loons</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>January 15, 2025</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">A small amount of lead will cause massive fatal lead poisoning in a loon. It's a terrible death for these legendary birds - and it is so easily avoidable. Learn about our tackle exchange program and get a FREE limited edition custom lure.</p>
-                <Link href="/news/lead-fishing-tackle-loons" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
-            
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(2, 132, 199, 0.15)',
-                      border: '2px solid rgba(2, 132, 199, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🌡️</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">Climate Impact on Lake Health</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>October 22, 2023</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">This July was the warmest on record and we expect to continue to see record-breaking weather in the near future. Understanding how warmer temperatures affect our lake ecosystem is crucial for preservation efforts.</p>
-                <Link href="/news/warmer-temperatures-lakes" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
+                  <p className="text-muted mb-3">{post.excerpt}</p>
+                  <Link href={`/news/${post.slug}`} className="fw-semibold">Read Full Article →</Link>
+                </article>
+              </div>
+            ))}
+          </div>
 
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(13, 148, 136, 0.15)',
-                      border: '2px solid rgba(13, 148, 136, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🚤</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">CLEAN, DRAIN and DRY Your Boat</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>August 28, 2023</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">Motors, boats, and Ontario's ecosystems can be ruined by zebra mussels and other aquatic invasive species. Learn the essential steps to protect our lakes and fisheries from invasive species.</p>
-                <Link href="/news/clean-drain-dry" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
-
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(15, 23, 42, 0.15)',
-                      border: '2px solid rgba(15, 23, 42, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🔥</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">Fire Safety & Fireworks Guidelines</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>June 12, 2023</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">This summer has been off to a smoky start. Smoke from wildfires in Quebec is causing hazy conditions while dry weather conditions expose us to our own wildfire risks. Stay safe and informed.</p>
-                <Link href="/news/fire-ban-fireworks" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
-
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(168, 85, 247, 0.15)',
-                      border: '2px solid rgba(168, 85, 247, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🧪</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">Understanding Phosphorus in Lake Ecosystems</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>September 15, 2023</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">Phosphorus is a key nutrient that affects lake health, but too much can lead to harmful algae blooms. Learn about the sources of phosphorus pollution and how cottagers can help maintain healthy phosphorus levels in our lakes.</p>
-                <Link href="/news/phosphorus-lake-ecosystems" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
-
-            <div className="col-lg-6">
-              <article className="news-card h-100">
-                <div className="d-flex align-items-start mb-3">
-                  <div className="me-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                      width: '48px', 
-                      height: '48px', 
-                      backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                      border: '2px solid rgba(34, 197, 94, 0.3)'
-                    }}>
-                      <span style={{fontSize: '1.4rem'}}>🌿</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h5 className="mb-2">Native Plants for Shoreline Restoration</h5>
-                    <div className="d-flex align-items-center text-muted mb-3">
-                      <small>May 20, 2023</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted mb-3">Discover which native plants are best for creating natural shoreline buffers that prevent erosion, filter runoff, and provide habitat for local wildlife. A comprehensive guide for cottagers looking to naturalize their waterfront.</p>
-                <Link href="/news/native-plants-shoreline" className="fw-semibold">Read Full Article →</Link>
-              </article>
-            </div>
+          <div className="text-center mt-4">
+            <Link href="/news" className="btn btn-outline-primary btn-lg">View All News & Articles</Link>
           </div>
         </div>
       </section>
 
+
+      {/* Sponsors strip */}
+      <section className="py-4" style={{ backgroundColor: '#ffffff', borderTop: '1px solid rgba(15,23,42,0.06)' }}>
+        <div className="container text-center">
+          <p className="text-muted small text-uppercase mb-3" style={{ letterSpacing: '0.08em' }}>
+            Thank you to our 2026 sponsors
+          </p>
+          <div className="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-2">
+            {sponsors.map(s => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={s.name} src={s.image} alt={s.name} title={s.name} style={{ height: '44px', width: 'auto', maxWidth: '140px', objectFit: 'contain' }} />
+            ))}
+          </div>
+          <Link href="/sponsors" className="small">Meet our sponsors →</Link>
+        </div>
+      </section>
 
       {/* Membership CTA */}
       <section className="py-5">
         <div className="container text-center">
           <h2 className="mb-4">Be part of something special. Become a Member Today!</h2>
           <Link href="/membership" className="btn btn-lake-primary btn-lg">
-            Join RLCA
+            Join RALA
           </Link>
         </div>
       </section>

@@ -1,0 +1,12 @@
+name = "rlca-data-refresh"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+# Every 15 minutes. Water/weather routes cache for 15 min, so this keeps them
+# permanently warm; the fire ban is force-refreshed on every run.
+[triggers]
+crons = ["*/15 * * * *"]
+
+[vars]
+# Point at wherever the Next.js app is reachable (Fly URL until DNS cutover).
+SITE_BASE_URL = "https://www.redstonelake.com"

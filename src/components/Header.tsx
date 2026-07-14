@@ -17,7 +17,7 @@ export default function Header() {
               </g>
           </svg>
             <span style={{ marginLeft: '0.5rem' }}>
-              <strong>Redstone Lake Cottagers Association</strong>
+              <strong>Redstone Area Lakes Association</strong>
             </span>
           </Link>
           
@@ -34,20 +34,79 @@ export default function Header() {
           
           <div className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`} id="navbarNav">
             <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link href="/#our-protected-lakes" className="nav-link">About RLCA</Link>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  About RALA
+                </a>
+                <ul className="dropdown-menu">
+                  <li><Link href="/about" className="dropdown-item">About the Association</Link></li>
+                  <li><Link href="/membership" className="dropdown-item">Membership</Link></li>
+                  <li><Link href="/board-members" className="dropdown-item">Board Members</Link></li>
+                  <li><Link href="/volunteers" className="dropdown-item">Volunteers</Link></li>
+                  <li><Link href="/governance" className="dropdown-item">Governing Documents</Link></li>
+                  <li><Link href="/agm" className="dropdown-item">Annual General Meeting</Link></li>
+                  <li><Link href="/newsletters" className="dropdown-item">Newsletters</Link></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li><Link href="/contact" className="dropdown-item">Contact Us</Link></li>
+                </ul>
               </li>
               <li className="nav-item">
                 <Link href="/#water-level-monitor" className="nav-link">Water Level & Quality</Link>
               </li>
               <li className="nav-item">
-                <Link href="/#events-news" className="nav-link">Events & News</Link>
+                <Link href="/#events-news" className="nav-link">Events</Link>
               </li>
               <li className="nav-item">
-                <Link href="/#essential-lake-protection" className="nav-link">How to Protect Your Lake</Link>
+                <Link href="/news" className="nav-link">News</Link>
               </li>
-              <li className="nav-item">
-                <Link href="/contact" className="nav-link">Contact Us</Link>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Community
+                </a>
+                <ul className="dropdown-menu">
+                  <li><Link href="/community-connection" className="dropdown-item">Community Connection</Link></li>
+                  <li><Link href="/galleries" className="dropdown-item">Photo Galleries</Link></li>
+                  <li><Link href="/photo-contest" className="dropdown-item">Photo Contest</Link></li>
+                  <li><Link href="/contests" className="dropdown-item">Contests</Link></li>
+                  <li><Link href="/sponsors" className="dropdown-item">Our Sponsors</Link></li>
+                  <li><Link href="/business-directory" className="dropdown-item">Business Directory</Link></li>
+                  <li><Link href="/municipal-bylaws" className="dropdown-item">Municipal By-Laws</Link></li>
+                  <li><Link href="/initiatives" className="dropdown-item">Initiatives</Link></li>
+                  <li><Link href="/nature-watch" className="dropdown-item">Nature Watch</Link></li>
+                  <li><Link href="/private-buoys" className="dropdown-item">Private Hazard Buoys</Link></li>
+                </ul>
+              </li>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Lake Protection
+                </a>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li><Link href="/#essential-lake-protection" className="dropdown-item">How to Protect Your Lake</Link></li>
+                  <li><Link href="/make-a-difference" className="dropdown-item">Make a Difference</Link></li>
+                  <li><Link href="/water-quality-program" className="dropdown-item">Water Quality Program</Link></li>
+                  <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>
+                  <li><Link href="/septic-systems" className="dropdown-item">Septic Systems</Link></li>
+                  <li><Link href="/get-the-lead-out" className="dropdown-item">Get the Lead Out</Link></li>
+                  <li><Link href="/new-cottager-guide" className="dropdown-item">New Cottager Guide</Link></li>
+                </ul>
               </li>
             </ul>
           </div>
