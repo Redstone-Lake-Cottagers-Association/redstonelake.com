@@ -7,6 +7,15 @@ interface Props {
   params: { slug: string }
 }
 
+
+// Articles reached from the homepage "Essential Lake Protection" section
+const LAKE_PROTECTION_SLUGS = new Set([
+  'clean-drain-and-dry-your-boat',
+  'watch-your-wake-to-protect-our-shorelines',
+  'fishing-around-the-lake',
+  'shoreline-naturalization-with-abbey-gardens',
+])
+
 export function generateStaticParams() {
   return posts.map(post => ({ slug: post.slug }))
 }
@@ -32,11 +41,15 @@ export default function NewsArticle({ params }: Props) {
   const post = posts.find(p => p.slug === params.slug)
   if (!post) notFound()
 
+  const isProtection = LAKE_PROTECTION_SLUGS.has(params.slug)
+  const backHref = isProtection ? '/#essential-lake-protection' : '/news'
+  const backLabel = isProtection ? '← Back to Lake Protection' : '← Back to News'
+
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-lg-9">
-          <Link href="/news" className="d-inline-block mb-4">← Back to News</Link>
+          <Link href={backHref} className="d-inline-block mb-4">{backLabel}</Link>
 
           <article>
             <h1 className="display-5 mb-2" dangerouslySetInnerHTML={{ __html: post.title }} />
@@ -61,7 +74,7 @@ export default function NewsArticle({ params }: Props) {
 
           <hr className="my-5" />
           <div className="text-center">
-            <Link href="/news" className="btn btn-outline-primary">← Back to News</Link>
+            <Link href={backHref} className="btn btn-outline-primary">{backLabel}</Link>
           </div>
         </div>
       </div>

@@ -462,19 +462,13 @@ export default function Home() {
           {/* Compact Events Section */}
           <div className="row mb-5">
             <div className="col-12">
-                                      <div className="text-center mb-4">
-                          <h3 className="h4 mb-3 text-primary"> Community Events</h3>
-                        </div>
               
               {!events.some(e => new Date(e.date) >= new Date()) && (
-                <div className="card lake-card mb-4">
-                  <div className="card-body text-center py-4">
-                    <h5 className="mb-2">No upcoming community events on file</h5>
-                    <p className="text-muted mb-3">
-                      Hosting a lake event — a concert, cleanup, workshop or get-together? We&apos;d love to help spread the word.
-                    </p>
-                    <Link href="/contact" className="btn btn-outline-primary btn-sm">Contact us to get your event published</Link>
-                  </div>
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 rounded border bg-white px-3 py-2 mb-4">
+                  <span className="text-muted small">
+                    No upcoming events on file — hosting a concert, cleanup or get-together? We&apos;d love to spread the word.
+                  </span>
+                  <Link href="/contact" className="btn btn-outline-primary btn-sm flex-shrink-0">Submit an event</Link>
                 </div>
               )}
               {Object.entries(groupedEvents).map(([monthKey, monthEvents]) => {
@@ -500,19 +494,27 @@ export default function Home() {
                     <div className="row g-2 mb-4">
                       {monthEvents.map(event => {
                         const eventDate = new Date(event.date)
-                        const isEventInPreviousMonth = eventDate.getFullYear() < currentYear || 
-                                                      (eventDate.getFullYear() === currentYear && eventDate.getMonth() < currentMonth)
-                        
+                        const isPastEvent = eventDate < new Date()
+                        const isEventInPreviousMonth = isPastEvent
+
                         return (
                           <div key={event.id} className="col-lg-3 col-md-4 col-sm-6">
                             <div 
-                              className={`card border-0 shadow-sm h-100 cursor-pointer hover-lift ${isEventInPreviousMonth ? 'opacity-75' : ''}`}
+                              className={`card border-0 shadow-sm h-100 cursor-pointer hover-lift position-relative ${isPastEvent ? 'opacity-75' : ''}`}
                               style={{
-                                borderLeft: `4px solid ${isEventInPreviousMonth ? '#6b7280' : event.color}`, 
+                                borderLeft: `4px solid ${isPastEvent ? '#6b7280' : event.color}`, 
                                 cursor: 'pointer'
                               }}
                               onClick={() => openEventModal(event)}
                             >
+                              {isPastEvent && (
+                                <span
+                                  className="badge position-absolute"
+                                  style={{ top: '8px', right: '8px', backgroundColor: '#6b7280', fontSize: '0.65rem', letterSpacing: '0.04em' }}
+                                >
+                                  PAST EVENT
+                                </span>
+                              )}
                               <div className="card-body p-3">
                                 <div className="d-flex align-items-center mb-2">
                                   <div className="me-2 text-center" style={{minWidth: '35px'}}>
