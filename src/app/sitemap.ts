@@ -32,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/water-quality-program', priority: 0.5, changeFrequency: 'yearly' },
     { path: '/photo-contest', priority: 0.4, changeFrequency: 'yearly' },
     { path: '/volunteers', priority: 0.5, changeFrequency: 'yearly' },
+    { path: '/contribute', priority: 0.4, changeFrequency: 'yearly' },
     { path: '/privacy-policy', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
   ]
