@@ -86,7 +86,6 @@ export default function Header() {
                 <ul className="dropdown-menu">
                   <li><Link href="/community-connection" className="dropdown-item">Community Connection</Link></li>
                   <li><Link href="/galleries" className="dropdown-item">Photo Galleries</Link></li>
-                  <li><Link href="/photo-contest" className="dropdown-item">Photo Contest</Link></li>
                   <li><Link href="/contests" className="dropdown-item">Contests</Link></li>
                   <li><Link href="/business-directory" className="dropdown-item">Sponsors &amp; Directory</Link></li>
                   <li><Link href="/municipal-bylaws" className="dropdown-item">Municipal By-Laws</Link></li>

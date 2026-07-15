@@ -6,19 +6,12 @@ import LakeInfo from '@/components/LakeInfo'
 import WaterLevelComponent from '@/components/WaterLevelComponent'
 import HeroMap from '@/components/HeroMap'
 import newsIndex from '@/data/news-index.json'
+import NewsCard from '@/components/NewsCard'
 import sponsorData from '@/data/sponsors.json'
 
 const sponsors = sponsorData.sponsors
 
 const latestPosts = newsIndex.slice(0, 6)
-const newsAccents = [
-  { icon: '\uD83D\uDCF0', bg: 'rgba(2, 132, 199, 0.15)', border: 'rgba(2, 132, 199, 0.3)' },
-  { icon: '\uD83C\uDF0A', bg: 'rgba(13, 148, 136, 0.15)', border: 'rgba(13, 148, 136, 0.3)' },
-  { icon: '\uD83C\uDF3F', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.3)' },
-  { icon: '\uD83C\uDFD5\uFE0F', bg: 'rgba(249, 115, 22, 0.15)', border: 'rgba(249, 115, 22, 0.3)' },
-  { icon: '\uD83D\uDEF6', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.3)' },
-  { icon: '\uD83D\uDC1F', bg: 'rgba(15, 23, 42, 0.15)', border: 'rgba(15, 23, 42, 0.3)' },
-]
 
 interface Event {
   id: number;
@@ -596,30 +589,9 @@ export default function Home() {
             <h3 className="h4 mb-3 text-primary">News & Articles</h3>
           </div>
           <div className="row g-4">
-            {latestPosts.map((post, i) => (
-              <div key={post.slug} className="col-lg-6">
-                <article className="news-card h-100">
-                  <div className="d-flex align-items-start mb-3">
-                    <div className="me-3">
-                      <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
-                        width: '48px',
-                        height: '48px',
-                        backgroundColor: newsAccents[i % newsAccents.length].bg,
-                        border: `2px solid ${newsAccents[i % newsAccents.length].border}`
-                      }}>
-                        <span style={{fontSize: '1.4rem'}}>{newsAccents[i % newsAccents.length].icon}</span>
-                      </div>
-                    </div>
-                    <div className="flex-grow-1">
-                      <h5 className="mb-2">{post.title}</h5>
-                      <div className="d-flex align-items-center text-muted mb-3">
-                        <small>{new Date(post.date).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</small>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-muted mb-3">{post.excerpt}</p>
-                  <Link href={`/news/${post.slug}`} className="fw-semibold">Read Full Article →</Link>
-                </article>
+            {latestPosts.map(post => (
+              <div key={post.slug} className="col-md-6 col-lg-4 d-flex">
+                <NewsCard post={post} />
               </div>
             ))}
           </div>
