@@ -47,7 +47,7 @@ async function analyzeWithClaude(
 ): Promise<DysartFireBanResponse['aiAnalysis'] | undefined> {
   try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    const model = process.env.ANTHROPIC_MODEL || 'claude-3-7-sonnet-20250219';
+    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
     if (!apiKey) {
       if (debug) debugMessages.push('AI disabled: ANTHROPIC_API_KEY not set');
       return undefined;
@@ -67,7 +67,7 @@ async function analyzeWithClaude(
       body: JSON.stringify({
         model,
         max_tokens: 400,
-        temperature: 0,
+        thinking: { type: 'disabled' },
         system,
         messages: [
           { role: 'user', content: [ { type: 'text', text: userPrompt } ] }
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     const results: DysartFireBanResponse = {
       source: 'Dysart et al',
-      sourceUrl: 'https://www.dysartetal.ca//modules/NewsModule/services/getalertbannerfeeds.ashx',
+      sourceUrl: 'https://www.dysartetal.ca/',
       alerts: [],
       hasActiveBan: false,
       summary: {
@@ -226,36 +226,73 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    // Fetch fire ban data from Dysart et al (official municipal source)
+    // Fetch alerts from the Municipality of Dysart et al homepage. Their 2026
+    // site redesign removed the old JSON alert feed (getalertbannerfeeds.ashx),
+    // so we extract the Umbraco alert banners and alert modals from the HTML.
+    const stripTags = (s: string) =>
+      s.replace(/<[^>]+>/g, ' ')
+        .replace(/&amp;/g, '&').replace(/&#8217;|&rsquo;/g, '’').replace(/&#8211;|&ndash;/g, '–')
+        .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ').trim();
+    const severityToColor = (sev: string) =>
+      /danger|error|red/i.test(sev) ? 'Red' : /warning/i.test(sev) ? 'Orange' : 'Blue';
+
     try {
       const municipalResponse = await fetchWithTimeout(
         results.sourceUrl,
         {
           headers: {
-            'Accept': 'application/json',
+            'Accept': 'text/html',
             'User-Agent': 'Redstone Lake Website'
           }
         },
         10000
       );
 
-      if (municipalResponse.ok) {
-        const municipalData: FireBanAlert[] = await municipalResponse.json();
-        results.alerts = Array.isArray(municipalData) ? municipalData : [];
-        if (debug) {
-          console.log('[fire-ban] dysart alerts count:', results.alerts.length);
-          results.debugInfo = results.debugInfo || {};
-          results.debugInfo.requestUrl = results.sourceUrl;
-        }
+      if (!municipalResponse.ok) {
+        throw new Error(`Dysart homepage responded with status ${municipalResponse.status}`);
+      }
 
-        // AI analysis (required)
+      const html = await municipalResponse.text();
+      const alerts: FireBanAlert[] = [];
+
+      // Alert banners: <div id="alert-banner-N" class="umb--alert umb--alert--{severity}"> …
+      const bannerRe = /id="alert-banner-\d+"\s+class="umb--alert umb--alert--(\w+)"[\s\S]*?umb--alert__title"[^>]*>([\s\S]*?)<\/div>[\s\S]*?umb--alert__summary"[^>]*>([\s\S]*?)<\/div>/g;
+      for (const m of html.matchAll(bannerRe)) {
+        alerts.push({ title: stripTags(m[2]), description: stripTags(m[3]), color: severityToColor(m[1]) });
+      }
+
+      // Alert modals: <div id="alert-modal-N" class="bx--modal umb--alert umb--alert--{severity} …
+      const modalRe = /id="alert-modal-\d+"\s+class="bx--modal umb--alert umb--alert--(\w+)[\s\S]*?bx--modal-header__heading[^>]*>([\s\S]*?)<\/p>[\s\S]*?bx--modal-content">([\s\S]*?)<\/div>/g;
+      for (const m of html.matchAll(modalRe)) {
+        alerts.push({ title: stripTags(m[2]), description: stripTags(m[3]), color: severityToColor(m[1]) });
+      }
+
+      results.alerts = alerts;
+      if (debug) {
+        console.log('[fire-ban] dysart alerts count:', results.alerts.length);
+        results.debugInfo = results.debugInfo || {};
+        results.debugInfo.requestUrl = results.sourceUrl;
+      }
+
+      if (alerts.length === 0) {
+        // Municipality has no alerts posted at all: confidently no ban, no AI needed
+        results.hasActiveBan = false;
+        results.summary.status = 'none';
+        results.aiAnalysis = {
+          hasFireBan: false,
+          banType: 'none',
+          summary: 'No alerts are currently posted by the Municipality of Dysart et al.',
+          confidence: 1
+        };
+      } else {
+        // AI analysis (required to interpret alerts)
         const ai = await analyzeWithClaude(results.alerts, results.sourceUrl, debug, aiDebugMessages);
         if (ai) {
           results.aiAnalysis = ai;
           if (typeof ai.hasFireBan === 'boolean') {
             results.hasActiveBan = ai.hasFireBan;
             results.summary.status = ai.hasFireBan ? 'active' : 'none';
-
           }
           if (!results.summary.primaryAlert && results.alerts.length > 0) {
             results.summary.primaryAlert = results.alerts[0];
@@ -270,7 +307,10 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (error) {
+      // Do NOT report "no fire ban" when we couldn't check: surface unknown status
       console.error('Error fetching Dysart fire ban data:', error);
+      results.hasActiveBan = false;
+      results.summary.status = 'error';
     }
 
     
@@ -285,7 +325,8 @@ export async function GET(request: NextRequest) {
     results.cachedAt = new Date().toISOString();
     results.cacheTtlSeconds = 21600;
 
-    if (!testMode) {
+    // Never cache an error result: the next request should retry immediately
+    if (!testMode && results.summary.status !== 'error') {
       cachedResult = results;
       cachedAtMs = Date.now();
     }
