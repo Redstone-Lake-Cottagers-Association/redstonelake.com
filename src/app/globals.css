@@ -137,10 +137,11 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
   position: relative;
   overflow: hidden;
-  min-height: 64vh;
+  min-height: 100vh;
   display: flex;
   align-items: flex-start;
   padding-top: 3rem;
+  padding-bottom: 3.5rem;
 }
 
 .hero-section::before {
@@ -163,7 +164,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: -2px;
   left: 0;
   right: 0;
-  height: 100px;
+  height: 60px;
   background: linear-gradient(180deg, transparent 0%, rgba(248, 250, 252, 0.8) 70%, #f8fafc 100%);
   z-index: 2;
 }
