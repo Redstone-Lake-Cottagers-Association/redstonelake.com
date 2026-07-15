@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
-export const revalidate = 1800 // 30 minutes
+// Computed per-request (upstream fetches cache for 30 min) so the OpenAQ key,
+// which is absent at Docker build time, is always read from the runtime env
+export const dynamic = 'force-dynamic'
 
 const LAT = 45.18
 const LNG = -78.54
@@ -104,7 +106,7 @@ interface OpenMeteo {
 async function fromOpenMeteo(): Promise<OpenMeteo | null> {
   try {
     const r = await fetch(
-      `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LNG}&current=pm2_5,us_aqi&hourly=us_aqi&forecast_days=2&timezone=America%2FToronto`,
+      `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LNG}&current=pm2_5,us_aqi&hourly=us_aqi&past_days=30&forecast_days=7&timezone=America%2FToronto`,
       { next: { revalidate: 1800 } }
     )
     if (!r.ok) return null
@@ -117,8 +119,10 @@ async function fromOpenMeteo(): Promise<OpenMeteo | null> {
 export async function GET() {
   const [observed, model] = await Promise.all([fromOpenAQ(), fromOpenMeteo()])
 
-  // Hourly forecast (always the model — monitors don't forecast): next 24 h
+  // Hourly forecast (always the model — monitors don't forecast): next 24 h,
+  // plus daily aggregates (max AQI per local day) for 30 days back / 7 ahead
   let hourly: { time: string[]; aqi: number[] } | null = null
+  let daily: { date: string; aqi: number; past: boolean }[] | null = null
   if (model?.hourly?.time?.length) {
     const now = Date.now()
     const idx = model.hourly.time.findIndex(t => new Date(t).getTime() >= now - 30 * 60 * 1000)
@@ -127,6 +131,15 @@ export async function GET() {
       time: model.hourly.time.slice(start, start + 24),
       aqi: model.hourly.us_aqi.slice(start, start + 24),
     }
+    const byDay = new Map<string, number>()
+    model.hourly.time.forEach((t, i) => {
+      const v = model.hourly!.us_aqi[i]
+      if (typeof v !== 'number') return
+      const day = t.slice(0, 10)
+      byDay.set(day, Math.max(byDay.get(day) ?? 0, v))
+    })
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+    daily = Array.from(byDay.entries()).map(([date, aqi]) => ({ date, aqi, past: date < today }))
   }
 
   let current: Record<string, unknown> | null = observed
@@ -143,5 +156,5 @@ export async function GET() {
   if (!current) {
     return NextResponse.json({ error: 'Air quality data unavailable' }, { status: 502 })
   }
-  return NextResponse.json({ ...current, hourly, cachedAt: new Date().toISOString() })
+  return NextResponse.json({ ...current, hourly, daily, cachedAt: new Date().toISOString() })
 }

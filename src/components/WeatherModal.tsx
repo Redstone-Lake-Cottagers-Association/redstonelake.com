@@ -116,10 +116,11 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
   const [forecast, setForecast] = useState<ForecastDay[]>([])
   const [hourlyForecast, setHourlyForecast] = useState<HourlyForecast[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'current' | 'daily' | 'radar' | 'alerts'>('current')
+  const [activeTab, setActiveTab] = useState<'current' | 'daily' | 'air' | 'radar' | 'alerts'>('current')
   const [cachedAt, setCachedAt] = useState<string | null>(null)
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C')
   const [aqHourly, setAqHourly] = useState<{ time: string[]; aqi: number[] } | null>(null)
+  const [aqDaily, setAqDaily] = useState<{ date: string; aqi: number; past: boolean }[] | null>(null)
   const [aqMeta, setAqMeta] = useState<{ aqi: number; category: string; source: string; station?: string; distanceKm?: number } | null>(null)
 
   useEffect(() => {
@@ -129,6 +130,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
         if (d && !d.error) {
           setAqMeta(d)
           if (d.hourly?.time?.length) setAqHourly(d.hourly)
+          if (d.daily?.length) setAqDaily(d.daily)
         }
       })
       .catch(() => {})
@@ -447,6 +449,28 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
               >
                 7-Day
               </button>
+              <button
+                className={`nav-link ${activeTab === 'air' ? 'active' : ''}`}
+                onClick={() => setActiveTab('air')}
+                style={{
+                  color: 'white !important',
+                  backgroundColor: activeTab === 'air' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '0'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeTab !== 'air') {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeTab !== 'air') {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }
+                }}
+              >
+                Air Quality
+              </button>
               <button 
                 className={`nav-link ${activeTab === 'radar' ? 'active' : ''}`}
                 onClick={() => setActiveTab('radar')}
@@ -666,50 +690,6 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                                     ) : null
                                   )}
                                 </svg>
-
-                                {aqHourly && aqHourly.aqi.length > 1 && (() => {
-                                  const an = aqHourly.aqi.length
-                                  const axAt = (i: number) => PADL + i * ((W - PADL - PADR) / Math.max(1, an - 1))
-                                  const aMax = Math.max(100, Math.ceil(Math.max(...aqHourly.aqi) / 25) * 25)
-                                  const A_TOP = 12
-                                  const A_BOT = 96
-                                  const aY = (v: number) => A_BOT - (v / aMax) * (A_BOT - A_TOP)
-                                  const hourLabel = (t: string) => {
-                                    const h = new Date(t).getHours()
-                                    return h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`
-                                  }
-                                  return (
-                                    <>
-                                      <div className="small text-white-50 mb-1 mt-3">
-                                        Air quality (US AQI){aqMeta && ` — now ${aqMeta.aqi}, ${aqMeta.category}`}
-                                        {aqMeta?.source === 'openaq' && aqMeta.station && (
-                                          <span className="ms-2" style={{ fontSize: '0.68rem' }}>
-                                            observed at {aqMeta.station} ({aqMeta.distanceKm} km); forecast modelled
-                                          </span>
-                                        )}
-                                      </div>
-                                      <svg width="100%" height="128" viewBox={`0 0 ${W} 128`} style={{ overflow: 'visible' }}>
-                                        {grid(aY(0))}{tick(aY(0), '0')}
-                                        {grid(aY(50))}{tick(aY(50), '50')}
-                                        <text x={PADL + 4} y={aY(50) - 4} fill="rgba(255,255,255,0.45)" fontSize="9">≤50 good · ≤100 moderate</text>
-                                        {grid(aY(100))}{tick(aY(100), '100')}
-                                        {aMax > 100 && <>{grid(aY(aMax))}{tick(aY(aMax), `${aMax}`)}</>}
-                                        <polyline
-                                          points={aqHourly.aqi.map((v, i) => `${axAt(i)},${aY(v)}`).join(' ')}
-                                          fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                                        />
-                                        {aqHourly.aqi.map((v, i) => (
-                                          <circle key={i} cx={axAt(i)} cy={aY(v)} r="3" fill="#a78bfa" stroke="#fff" strokeWidth="1" />
-                                        ))}
-                                        {aqHourly.time.map((t, i) =>
-                                          i % 3 === 0 ? (
-                                            <text key={i} x={axAt(i)} y={122} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">{hourLabel(t)}</text>
-                                          ) : null
-                                        )}
-                                      </svg>
-                                    </>
-                                  )
-                                })()}
                               </>
                             )
                           })()}
@@ -884,6 +864,123 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                   )}
 
                   {/* Radar Tab */}
+                  {/* Air Quality Tab */}
+                  {activeTab === 'air' && (
+                    <div>
+                      <div className="mb-4">
+                        <h6 className="text-white mb-1">Air Quality — US AQI</h6>
+                        {aqMeta && (
+                          <div className="text-white-50 small mb-3">
+                            Now: <span className="text-white fw-semibold">{aqMeta.aqi} ({aqMeta.category})</span>
+                            {aqMeta.source === 'openaq'
+                              ? ` — observed at the ${aqMeta.station} monitor, ${aqMeta.distanceKm} km away. History and forecast are modelled (Open-Meteo/CAMS).`
+                              : ' — modelled for the lakes (Open-Meteo/CAMS).'}
+                          </div>
+                        )}
+                        <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                          {(() => {
+                            const W = 800
+                            const PADL = 48
+                            const PADR = 14
+                            const grid = (y: number) => (
+                              <line x1={PADL} y1={y} x2={W - PADR} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                            )
+                            const tick = (y: number, label: string) => (
+                              <text x={PADL - 6} y={y + 3} textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">{label}</text>
+                            )
+                            const hourLabel = (t: string) => {
+                              const h = new Date(t).getHours()
+                              return h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`
+                            }
+                            return (
+                              <>
+                                {aqHourly && aqHourly.aqi.length > 1 && (() => {
+                                  const an = aqHourly.aqi.length
+                                  const axAt = (i: number) => PADL + i * ((W - PADL - PADR) / Math.max(1, an - 1))
+                                  const aMax = Math.max(100, Math.ceil(Math.max(...aqHourly.aqi) / 25) * 25)
+                                  const A_TOP = 12
+                                  const A_BOT = 96
+                                  const aY = (v: number) => A_BOT - (v / aMax) * (A_BOT - A_TOP)
+                                  return (
+                                    <>
+                                      <div className="small text-white-50 mb-1">Next 24 hours</div>
+                                      <svg width="100%" height="128" viewBox={`0 0 ${W} 128`} style={{ overflow: 'visible' }}>
+                                        {grid(aY(0))}{tick(aY(0), '0')}
+                                        {grid(aY(50))}{tick(aY(50), '50')}
+                                        <text x={PADL + 4} y={aY(50) - 4} fill="rgba(255,255,255,0.45)" fontSize="9">≤50 good · ≤100 moderate</text>
+                                        {grid(aY(100))}{tick(aY(100), '100')}
+                                        {aMax > 100 && <>{grid(aY(aMax))}{tick(aY(aMax), `${aMax}`)}</>}
+                                        <polyline
+                                          points={aqHourly.aqi.map((v, i) => `${axAt(i)},${aY(v)}`).join(' ')}
+                                          fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                                        />
+                                        {aqHourly.aqi.map((v, i) => (
+                                          <circle key={i} cx={axAt(i)} cy={aY(v)} r="3" fill="#a78bfa" stroke="#fff" strokeWidth="1" />
+                                        ))}
+                                        {aqHourly.time.map((t, i) =>
+                                          i % 3 === 0 ? (
+                                            <text key={i} x={axAt(i)} y={122} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">{hourLabel(t)}</text>
+                                          ) : null
+                                        )}
+                                      </svg>
+                                    </>
+                                  )
+                                })()}
+
+                                {aqDaily && aqDaily.length > 1 && (() => {
+                                  const dn = aqDaily.length
+                                  const step = (W - PADL - PADR) / dn
+                                  const dxAt = (i: number) => PADL + i * step + step / 2
+                                  const dMax = Math.max(100, Math.ceil(Math.max(...aqDaily.map(d => d.aqi)) / 25) * 25)
+                                  const D_TOP = 12
+                                  const D_BOT = 108
+                                  const dY = (v: number) => D_BOT - (v / dMax) * (D_BOT - D_TOP)
+                                  return (
+                                    <>
+                                      <div className="small text-white-50 mb-1 mt-4 d-flex align-items-center gap-3">
+                                        <span>Daily worst-hour AQI — past 30 days &amp; week ahead</span>
+                                        <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                          <span style={{ width: '10px', height: '10px', background: 'rgba(148,163,184,0.5)', display: 'inline-block' }} /> past
+                                        </span>
+                                        <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                          <span style={{ width: '10px', height: '10px', background: 'rgba(167,139,250,0.8)', display: 'inline-block' }} /> forecast
+                                        </span>
+                                      </div>
+                                      <svg width="100%" height="140" viewBox={`0 0 ${W} 140`} style={{ overflow: 'visible' }}>
+                                        {grid(dY(0))}{tick(dY(0), '0')}
+                                        {grid(dY(50))}{tick(dY(50), '50')}
+                                        {grid(dY(100))}{tick(dY(100), '100')}
+                                        {dMax > 100 && <>{grid(dY(dMax))}{tick(dY(dMax), `${dMax}`)}</>}
+                                        {aqDaily.map((d, i) => (
+                                          <rect key={d.date} x={dxAt(i) - Math.max(2, step * 0.32)} y={dY(d.aqi)}
+                                            width={Math.max(4, step * 0.64)} height={Math.max(1, dY(0) - dY(d.aqi))}
+                                            fill={d.past ? 'rgba(148,163,184,0.5)' : 'rgba(167,139,250,0.8)'}>
+                                            <title>{`${d.date}: worst hour AQI ${d.aqi}`}</title>
+                                          </rect>
+                                        ))}
+                                        {aqDaily.map((d, i) =>
+                                          i % 7 === 0 || i === dn - 1 ? (
+                                            <text key={d.date} x={dxAt(i)} y={134} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="9">
+                                              {new Date(d.date + 'T12:00').toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
+                                            </text>
+                                          ) : null
+                                        )}
+                                      </svg>
+                                    </>
+                                  )
+                                })()}
+                                <div className="text-white-50 mt-2" style={{ fontSize: '0.7rem' }}>
+                                  US AQI from PM2.5 and other pollutants. ≤50 good · 51–100 moderate · 101–150 unhealthy for
+                                  sensitive groups. Sources: OpenAQ (Ontario MECP Dorset monitor) and the Open-Meteo/CAMS model.
+                                </div>
+                              </>
+                            )
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {activeTab === 'radar' && (
                     <div>
                       <div className="d-flex justify-content-between align-items-center mb-3">
