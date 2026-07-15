@@ -116,8 +116,43 @@ async function fromOpenMeteo(): Promise<OpenMeteo | null> {
   }
 }
 
+// Monthly mean AQI for the last 24 months (separate call, cached a day)
+async function monthlyHistory(): Promise<{ month: string; aqi: number }[] | null> {
+  try {
+    const end = new Date()
+    end.setDate(end.getDate() - 1)
+    const start = new Date(end)
+    start.setMonth(start.getMonth() - 23)
+    start.setDate(1)
+    const fmt = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+    const r = await fetch(
+      `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LNG}&hourly=us_aqi&start_date=${fmt(start)}&end_date=${fmt(end)}&timezone=America%2FToronto`,
+      { next: { revalidate: 86400 } }
+    )
+    if (!r.ok) return null
+    const d = await r.json()
+    const time: string[] = d?.hourly?.time || []
+    const vals: (number | null)[] = d?.hourly?.us_aqi || []
+    const sums = new Map<string, { s: number; n: number }>()
+    time.forEach((t, i) => {
+      const v = vals[i]
+      if (typeof v !== 'number') return
+      const key = t.slice(0, 7)
+      const e = sums.get(key) || { s: 0, n: 0 }
+      e.s += v
+      e.n += 1
+      sums.set(key, e)
+    })
+    return Array.from(sums.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, { s, n }]) => ({ month, aqi: Math.round(s / n) }))
+  } catch {
+    return null
+  }
+}
+
 export async function GET() {
-  const [observed, model] = await Promise.all([fromOpenAQ(), fromOpenMeteo()])
+  const [observed, model, monthly] = await Promise.all([fromOpenAQ(), fromOpenMeteo(), monthlyHistory()])
 
   // Hourly forecast (always the model — monitors don't forecast): next 24 h,
   // plus daily aggregates (max AQI per local day) for 30 days back / 7 ahead
@@ -156,5 +191,5 @@ export async function GET() {
   if (!current) {
     return NextResponse.json({ error: 'Air quality data unavailable' }, { status: 502 })
   }
-  return NextResponse.json({ ...current, hourly, daily, cachedAt: new Date().toISOString() })
+  return NextResponse.json({ ...current, hourly, daily, monthly, cachedAt: new Date().toISOString() })
 }

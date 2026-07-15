@@ -32,12 +32,17 @@ interface WeatherWidgetProps {
 export default function EnhancedWeatherWidget({ onExpand, showForecast = true }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [forecast, setForecast] = useState<ForecastDay[]>([])
+  const [airQuality, setAirQuality] = useState<{ aqi: number | null; category: string | null; pm25: number; source: string; station?: string; distanceKm?: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tempUnit, setTempUnit] = useState<'C' | 'F' | null>(null)
 
   useEffect(() => {
     fetchWeatherData()
+    fetch('/api/air-quality')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (d && !d.error) setAirQuality(d) })
+      .catch(() => {})
     
     // Load temperature unit preference from localStorage
     const savedUnit = localStorage.getItem('weather-temp-unit') as 'C' | 'F'
@@ -403,6 +408,15 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                 <span className="me-2">💨 <span className="text-muted">Wind</span></span>
                 <span className="fw-medium">{weather.wind.speed} km/h</span>
               </div>
+              {airQuality && airQuality.aqi !== null && (
+                <div
+                  className="d-flex justify-content-between"
+                  title={`Air quality index ${airQuality.aqi} (PM2.5 ${airQuality.pm25} µg/m³) — ${airQuality.source === 'openaq' ? `observed at the ${airQuality.station} monitor, ${airQuality.distanceKm} km away` : 'modelled, Open-Meteo/CAMS'}. Open the full forecast for history and outlook.`}
+                >
+                  <span className="me-2 text-nowrap">🌫️ <span className="text-muted">Air</span></span>
+                  <span className="fw-medium text-nowrap">{airQuality.category === 'Unhealthy for sensitive groups' ? 'Sensitive' : airQuality.category}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

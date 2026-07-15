@@ -121,6 +121,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C')
   const [aqHourly, setAqHourly] = useState<{ time: string[]; aqi: number[] } | null>(null)
   const [aqDaily, setAqDaily] = useState<{ date: string; aqi: number; past: boolean }[] | null>(null)
+  const [aqMonthly, setAqMonthly] = useState<{ month: string; aqi: number }[] | null>(null)
   const [aqMeta, setAqMeta] = useState<{ aqi: number; category: string; source: string; station?: string; distanceKm?: number } | null>(null)
 
   useEffect(() => {
@@ -131,6 +132,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
           setAqMeta(d)
           if (d.hourly?.time?.length) setAqHourly(d.hourly)
           if (d.daily?.length) setAqDaily(d.daily)
+          if (d.monthly?.length) setAqMonthly(d.monthly)
         }
       })
       .catch(() => {})
@@ -969,6 +971,61 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                                     </>
                                   )
                                 })()}
+                                {aqMonthly && aqMonthly.length >= 13 && (() => {
+                                  // Pair the last 12 calendar months with the same month a year earlier
+                                  const byKey = new Map(aqMonthly.map(m => [m.month, m.aqi]))
+                                  const months = aqMonthly.slice(-12)
+                                  const pairs = months.map(m => {
+                                    const [y, mo] = m.month.split('-').map(Number)
+                                    const prevKey = `${y - 1}-${String(mo).padStart(2, '0')}`
+                                    return { month: m.month, cur: m.aqi, prev: byKey.get(prevKey) ?? null }
+                                  })
+                                  const dn = pairs.length
+                                  const step = (W - PADL - PADR) / dn
+                                  const dxAt = (i: number) => PADL + i * step + step / 2
+                                  const vals = pairs.flatMap(p => [p.cur, p.prev ?? 0])
+                                  const yMax = Math.max(75, Math.ceil(Math.max(...vals) / 25) * 25)
+                                  const Y_TOP = 12
+                                  const Y_BOT = 108
+                                  const yAt = (v: number) => Y_BOT - (v / yMax) * (Y_BOT - Y_TOP)
+                                  const monthName = (key: string) =>
+                                    new Date(key + '-15T12:00').toLocaleDateString('en-CA', { month: 'short' })
+                                  const curYears = `${months[0].month.slice(0, 4)}–${months[dn - 1].month.slice(0, 4)}`
+                                  return (
+                                    <>
+                                      <div className="small text-white-50 mb-1 mt-4 d-flex align-items-center gap-3">
+                                        <span>Monthly average AQI — year over year</span>
+                                        <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                          <span style={{ width: '10px', height: '10px', background: 'rgba(148,163,184,0.5)', display: 'inline-block' }} /> a year earlier
+                                        </span>
+                                        <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                          <span style={{ width: '10px', height: '10px', background: 'rgba(167,139,250,0.85)', display: 'inline-block' }} /> last 12 months ({curYears})
+                                        </span>
+                                      </div>
+                                      <svg width="100%" height="140" viewBox={`0 0 ${W} 140`} style={{ overflow: 'visible' }}>
+                                        {grid(yAt(0))}{tick(yAt(0), '0')}
+                                        {grid(yAt(50))}{tick(yAt(50), '50')}
+                                        {yMax >= 100 && <>{grid(yAt(100))}{tick(yAt(100), '100')}</>}
+                                        {pairs.map((p, i) => (
+                                          <g key={p.month}>
+                                            {p.prev !== null && (
+                                              <rect x={dxAt(i) - step * 0.3} y={yAt(p.prev)} width={step * 0.26}
+                                                height={Math.max(1, yAt(0) - yAt(p.prev))} fill="rgba(148,163,184,0.5)">
+                                                <title>{`${monthName(p.month)} ${Number(p.month.slice(0, 4)) - 1}: avg AQI ${p.prev}`}</title>
+                                              </rect>
+                                            )}
+                                            <rect x={dxAt(i) + step * 0.04} y={yAt(p.cur)} width={step * 0.26}
+                                              height={Math.max(1, yAt(0) - yAt(p.cur))} fill="rgba(167,139,250,0.85)">
+                                              <title>{`${monthName(p.month)} ${p.month.slice(0, 4)}: avg AQI ${p.cur}`}</title>
+                                            </rect>
+                                            <text x={dxAt(i)} y={134} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="9">{monthName(p.month)}</text>
+                                          </g>
+                                        ))}
+                                      </svg>
+                                    </>
+                                  )
+                                })()}
+
                                 <div className="text-white-50 mt-2" style={{ fontSize: '0.7rem' }}>
                                   US AQI from PM2.5 and other pollutants. ≤50 good · 51–100 moderate · 101–150 unhealthy for
                                   sensitive groups. Sources: OpenAQ (Ontario MECP Dorset monitor) and the Open-Meteo/CAMS model.
