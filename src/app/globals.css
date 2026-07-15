@@ -28,6 +28,17 @@
   scroll-behavior: smooth;
 }
 
+/* The sticky header must never cover an anchor target.
+   scroll-padding-top handles href="#..." jumps; scroll-margin-top handles
+   scrollIntoView() — together they cover every scroll-to on the site. */
+html {
+  scroll-padding-top: 80px;
+}
+
+[id] {
+  scroll-margin-top: 80px;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.7;
@@ -704,6 +715,65 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Centered link-style CTA under weather, subtle weight */
 .weather-cta-row { border-top: 1px solid rgba(15,23,42,0.06); }
+/* Lake map layer-toggle chips */
+.map-control-bar {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.layer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: #f8fafc;
+  color: #475569;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.layer-chip:hover {
+  border-color: var(--primary-blue, #0f4c81);
+  color: var(--primary-blue, #0f4c81);
+}
+
+.layer-chip.active {
+  background: var(--primary-blue, #0f4c81);
+  border-color: var(--primary-blue, #0f4c81);
+  color: #ffffff;
+}
+
+.layer-chip-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.7);
+}
+
+.layer-chip:not(.active) .layer-chip-dot {
+  opacity: 0.55;
+}
+
+.layer-chip-satellite.active {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+
+.map-control-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(15, 23, 42, 0.12);
+  margin: 2px 2px;
+}
+
 .weather-cta-link {
   color: var(--dark-gray);
   text-decoration: none;
@@ -987,18 +1057,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* Condensed state once the page is scrolled */
+/* Scrolled state: shadow only — the header must never change height on
+   scroll, or the sticky layout feeds back into scroll position and flickers */
 .navbar-scrolled {
-  padding: 0.15rem 0 !important;
   box-shadow: 0 6px 24px rgba(15, 23, 42, 0.12) !important;
-  background: rgba(255, 255, 255, 0.96) !important;
-}
-
-.navbar-scrolled .navbar-brand {
-  font-size: 1.05rem;
-}
-
-.navbar-scrolled .navbar-brand svg {
-  width: 30px;
-  height: 30px;
 }

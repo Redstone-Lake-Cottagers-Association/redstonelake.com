@@ -1,0 +1,184 @@
+{
+ "note": "Most recent reading per lake per metric. Sources: Ontario Lake Partner dataset (lpp) and 2025 steward readings presented at the 2026 AGM (agm2026). Deck values supersede older LPP years.",
+ "lakes": {
+  "redstone": {
+   "phosphorus": {
+    "value": 3.6,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 5.0,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 1.8,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 0.9,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 2.6,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "little-redstone": {
+   "phosphorus": {
+    "value": 4.5,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 4.2,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 1.5,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 0.3,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 2.1,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "bitter": {
+   "phosphorus": {
+    "value": 4.6,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 5.4,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 3.6,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 4.3,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 2.6,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "burdock": {
+   "phosphorus": {
+    "value": 3.0,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 7.4,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 5.8,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 44.4,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 2.4,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "coleman": {
+   "phosphorus": {
+    "value": 15.2,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 3.1,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 5.6,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 0.8,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 3.2,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "pelaw": {
+   "phosphorus": {
+    "value": 8.2,
+    "year": 2024,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 3.2,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "calcium": {
+    "value": 1.45,
+    "year": 2024,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 0.2,
+    "year": 2024,
+    "source": "agm2026"
+   },
+   "sulphate": {
+    "value": 1.9,
+    "year": 2024,
+    "source": "lpp"
+   }
+  },
+  "tedious": {
+   "phosphorus": {
+    "value": 3.75,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "secchi": {
+    "value": 5.6,
+    "year": 2025,
+    "source": "agm2026"
+   },
+   "chloride": {
+    "value": 28.9,
+    "year": 2025,
+    "source": "agm2026"
+   }
+  }
+ }
+}

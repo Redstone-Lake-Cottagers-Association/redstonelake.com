@@ -106,6 +106,7 @@ export default function Header() {
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li><Link href="/#essential-lake-protection" className="dropdown-item">How to Protect Your Lake</Link></li>
                   <li><Link href="/lake-health" className="dropdown-item">Lake Health Data</Link></li>
+                  <li><Link href="/lake-map" className="dropdown-item">Lake Map</Link></li>
                   <li><Link href="/water-quality-program" className="dropdown-item">Water Quality Program</Link></li>
                   <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>
                   <li><Link href="/septic-systems" className="dropdown-item">Septic Systems</Link></li>

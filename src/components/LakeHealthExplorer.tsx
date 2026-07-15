@@ -1,11 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceArea, ReferenceLine, ResponsiveContainer,
 } from 'recharts'
 import data from '@/data/lake-partner.json'
+import { LAKE_NOTES, NOTES_SOURCE } from '@/lib/water-guidelines'
 
 type MetricKey = 'phosphorus' | 'secchi' | 'calcium' | 'chloride' | 'sulphate'
 
@@ -204,21 +205,11 @@ export default function LakeHealthExplorer() {
   const [lakeId, setLakeId] = useState('redstone')
   const lakeName = data.lakes.find(l => l.id === lakeId)?.name
 
-  // headline tiles for the selected lake
-  const tiles = useMemo(() => {
-    const out: { label: string; value: string; sub: string; color: string }[] = []
-    for (const metric of METRICS.slice(0, 3)) {
-      const lake = metricsData[metric.key]?.[lakeId]
-      if (!lake || lake.samples.length === 0) continue
-      const latest = lake.samples[lake.samples.length - 1]
-      let sub = formatYear(latest[0])
-      if (metric.key === 'phosphorus') {
-        sub += latest[1] < 10 ? ' · oligotrophic' : latest[1] <= 20 ? ' · mesotrophic' : ' · eutrophic'
-      }
-      out.push({ label: metric.title, value: `${latest[1]} ${metric.unit}`, sub, color: metric.color })
-    }
-    return out
-  }, [lakeId])
+  // Deep links from the lake map: /lake-health?lake=<id>#explore
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get('lake')
+    if (wanted && data.lakes.some(l => l.id === wanted)) setLakeId(wanted)
+  }, [])
 
   return (
     <div>
@@ -236,24 +227,30 @@ export default function LakeHealthExplorer() {
         ))}
       </div>
 
-      {/* Headline tiles */}
-      {tiles.length > 0 && (
-        <div className="row g-3 justify-content-center mb-4">
-          {tiles.map(tile => (
-            <div key={tile.label} className="col-6 col-md-4 col-lg-3">
-              <div className="card lake-card h-100">
-                <div className="card-body py-3 text-center">
-                  <div className="text-muted small">{tile.label}</div>
-                  <div className="fs-4 fw-bold" style={{ color: tile.color }}>{tile.value}</div>
-                  <div className="text-muted" style={{ fontSize: '0.75rem' }}>{tile.sub}</div>
+      <h4 className="mb-3 text-center">{lakeName}</h4>
+
+      {/* Steward's notes for the selected lake */}
+      {LAKE_NOTES[lakeId] && (
+        <div className="row justify-content-center mb-4">
+          <div className="col-lg-8">
+            <div className="card lake-card" style={{ borderLeft: '4px solid #0d9488' }}>
+              <div className="card-body py-3">
+                <h6 className="mb-2">Steward&rsquo;s notes</h6>
+                <ul className="small mb-2 ps-3">
+                  {LAKE_NOTES[lakeId].map(note => (
+                    <li key={note} className="mb-1">{note}</li>
+                  ))}
+                </ul>
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                  Source:{' '}
+                  <a href={NOTES_SOURCE.href} className="text-muted">{NOTES_SOURCE.text}</a>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       )}
 
-      <h4 className="mb-3 text-center">{lakeName}</h4>
       {METRICS.map(metric => (
         <MetricChart key={metric.key} metric={metric} lakeId={lakeId} />
       ))}

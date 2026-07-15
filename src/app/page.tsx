@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import LakeInfo from '@/components/LakeInfo'
-import WaterLevelComponent from '@/components/WaterLevelComponent'
+import LakeDataPreview from '@/components/LakeDataPreview'
 import HeroMap from '@/components/HeroMap'
 import newsIndex from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
@@ -229,6 +229,11 @@ export default function Home() {
                 </p>
               </div>
               <HeroMap />
+              <div className="text-center mt-3">
+                <Link href="/lake-map" className="btn btn-outline-primary btn-sm">
+                  Explore the Interactive Lake Map — depths, parcels &amp; more →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -308,14 +313,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Water Level Monitor Section */}
+      {/* Water Level & Lake Health Preview Section */}
       <section id="water-level-monitor" className="py-6 bg-light">
         <div className="container">
-          <WaterLevelComponent />
-          <div className="text-center mt-4">
-            <Link href="/lake-health" className="btn btn-outline-primary">
-              Explore Decades of Lake Health Data →
-            </Link>
+          <div className="text-center mb-4">
+            <h2 className="display-5 mb-3">Water Level &amp; Lake Health</h2>
+            <p className="lead text-muted">
+              Live conditions and nearly 30 years of water quality data for our seven lakes
+            </p>
+          </div>
+          <div className="row justify-content-center">
+            <div className="col-lg-10">
+              <LakeDataPreview />
+            </div>
           </div>
         </div>
       </section>

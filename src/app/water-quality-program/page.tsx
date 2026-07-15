@@ -103,12 +103,12 @@ export default function WaterQualityProgramPage() {
             <div className="col-md-6 d-flex">
               <div className="card lake-card w-100">
                 <div className="card-body text-center">
-                  <h5 className="mb-2">💧 Live Conditions</h5>
+                  <h5 className="mb-2">💧 Live Water Level</h5>
                   <p className="text-muted small mb-3">
-                    Current Redstone Lake water level, weather and fire-ban status, updated
-                    continuously on our water quality page.
+                    Current Redstone Lake water level with historical trends, updated continuously
+                    from the Parks Canada gauge.
                   </p>
-                  <Link href="/water-quality" className="btn btn-outline-primary btn-sm">View Live Conditions</Link>
+                  <Link href="/lake-health#water-level" className="btn btn-outline-primary btn-sm">View Live Water Level</Link>
                 </div>
               </div>
             </div>

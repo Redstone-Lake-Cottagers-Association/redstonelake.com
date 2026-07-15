@@ -1,0 +1,8 @@
+{"type":"FeatureCollection", "features": [
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.66347,45.21538]},"properties":{"DAM_NAME":"Kennisis Lake Dam","DAM_OWNERSHIP":"Federal"},"id":29025},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.55556,45.16118]},"properties":{"DAM_NAME":"West Redstone Dam","DAM_OWNERSHIP":"Federal"},"id":28865},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.50801,45.12897]},"properties":{"DAM_NAME":"Eagle Lake Dam","DAM_OWNERSHIP":"Federal"},"id":10161},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.50043,45.16386]},"properties":{"DAM_NAME":"East Redstone Dam","DAM_OWNERSHIP":"Federal"},"id":29329},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.44164,45.17275]},"properties":{"DAM_NAME":"Gowing Lake Dam","DAM_OWNERSHIP":"Federal"},"id":29169},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[-78.38558,45.20791]},"properties":{"DAM_NAME":"Percy Lake Dam","DAM_OWNERSHIP":"Federal"},"id":29089}
+]}

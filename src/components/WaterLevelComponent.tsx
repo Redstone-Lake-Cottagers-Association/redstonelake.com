@@ -35,7 +35,7 @@ interface ChartDataPoint {
   max?: number;
 }
 
-const WaterLevelComponent = () => {
+const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {}) => {
   const [waterData, setWaterData] = useState<WaterData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -273,15 +273,15 @@ const WaterLevelComponent = () => {
       <div className="row">
         <div className="col-12">
           {/* Header */}
-          <div className="text-center mb-5">
-            <h1 className="display-4 fw-bold text-dark d-flex align-items-center justify-content-center gap-3 mb-4">
-              <Droplets className="text-primary" size={48} />
-              Water Level & Quality
-            </h1>
-            <p className="lead text-muted fs-4">Real-time monitoring and comprehensive lake health data</p>
-            
-
-          </div>
+          {showHeader && (
+            <div className="text-center mb-5">
+              <h1 className="display-4 fw-bold text-dark d-flex align-items-center justify-content-center gap-3 mb-4">
+                <Droplets className="text-primary" size={48} />
+                Water Level & Quality
+              </h1>
+              <p className="lead text-muted fs-4">Real-time monitoring and comprehensive lake health data</p>
+            </div>
+          )}
 
           {/* Current Level Card */}
           {displayLevel && (

@@ -1,0 +1,63 @@
+# Data Sources
+
+Every external dataset and service this site depends on, where it came from, and how to
+verify or refresh it. Live-service health can be checked any time at **/debug/health**.
+
+## Live services (called at runtime)
+
+| What | Endpoint | Used by | Notes |
+|---|---|---|---|
+| Water levels | `https://www.pc.gc.ca/apps/waterlevels/api/Charts/GetWaterLevelData/17?lang=EN` | `/api/water-levels` → homepage hero card, homepage preview, /lake-health | Parks Canada (Trent–Severn Waterway) gauge, station 17 = Redstone Lake |
+| Weather | `https://api.openweathermap.org/data/3.0/onecall` (fallback 2.5) | `/api/weather` → homepage weather widget | Needs `OPENWEATHER_API_KEY` (Fly secret) |
+| Fire ban status | Scrape of `https://www.dysartetal.ca/` alert banners/modals, classified by Claude (`claude-sonnet-5`) | `/api/fire-ban` → homepage fire-ban banner | Breaks if Dysart redesigns their site again (happened once, 2026); errors surface as status `error`, never a false "No fire ban" |
+| Radar tiles | OpenWeatherMap tile API | `/api/radar-tile` → weather modal | Same key as weather |
+| Newsletters | `https://us14.campaign-archive.com/feed?u=abfff5b565ccb6c32026c05ab&id=754031d995` | `src/lib/newsletters.ts` → /newsletters, homepage strip | Mailchimp RSS; feed ID changes if the Mailchimp audience is recreated |
+| Property parcels | `https://gis.haliburtoncounty.ca/arcgis/rest/services/Public/SearchLayers_2/MapServer/0/query` | /lake-map (live per-viewport query, zoom ≥ 13) | County of Haliburton GIS; assessment fabric © Teranet/MPAC. CORS allows our domain. Fields: ARN, ADDRESS, TOWNSHIP |
+| Ontario topo overlay | `https://ws.lioservices.lrc.gov.on.ca/arcgis1/rest/services/LIO_Cartographic/LIO_Topographic/MapServer/tile/{z}/{y}/{x}` | /lake-map raster toggle | Land Information Ontario cached tiles, Web Mercator z0–19 |
+| Mapbox | `mapbox://styles/mapbox/outdoors-v12`, `satellite-streets-v12`, geocoder plugin v5.0.3 | /lake-map, HeroMap | Token via `/api/mapbox-token` (`NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` Fly secret). Geocoder plugin lives under `api.mapbox.com/mapbox-gl-js/plugins/…` (NOT `api.mapbox.com/mapbox-gl-geocoder/…`) |
+
+## Static extracts in `public/map-data/` (refresh manually)
+
+All extracted July 2026 for the bounding box **lng −78.70 … −78.38, lat 45.08 … 45.30**
+and simplified with mapshaper (`-simplify keep-shapes`, precision 0.00001).
+Licence: Open Government Licence – Ontario unless noted.
+
+| File | Source | Refresh procedure |
+|---|---|---|
+| `bathymetry.geojson` | Ontario GeoHub "Bathymetry Line" download (2.2 GB provincewide GeoJSON) | Re-download from GeoHub, stream-filter features whose first coordinate is in the bbox, mapshaper `-filter-fields DEPTH -simplify 15%` |
+| `ansi.geojson` | GeoHub "Areas of Natural and Scientific Interest" download; also live at `LIO_OPEN_DATA/LIO_Open05/MapServer/3` | Filter to bbox; keep NAME/TYPE/SIGNIFICANCE. 3 features: Clear Lake, West Guilford, Kennisis River |
+| `wetlands.geojson` | `LIO_OPEN_DATA/LIO_Open01/MapServer/15` ("Wetland With Significance") | Envelope query (paged, ~1 172 features), keep WETLAND_TYPE/WETLAND_SIGNIFICANCE/EVALUATED_WETLAND_NAME, simplify 20% |
+| `wmu.geojson` | `LIO_OPEN_DATA/LIO_Open05/MapServer/5` ("Wildlife Management Unit") | Envelope query (2 units: 54, 56), clip to bbox, keep OFFICIAL_NAME |
+| `our-lakes.geojson` | County GIS `Public/IdentifyLayers/MapServer/13` ("Lakes and Rivers"), `OFF_NAME` query for the seven lakes | 8 polygons (Pelaw is two parts); ids match lake-health explorer ids. Also the source of the lake-pin centroids in `InteractiveLakeMap.tsx` |
+| `crown-land.geojson` | `LIO_OPEN_DATA/LIO_Open08/MapServer/34` ("Crown Land – MNR Unpatented Land") | Envelope query (127 features), keep AREA_IN_HA/LOCATION_DESCR, simplify 25% |
+| `dams.geojson` | `LIO_OPEN_DATA/LIO_Open04/MapServer/0` ("Ontario Dam Inventory") | 6 points; keep DAM_NAME/DAM_OWNERSHIP |
+| `trails.geojson` | `LIO_OPEN_DATA/LIO_Open04/MapServer/19` ("OTN Trail Segment") | 37 segments; keep TRAIL_NAME/TRAIL_ASSOCIATION/PERMITTED_USES/TRAIL_LENGTH_KM |
+| `fishing-access.geojson` | `LIO_OPEN_DATA/LIO_Open07/MapServer/15` ("Fishing Access Point") | 21 points; keep SITE_NAME/FISHING_ACCESS_POINT_TYPE/PARKING_PRESENCE_FLG/SITE_OWNERSHIP_TYPE |
+| `aggregates.geojson` | `LIO_OPEN_DATA/LIO_Open05/MapServer/17` ("Aggregate Site Authorized Active") | 27 features; keep CLIENT_NAME/OPERATION_TYPE/CURRENT_STATUS/LOCATION_NAME |
+| `conservation-reserve.geojson` | `LIO_OPEN_DATA/LIO_Open03/MapServer/2` ("Conservation Reserve Regulated") | 1 feature (Clear Lake); keep PROTECTED_AREA_NAME_ENG/TYPE_ENG/STATUS_ENG |
+
+The full layer catalogue for those servers: `https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA` (folders `LIO_Open01`–`LIO_Open10`). The `LIO` and `MNRF` folders on `arcgis1` are 403 (restricted) — only `LIO_Cartographic` tiles are public there.
+
+## Lake water quality data in `src/data/`
+
+| File | Source | Notes |
+|---|---|---|
+| `lake-partner.json` | [Ontario Lake Partner open dataset](https://data.ontario.ca/dataset/ontario-lake-partner) (MECP/Dorset). Stations under historic GUILFORD township: Redstone 4596, Little Redstone 2705, Bitter 433, Burdock 647, Coleman 945, Pelaw 4292, Tedious 5322 | Ministry-flagged outliers excluded. **Manual correction:** Little Redstone calcium 2017 (31.4 mg/L) removed as a decimal-place error — the series runs 1.3–2.1 and the steward's chart shows ~3.1 that year. Dataset updates annually (currently through 2024) |
+| `lake-health-latest.json` | Merged: LPP latest + 2025 steward readings extracted from the chart XML inside `public/documents/agm/AGM_2026Presentation_JKidd.pptx` (Kidd, 2026 AGM) | Deck values supersede older LPP years. Burdock chloride = Summer 2025 bar (44.4); Burdock/Tedious phosphorus from the late-summer bar chart. Regenerate by re-running the merge if either source updates |
+| `src/lib/water-guidelines.ts` | Guidelines & citations: Ontario PWQO (MOEE 1994) 20 µg/L phosphorus; CCME (2011) 120 mg/L chloride; Jeziorski et al. 2008 (Science) 1.5 mg/L calcium; MNR (2010) 7 mg/L lake-trout DO. Steward's notes and Coleman mesotrophic context from the 2026 AGM deck | Single source of truth for the homepage preview, /lake-health summary, and steward's notes |
+
+## Other data files
+
+| File | Source |
+|---|---|
+| `src/data/board-members.json`, `sponsors.json` | 2026 AGM decks (`RLCA-AGM-2026.pptx`, `2026-Sponsors.pptx`) + member feedback (Donna, July 2026: Tim Hockley and Alex Bellamy removed) |
+| `src/data/news-posts.json`, `site-pages.json`, `newsletters.json` | Migrated from the old WordPress site (redstonelake.com), with substantial rewrites July 2026 |
+| `src/data/business-directory.json` | Old site + feedback (four ex-sponsors removed July 2026) |
+| Volunteers page names | 2025 lake stewards & vegetation-survey volunteers from the 2026 AGM deck; buoy stewards from the old site's 2021 list (Bob Lehman removed; awaiting Ed's current list) |
+
+## Known fragilities
+
+- **Dysart et al website** redesigns break the fire-ban scrape and by-law links (both fixed July 2026 after their Umbraco migration).
+- **County GIS** could rename `SearchLayers_2` or change CORS — the parcels layer dies silently (map shows "Parcel service unavailable").
+- **Mailchimp feed ID** changes if the audience is recreated.
+- **LIO service numbering** (`LIO_Open01`–`10` layer ids) has historically shifted when the province republishes services.
