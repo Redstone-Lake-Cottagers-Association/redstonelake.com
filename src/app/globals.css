@@ -869,12 +869,14 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 100%;
   height: auto;
   border-radius: 0.5rem;
-  margin: 1rem 0;
+  margin: 1rem auto;
+  display: block;
 }
 
 .article-content figure {
-  margin: 1.5rem 0;
+  margin: 1.5rem auto;
   max-width: 100%;
+  text-align: center;
 }
 
 .article-content figcaption {
