@@ -244,11 +244,7 @@ export default function Home() {
           <div className="row g-4">
             <div className="col-lg-4">
               <div className="card lake-card h-100">
-                <div className="card-img-top" style={{
-                  background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.8), rgba(14, 165, 233, 0.8)), url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 200\'%3E%3Cdefs%3E%3ClinearGradient id=\'lake1\' x1=\'0%25\' y1=\'0%25\' x2=\'0%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%2387CEEB\'/%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23E0F6FF\'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'400\' height=\'200\' fill=\'url(%23lake1)\'/%3E%3Cpath d=\'M0 120 Q100 100 200 120 Q300 140 400 120 L400 200 L0 200 Z\' fill=\'%23006400\' opacity=\'0.8\'/%3E%3Cellipse cx=\'200\' cy=\'160\' rx=\'180\' ry=\'30\' fill=\'%230d9488\' opacity=\'0.9\'/%3E%3Cpath d=\'M150 120 L170 90 L190 120 Z\' fill=\'%23228B22\'/%3E%3Cpath d=\'M210 120 L235 85 L260 120 Z\' fill=\'%23228B22\'/%3E%3C/svg%3E")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}></div>
+                <img src="/images/pages/media-galleries/Fishing_Buddies-1024x576.png" alt="Members showing off their catch on Redstone Lake" className="card-img-top" style={{ objectFit: 'cover' }} />
                 <div className="card-body d-flex flex-column">
                   <h4 className="card-title">Making a Difference</h4>
                   <p className="card-text text-muted mb-4">
@@ -268,11 +264,7 @@ export default function Home() {
 
             <div className="col-lg-4">
               <div className="card lake-card h-100">
-                <div className="card-img-top" style={{
-                  background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.8), rgba(59, 130, 246, 0.8)), url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 200\'%3E%3Cdefs%3E%3ClinearGradient id=\'water2\' x1=\'0%25\' y1=\'0%25\' x2=\'0%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%234A90E2\'/%3E%3Cstop offset=\'100%25\' style=\'stop-color:%230ea5e9\'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'400\' height=\'200\' fill=\'url(%23water2)\'/%3E%3Cellipse cx=\'200\' cy=\'140\' rx=\'150\' ry=\'40\' fill=\'%23FFFFFF\' opacity=\'0.3\'/%3E%3Cellipse cx=\'200\' cy=\'140\' rx=\'100\' ry=\'25\' fill=\'%23FFFFFF\' opacity=\'0.2\'/%3E%3Ccircle cx=\'180\' cy=\'60\' r=\'3\' fill=\'%23FFFFFF\' opacity=\'0.8\'/%3E%3Ccircle cx=\'220\' cy=\'80\' r=\'2\' fill=\'%23FFFFFF\' opacity=\'0.6\'/%3E%3Ccircle cx=\'160\' cy=\'90\' r=\'2.5\' fill=\'%23FFFFFF\' opacity=\'0.7\'/%3E%3C/svg%3E")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}></div>
+                <img src="/images/pages/media-galleries/IMG_6482-1024x768.jpeg" alt="Morning mist over the lake" className="card-img-top" style={{ objectFit: 'cover' }} />
                 <div className="card-body d-flex flex-column">
                   <h4 className="card-title">Water Quality Excellence</h4>
                   <p className="card-text text-muted mb-4">
@@ -292,11 +284,7 @@ export default function Home() {
 
             <div className="col-lg-4">
               <div className="card lake-card h-100">
-                <div className="card-img-top" style={{
-                  background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.8), rgba(13, 148, 136, 0.8)), url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 200\'%3E%3Cdefs%3E%3ClinearGradient id=\'cottage\' x1=\'0%25\' y1=\'0%25\' x2=\'0%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%2387CEEB\'/%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23E0F6FF\'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'400\' height=\'200\' fill=\'url(%23cottage)\'/%3E%3Cpath d=\'M0 140 Q100 120 200 140 Q300 160 400 140 L400 200 L0 200 Z\' fill=\'%23228B22\' opacity=\'0.8\'/%3E%3Crect x=\'150\' y=\'120\' width=\'100\' height=\'60\' fill=\'%238B4513\'/%3E%3Cpolygon points=\'140,120 200,90 260,120\' fill=\'%23A0522D\'/%3E%3Crect x=\'170\' y=\'140\' width=\'15\' height=\'25\' fill=\'%23654321\'/%3E%3Crect x=\'210\' y=\'135\' width=\'20\' height=\'15\' fill=\'%2387CEEB\' opacity=\'0.8\'/%3E%3Cellipse cx=\'200\' cy=\'180\' rx=\'80\' ry=\'15\' fill=\'%230d9488\' opacity=\'0.6\'/%3E%3C/svg%3E")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}></div>
+                <img src="/images/pages/media-galleries/20210703_162424_resized-1024x768.jpg" alt="Kayakers and boats gathered on Redstone Lake" className="card-img-top" style={{ objectFit: 'cover' }} />
                 <div className="card-body d-flex flex-column">
                   <h4 className="card-title">Welcoming New Cottagers</h4>
                   <p className="card-text text-muted mb-4">

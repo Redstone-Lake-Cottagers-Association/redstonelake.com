@@ -17,6 +17,17 @@ export function normalizeUrl(url: string) {
   return url.split('?')[0].replace(/\/$/, '')
 }
 
+
+function cleanTitle(raw?: string): string | undefined {
+  if (!raw) return undefined
+  const cleaned = raw
+    .replace(/^RLCA\s*/i, '')          // org prefix
+    .replace(/^\([^)]*\)\s*:?\s*/, '') // leading "(June/26):" style month tag (date shown separately)
+    .replace(/^[-–:\s]+/, '')
+    .trim()
+  return cleaned || undefined
+}
+
 export async function getFeedNewsletters(): Promise<Newsletter[]> {
   try {
     const res = await fetch(NEWSLETTER_FEED_URL, { next: { revalidate: NEWSLETTER_REVALIDATE } })
@@ -35,7 +46,7 @@ export async function getFeedNewsletters(): Promise<Newsletter[]> {
         label: date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }),
         year: date.getFullYear(),
         url,
-        title: title?.replace(/^RLCA\s*/i, '').replace(/^[-–:(\s]+/, '').trim() || undefined,
+        title: cleanTitle(title),
         dateMs: date.getTime(),
       })
     }

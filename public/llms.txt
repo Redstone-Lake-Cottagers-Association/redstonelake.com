@@ -1,0 +1,37 @@
+# Redstone Lake Cottagers Association
+
+> Volunteer-run, not-for-profit cottagers' association (founded 1961) protecting
+> seven lakes in the Redstone River watershed, Haliburton County, Ontario,
+> Canada: Redstone, Little Redstone, Pelaw, Bitter, Long (Tedious), Burdock and
+> Coleman Lakes. At the July 2026 AGM members approved renaming the association
+> to the Redstone Area Lakes Association (RALA); the change takes effect once
+> corporate filings complete.
+
+Key facts:
+- Membership: $30/1yr, $60/2yr, $80/3yr; open to property owners within the
+  Redstone group of lakes. Contact membership@redstonelake.com
+- Annual General Meeting: second Saturday of July, Haliburton Forest
+- The site shows live Redstone Lake water levels (Parks Canada), local weather,
+  and the Municipality of Dysart et al fire-ban status
+- Open-air burning in fire season (Apr 1–Oct 31) is permitted only 7 p.m.–7 a.m.
+  under the county by-law; always verify current fire bans with the municipality
+
+## Main pages
+- [Home](/): live water level, weather, fire-ban status, events and news
+- [News & Articles](/news): community news archive since 2021
+- [Lake Health Data](/lake-health): ~30 years of provincial water quality data
+  (phosphorus, clarity, calcium, chloride, sulphate) for all seven lakes
+- [Membership](/membership): dues, benefits, how to join
+- [Newsletters](/newsletters): monthly newsletter archive since 2020
+- [Annual General Meeting](/agm): minutes and presentations, 2020–2026
+- [Governing Documents](/governance): letters patent and by-laws since 1961
+- [Board Members](/board-members): current volunteer board
+- [Sponsors & Business Directory](/business-directory): local businesses
+- [New Cottager Guide](/new-cottager-guide), [Healthy Shoreline](/healthy-shoreline),
+  [Septic Systems](/septic-systems), [Get the Lead Out](/get-the-lead-out)
+- [Contact](/contact): communications@redstonelake.com
+
+## Policies
+- [Privacy Policy](/privacy-policy)
+- [Terms of Use](/terms) — information is provided as-is by volunteers; verify
+  safety-critical information (fire bans, water conditions) with authorities
