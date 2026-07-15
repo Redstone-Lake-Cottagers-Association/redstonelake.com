@@ -13,26 +13,33 @@ export default function GetTheLeadOutPage() {
       <div className="row justify-content-center">
         <div className="col-lg-8">
           <div className="text-center mb-5">
+            <div className="fs-1" aria-hidden="true">🦆</div>
             <h1 className="mb-3">Get the Lead Out</h1>
-            <p className="lead text-muted">Lead fishing tackle can kill common loons</p>
+            <p className="lead text-muted mx-auto" style={{ maxWidth: '620px' }}>
+              A single lead sinker can kill an adult loon. Trade in your lead tackle and protect
+              the birds our lakes are known for.
+            </p>
+            <Link href="/agm" className="btn btn-lake-primary">Trade In Tackle at the AGM</Link>
           </div>
 
           <div className="card lake-card mb-4">
             <div className="card-body">
+              <h5 className="mb-2">Why it matters</h5>
               <p>
-                A small amount of lead will cause massive, fatal lead poisoning in a loon. It&apos;s a
-                terrible death for these legendary birds — and it is so easily avoidable.
+                Loons swallow small stones from the lake bottom to help grind their food, and lost
+                lead sinkers and jigs are easily picked up along with them. Even a small amount of
+                lead causes massive, fatal poisoning — a terrible death for these legendary birds,
+                and one that is entirely avoidable.
               </p>
               <p className="mb-0">
-                Loons swallow small stones from the lake bottom to help grind their food, and lost
-                lead sinkers and jigs are easily picked up along with them. A single lead sinker is
-                enough to poison an adult loon. Switching to non-toxic alternatives (steel, tin,
-                tungsten or bismuth) protects the birds our lakes are known for.
+                Switching to non-toxic alternatives — steel, tin, tungsten or bismuth — costs
+                little and works just as well. Most tackle shops now stock lead-free options;
+                just ask.
               </p>
             </div>
           </div>
 
-          <div className="card lake-card mb-4">
+          <div className="card lake-card mb-4" style={{ borderLeft: '4px solid #2f7d5c' }}>
             <div className="card-body text-center">
               <h4 className="mb-2">🎣 Get a FREE Limited Edition Custom Lure</h4>
               <p className="mb-1">
@@ -60,7 +67,7 @@ export default function GetTheLeadOutPage() {
               </a>
             </li>
             <li>
-              <Link href="/nature-watch">{ORG_ACRONYM} Nature Watch — share your loon sightings →</Link>
+              <Link href="/galleries">Share your loon sightings in our photo galleries →</Link>
             </li>
           </ul>
         </div>

@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 
 const DUES = [
   { term: '1 Year', price: '$30' },
-  { term: '2 Years', price: '$60' },
   { term: '3 Years', price: '$80' },
 ]
 
@@ -18,7 +17,7 @@ const BENEFITS = [
   'Confirmation letter of membership',
   'Map of the Redstone Group of Lakes',
   'Two membership signs (dock and driveway)',
-  'Discounts with local businesses — Superior Propane, French’s Septic, insurance companies',
+  'Discounts with local businesses — Superior Propane and participating insurance companies',
   'FOCA membership benefits and discounts',
   'Water quality monitoring alerts',
   'A vote at the Annual General Meeting (second Saturday in July)',

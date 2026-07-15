@@ -353,5 +353,20 @@
     "source": "/terms-and-conditions",
     "destination": "/terms",
     "permanent": true
+  },
+  {
+    "source": "/make-a-difference",
+    "destination": "/volunteers",
+    "permanent": true
+  },
+  {
+    "source": "/community-connection",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/nature-watch",
+    "destination": "/galleries",
+    "permanent": true
   }
 ]

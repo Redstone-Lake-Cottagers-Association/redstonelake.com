@@ -11,7 +11,10 @@ import NewsletterStrip from '@/components/NewsletterStrip'
 import sponsorData from '@/data/sponsors.json'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
-const sponsors = sponsorData.sponsors
+// Premier ($995) sponsors sort first and render larger than standard ($250) sponsors
+const sponsors = [...sponsorData.sponsors].sort(
+  (a, b) => (b.tier === 'premier' ? 1 : 0) - (a.tier === 'premier' ? 1 : 0)
+)
 
 const latestPosts = newsIndex.slice(0, 6)
 
@@ -341,7 +344,7 @@ export default function Home() {
                   <div className="flex-grow-1">
                     <h4 className="text-primary mb-3 fw-bold">CLEAN, DRAIN and DRY Your Boat</h4>
                     <p className="mb-3 text-muted">
-                      Motors, boats, and Ontario's ecosystems can be ruined by zebra mussels and other aquatic invasive species. Take a few simple steps to preserve our lakes and fisheries: <strong>CLEAN</strong> off any plants or debris, <strong>DRAIN</strong> bilges and ballast water, and <strong>DRY</strong> any wet areas of your boat.
+                      Invasive species like zebra mussels travel by boat — and it's the law in Ontario to <strong>CLEAN</strong>, <strong>DRAIN</strong> and <strong>DRY</strong> before moving between waterbodies. That includes moving between our own seven lakes, and it especially matters for rented boats or boats arriving from out of town.
                     </p>
                     <Link href="/news/clean-drain-and-dry-your-boat" className="btn btn-outline-primary btn-sm">
                       Learn More About Prevention →
@@ -365,7 +368,7 @@ export default function Home() {
                   <div className="flex-grow-1">
                     <h4 className="text-primary mb-3 fw-bold">Watch Your Wake</h4>
                     <p className="mb-3 text-muted">
-                      The wave action created by boats moving at high speeds can wash away shoreline soils, which can harm fish and their habitat. Protect our delicate shoreline ecosystem by maintaining appropriate speeds and distances from shore.
+                      Boat wakes erode shorelines, muddy fish habitat and can swamp loon nests right at the waterline. Keep to 10 km/h within 30 metres of shore, take big wakes to deep open water, and be #WakeAware around paddlers and swimmers.
                     </p>
                     <Link href="/news/watch-your-wake-to-protect-our-shorelines" className="btn btn-outline-primary btn-sm">
                       Learn About Wake Safety →
@@ -389,7 +392,7 @@ export default function Home() {
                   <div className="flex-grow-1">
                     <h4 className="text-primary mb-3 fw-bold">Maintain Your Septic System</h4>
                     <p className="mb-3 text-muted">
-                      A failing septic system is one of the biggest threats to lake water quality. Have your system inspected every 3 years and pumped every 3-5 years. Use phosphate-free detergents and avoid flushing harmful chemicals that can kill beneficial bacteria.
+                      A failing septic system leaks the nutrients that feed algae blooms. Pump every 3–5 years, use phosphate-free detergents, and know the warning signs — Dysart et al now runs a mandatory inspection program for waterfront systems.
                     </p>
                     <Link href="/septic-systems" className="btn btn-outline-primary btn-sm">
                       Septic Care Guide →
@@ -413,9 +416,9 @@ export default function Home() {
                   <div className="flex-grow-1">
                     <h4 className="text-primary mb-3 fw-bold">Protect Natural Shorelines</h4>
                     <p className="mb-3 text-muted">
-                      Natural vegetation along shorelines prevents erosion, filters runoff, and provides critical habitat for wildlife. Maintain a natural buffer zone of at least 30 feet from the water's edge. Avoid using fertilizers and pesticides near the water.
+                      Native shoreline vegetation holds the bank together, filters runoff before it reaches the lake, and even keeps the geese away. Start with a small no-mow buffer — and remember shoreline vegetation within 30 metres of the water is protected by county by-law.
                     </p>
-                    <Link href="/shoreline-naturalization" className="btn btn-outline-primary btn-sm">
+                    <Link href="/news/shoreline-naturalization-with-abbey-gardens" className="btn btn-outline-primary btn-sm">
                       Naturalization Tips →
                     </Link>
                   </div>
@@ -437,10 +440,34 @@ export default function Home() {
                   <div className="flex-grow-1">
                     <h4 className="text-primary mb-3 fw-bold">Fish Responsibly</h4>
                     <p className="mb-3 text-muted">
-                      Use lead-free tackle to protect loons and other wildlife from poisoning. Follow catch limits and seasonal restrictions. Practice catch-and-release for breeding fish, and never transport live fish between water bodies to prevent species introduction.
+                      Our deep, cold lakes are prime lake trout water — a fishery found in only 1% of Ontario lakes. Know the Zone 15 seasons and limits (many lake trout lakes have their own rules), never move live bait between waterbodies, and handle released fish with care.
                     </p>
                     <Link href="/news/fishing-around-the-lake" className="btn btn-outline-primary btn-sm">
                       Fishing Guidelines →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="d-flex align-items-start p-4 bg-white rounded-3 shadow-sm border-start border-4" style={{borderColor: 'var(--warm-orange) !important', borderWidth: '4px !important'}}>
+                  <div className="me-4">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" style={{
+                      width: '60px',
+                      height: '60px',
+                      backgroundColor: 'rgba(194, 112, 61, 0.15)',
+                      border: '2px solid rgba(194, 112, 61, 0.3)'
+                    }}>
+                      <span style={{fontSize: '1.5rem'}}>🦆</span>
+                    </div>
+                  </div>
+                  <div className="flex-grow-1">
+                    <h4 className="text-primary mb-3 fw-bold">Get the Lead Out</h4>
+                    <p className="mb-3 text-muted">
+                      A single lost lead sinker is enough to kill an adult loon. Switch to steel, tin, tungsten or bismuth tackle — and trade in your old lead at our tackle exchange for a free limited-edition custom lure.
+                    </p>
+                    <Link href="/get-the-lead-out" className="btn btn-outline-primary btn-sm">
+                      About the Campaign →
                     </Link>
                   </div>
                 </div>
@@ -607,7 +634,18 @@ export default function Home() {
           <div className="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-2">
             {sponsors.map(s => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={s.name} src={s.image} alt={s.name} title={s.name} style={{ height: '44px', width: 'auto', maxWidth: '140px', objectFit: 'contain' }} />
+              <img
+                key={s.name}
+                src={s.image}
+                alt={s.name}
+                title={s.name}
+                style={{
+                  height: s.tier === 'premier' ? '72px' : '56px',
+                  width: 'auto',
+                  maxWidth: s.tier === 'premier' ? '220px' : '170px',
+                  objectFit: 'contain'
+                }}
+              />
             ))}
           </div>
           <Link href="/business-directory" className="small">Meet our sponsors →</Link>

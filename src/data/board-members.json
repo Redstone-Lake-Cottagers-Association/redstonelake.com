@@ -1,18 +1,75 @@
 {
   "asOf": "Affirmed at the 2026 Annual General Meeting, July 11, 2026",
   "board": [
-    { "name": "Jess Kidd", "role": "President and Lake Steward", "years": 6, "emails": ["president@redstonelake.com", "watershed@redstonelake.com"] },
-    { "name": "Paula Miller", "role": "Past President and Government Relations Liaison", "years": 8, "emails": [] },
-    { "name": "Steve Harris", "role": "Secretary", "years": 7, "emails": ["secretary@redstonelake.com"] },
-    { "name": "Donna Luger", "role": "Membership, Treasurer, and Signage Manager", "years": 11, "emails": ["treasurer@redstonelake.com", "membership@redstonelake.com"] },
-    { "name": "Laurie Kerr", "role": "Social Media Manager", "years": 10, "emails": ["communications@redstonelake.com"] },
-    { "name": "Ed Payne", "role": "Buoy Program Manager", "years": 6, "emails": ["privatebuoys@redstonelake.com"] },
-    { "name": "Gerry Oxford", "role": "Content Editor and Eblast Manager", "years": 6, "emails": [] },
-    { "name": "Amanda Bellerby", "role": "Get the Lead Out Campaign Manager", "years": 1, "emails": [] },
-    { "name": "Tim Hockley", "role": "Business Development Manager", "years": 5, "emails": [] }
+    {
+      "name": "Jess Kidd",
+      "role": "President and Lake Steward",
+      "years": 6,
+      "emails": [
+        "president@redstonelake.com",
+        "watershed@redstonelake.com"
+      ]
+    },
+    {
+      "name": "Paula Miller",
+      "role": "Past President and Government Relations Liaison",
+      "years": 8,
+      "emails": []
+    },
+    {
+      "name": "Steve Harris",
+      "role": "Secretary",
+      "years": 7,
+      "emails": [
+        "secretary@redstonelake.com"
+      ]
+    },
+    {
+      "name": "Donna Luger",
+      "role": "Membership, Treasurer, and Signage Manager",
+      "years": 11,
+      "emails": [
+        "treasurer@redstonelake.com",
+        "membership@redstonelake.com"
+      ]
+    },
+    {
+      "name": "Laurie Kerr",
+      "role": "Social Media Manager",
+      "years": 10,
+      "emails": [
+        "communications@redstonelake.com"
+      ]
+    },
+    {
+      "name": "Ed Payne",
+      "role": "Buoy Program Manager",
+      "years": 6,
+      "emails": [
+        "privatebuoys@redstonelake.com"
+      ]
+    },
+    {
+      "name": "Gerry Oxford",
+      "role": "Content Editor and Eblast Manager",
+      "years": 6,
+      "emails": []
+    },
+    {
+      "name": "Amanda Bellerby",
+      "role": "Get the Lead Out Campaign Manager",
+      "years": 1,
+      "emails": []
+    }
   ],
   "committee": [
-    { "name": "Andrew McGrath", "role": "Information Technology Manager", "years": 1, "emails": ["website@redstonelake.com"] },
-    { "name": "Alex Bellamy", "role": "Social Coordinator", "years": 1, "emails": [] }
+    {
+      "name": "Andrew McGrath",
+      "role": "Information Technology Manager",
+      "years": 1,
+      "emails": [
+        "website@redstonelake.com"
+      ]
+    }
   ]
 }

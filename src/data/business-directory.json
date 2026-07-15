@@ -13,19 +13,6 @@
     "email": null
   },
   {
-    "slug": "haliburton-cottage-rentals",
-    "name": "Haliburton Cottage Rentals",
-    "categories": [
-      "Rentals"
-    ],
-    "description": "",
-    "website": "https://www.haliburtoncottagerentals.ca/",
-    "image": "/images/directory/HCR-Listing-Image.jpg",
-    "phone": "(705)-457-9997",
-    "address": "Haliburton Cottage Rentals, 83 Maple Avenue #10b, Haliburton, ON K0M 1S0, Canada",
-    "email": "info@haliburtoncottagerentals.ca"
-  },
-  {
     "slug": "vince-duchene-re-max-professionals-north",
     "name": "Vince Duchene Re/Max Professionals North",
     "categories": [
@@ -91,32 +78,6 @@
     "email": null
   },
   {
-    "slug": "all-season-cottage-rentals",
-    "name": "All-Season Cottage Rentals",
-    "categories": [
-      "Rentals"
-    ],
-    "description": "Discover the benefits of renting professionally managed vacation homes in the Haliburton Highlands of Ontario. All-Season Cottage Rentals knows that a worry free vacation is what you deserve. We are dedicated professionals committed to serving our customers with care and attention, offering personal and professional service in vacation rentals.",
-    "website": "https://haliburtoncottages.com/",
-    "image": "/images/directory/All-Season-Listing-Image.jpg",
-    "phone": "(705) 754-1506",
-    "address": "1111 Elk Dr, Haliburton, ON K0M 1S0, Canada",
-    "email": "rentals@haliburtoncottages.com"
-  },
-  {
-    "slug": "fort-irwin-marina",
-    "name": "Fort Irwin Marina",
-    "categories": [
-      "Marina"
-    ],
-    "description": "Fort Irwin Marina is located on Haliburton Lake, located 7 min from the Klondike Road boat launch. We offer service and winter storage for all makes and models of boats and PWCs, and service ATVs and snowmobiles. Marina store offerings: Premium and Regular Fuel, marine and boat parts and supplies, Kawartha Dairy Ice Cream, sporting goods and equipment, convenance items, LCBO and Beer Store.",
-    "website": "http://www.fortirwinmarina.com",
-    "image": "/images/directory/Fort-Irwin-Listing-Image.jpg",
-    "phone": "(705) 754-4176",
-    "address": "5002 Haliburton Lake Rd, Eagle Lake, ON K0M 1M0, Canada",
-    "email": "info@fortirwinmarina.com"
-  },
-  {
     "slug": "troy-austen-real-estate-team",
     "name": "Troy Austen Real Estate Team",
     "categories": [
@@ -129,18 +90,5 @@
     "phone": "705-455-7653",
     "address": null,
     "email": "troy@troyausten.ca"
-  },
-  {
-    "slug": "acm-designs",
-    "name": "ACM Designs",
-    "categories": [
-      "Home Decor"
-    ],
-    "description": "Award Winning Decorating & Design for Lakeside Living ACM Designs is Haliburton’s top design & decorating firm. Our residential, cottage and commercial designs are inspired by our stunning surroundings, and built to embrace the incredible winters and summers on the water.",
-    "website": "https://www.acm-designs.com/",
-    "image": "/images/directory/ACM-Listing-Image-2024.jpg",
-    "phone": "705-457-5253",
-    "address": "7 Dysart Ave, Haliburton, ON K0M 1S0, Canada",
-    "email": "nicole@acm-designs.com"
   }
 ]

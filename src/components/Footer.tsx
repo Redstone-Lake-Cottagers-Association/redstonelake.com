@@ -36,20 +36,17 @@ export default function Footer() {
           <div className="col-md-3">
             <h5>Community</h5>
             <ul className="list-unstyled">
-              <li><Link href="/community-connection" className="text-white-50">Community Connection</Link></li>
               <li><Link href="/galleries" className="text-white-50">Photo Galleries</Link></li>
               <li><Link href="/business-directory" className="text-white-50">Sponsors &amp; Directory</Link></li>
               <li><Link href="/municipal-bylaws" className="text-white-50">Municipal By-Laws</Link></li>
               <li><Link href="/initiatives" className="text-white-50">Initiatives</Link></li>
               <li><Link href="/contests" className="text-white-50">Contests</Link></li>
-              <li><Link href="/nature-watch" className="text-white-50">Nature Watch</Link></li>
             </ul>
           </div>
 
           <div className="col-md-3">
             <h5>Lake Stewardship</h5>
             <ul className="list-unstyled">
-              <li><Link href="/make-a-difference" className="text-white-50">Make a Difference</Link></li>
               <li><Link href="/lake-health" className="text-white-50">Lake Health Data</Link></li>
               <li><Link href="/water-quality-program" className="text-white-50">Water Quality Program</Link></li>
               <li><Link href="/healthy-shoreline" className="text-white-50">Healthy Shoreline</Link></li>

@@ -85,13 +85,11 @@ export default function Header() {
                   Community
                 </a>
                 <ul className="dropdown-menu">
-                  <li><Link href="/community-connection" className="dropdown-item">Community Connection</Link></li>
                   <li><Link href="/galleries" className="dropdown-item">Photo Galleries</Link></li>
                   <li><Link href="/contests" className="dropdown-item">Contests</Link></li>
                   <li><Link href="/business-directory" className="dropdown-item">Sponsors &amp; Directory</Link></li>
                   <li><Link href="/municipal-bylaws" className="dropdown-item">Municipal By-Laws</Link></li>
                   <li><Link href="/initiatives" className="dropdown-item">Initiatives</Link></li>
-                  <li><Link href="/nature-watch" className="dropdown-item">Nature Watch</Link></li>
                   <li><Link href="/private-buoys" className="dropdown-item">Private Hazard Buoys</Link></li>
                 </ul>
               </li>
@@ -107,7 +105,6 @@ export default function Header() {
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li><Link href="/#essential-lake-protection" className="dropdown-item">How to Protect Your Lake</Link></li>
-                  <li><Link href="/make-a-difference" className="dropdown-item">Make a Difference</Link></li>
                   <li><Link href="/lake-health" className="dropdown-item">Lake Health Data</Link></li>
                   <li><Link href="/water-quality-program" className="dropdown-item">Water Quality Program</Link></li>
                   <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>

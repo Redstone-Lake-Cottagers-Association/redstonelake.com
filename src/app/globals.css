@@ -406,14 +406,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .fireban-icon {
+  flex: 0 0 auto;
   width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.7);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
+  line-height: 1;
 }
 
 .fireban-title {
@@ -459,7 +458,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.5rem 0.875rem;
   border-radius: 999px;
   font-weight: 700;
-  box-shadow: 0 6px 20px rgba(220,53,69,0.25);
+  box-shadow: 0 6px 20px var(--fb-shadow, rgba(15,23,42,0.18));
 }
 
 .fireban-alert-card {

@@ -280,7 +280,6 @@ export default function LakeInfo() {
       <div className="mb-3">
         {(() => {
           const fireBanStatus = getFireBanStatus()
-          const hasDetails = Boolean(fireBanStatus.data && (fireBanStatus.data.hasActiveBan || fireBanStatus.data.aiAnalysis?.hasFireBan))
           const isLoaded = fireBanStatus.status !== 'loading'
 
           return (
@@ -313,7 +312,7 @@ export default function LakeInfo() {
 
                   {fireBanStatus.status === 'safe' && (
                     <div className="small" style={{ opacity: 0.85 }}>
-                      Daytime burning still prohibited in fire season — details ›
+                      Daytime burning still prohibited in fire season
                     </div>
                   )}
 
@@ -352,14 +351,16 @@ export default function LakeInfo() {
                     })()}
                   </div>
                 </div>
-                {/* Always render chevron to keep width stable; dim when not actionable */}
-                <span
-                  className="fireban-cta ms-auto align-self-center"
-                  aria-hidden="true"
-                  style={{ opacity: hasDetails ? 1 : 0.35, cursor: hasDetails ? 'pointer' : 'default' }}
-                >
-                  ›
-                </span>
+                {isLoaded && (
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 small weather-cta-link ms-auto align-self-start flex-shrink-0"
+                    onClick={() => setShowFireBanModal(true)}
+                    aria-label="Open fire ban details"
+                  >
+                    Details ›
+                  </button>
+                )}
               </div>
             </div>
           )
@@ -447,7 +448,7 @@ export default function LakeInfo() {
                 
                 return (
                                        <div>
-                       <div className="d-inline-flex align-items-center mb-2">
+                       <div className="d-flex align-items-center justify-content-between mb-2">
                          <span className="badge me-2 px-2 py-1" style={{
                            backgroundColor: 'rgba(255,255,255,0.2)',
                            border: '1px solid rgba(255,255,255,0.6)',
@@ -455,6 +456,15 @@ export default function LakeInfo() {
                            fontWeight: 700,
                            fontSize: '0.75rem'
                          }}>Redstone Lake water level</span>
+                         <button
+                           type="button"
+                           className="btn btn-link p-0 small flex-shrink-0"
+                           style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}
+                           onClick={(e) => { e.stopPropagation(); scrollToWaterLevelSection() }}
+                           aria-label="View water level trends"
+                         >
+                           View trends ›
+                         </button>
                        </div>
                        <div className="d-flex align-items-center justify-content-between">
                          <div>
@@ -596,7 +606,15 @@ export default function LakeInfo() {
                     <div>
                       {/* Overall Status */}
                       <div className="text-center mb-2">
-                        <div className="fireban-status-badge" style={{ background: fireBanStatus.color }}>{fireBanStatus.message.toUpperCase()}</div>
+                        <div
+                          className="fireban-status-badge"
+                          style={{
+                            background: fireBanStatus.color,
+                            ['--fb-shadow' as any]: fireBanStatus.color + '40'
+                          }}
+                        >
+                          {fireBanStatus.message.toUpperCase()}
+                        </div>
                       </div>
                       <div className="text-center mb-4 small text-muted">
                         {(() => {
