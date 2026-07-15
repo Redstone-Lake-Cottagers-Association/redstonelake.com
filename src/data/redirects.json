@@ -343,5 +343,15 @@
     "source": "/sponsors",
     "destination": "/business-directory",
     "permanent": true
+  },
+  {
+    "source": "/privacy-policy-2",
+    "destination": "/privacy-policy",
+    "permanent": true
+  },
+  {
+    "source": "/terms-and-conditions",
+    "destination": "/terms",
+    "permanent": true
   }
 ]

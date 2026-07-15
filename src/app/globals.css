@@ -129,7 +129,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero-section {
   background: 
     var(--gradient-hero),
-    url('/images/community-connection.jpg');
+    url('/images/hero-lake.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -717,7 +717,7 @@ h1, h2, h3, h4, h5, h6 {
 .footer {
   background: 
     linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%),
-    url('/images/community-connection.jpg');
+    url('/images/hero-lake.jpg');
   background-size: cover;
   background-position: center;
   color: white;

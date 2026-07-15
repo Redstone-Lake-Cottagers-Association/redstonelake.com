@@ -75,7 +75,12 @@ export default function Footer() {
         
         <div className="row">
           <div className="col-12 text-center">
-            <p className="mb-0">&copy; {currentYear} {ORG_NAME}</p>
+            <p className="mb-1">&copy; {currentYear} {ORG_NAME}</p>
+            <p className="mb-0 small">
+              <Link href="/privacy-policy" className="text-white-50">Privacy Policy</Link>
+              <span className="text-white-50 mx-2">·</span>
+              <Link href="/terms" className="text-white-50">Terms of Use</Link>
+            </p>
           </div>
         </div>
       </div>
