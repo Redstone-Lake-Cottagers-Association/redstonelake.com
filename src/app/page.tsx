@@ -8,6 +8,7 @@ import HeroMap from '@/components/HeroMap'
 import newsIndex from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
 import sponsorData from '@/data/sponsors.json'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 const sponsors = sponsorData.sponsors
 
@@ -184,7 +185,7 @@ export default function Home() {
                   }}>conservation</span>
                 </h1>
                 <p className="lead mb-4 fs-3" style={{maxWidth: '600px', fontWeight: '400', lineHeight: '1.5', minHeight: '4.5rem'}}>
-                  60 years of protecting seven pristine Haliburton lakes through passionate community stewardship.
+                  Over 60 years of protecting lakes and building community in the Redstone River Watershed, Haliburton.
                 </p>
                 <div className="d-flex flex-column flex-sm-row gap-3">
                   <Link href="/membership" className="btn btn-lake-primary btn-lg" style={{fontSize: '1.1rem', padding: '1rem 2rem'}}>
@@ -206,9 +207,9 @@ export default function Home() {
         <div className="row justify-content-center">
             <div className="col-lg-10">
               <div className="text-center mb-5">
-                <h2 className="display-5 mb-4">About the Redstone Lake Cottage Association</h2>
+                <h2 className="display-5 mb-4">About the {ORG_NAME}</h2>
                 <p className="lead text-muted mb-4">
-                  For over 60 years, the association (founded as the Redstone Lake Cottagers Association, now the Redstone Area Lakes Association) has been the dedicated guardian of pristine lakes nestled in the heart of Haliburton's wilderness. Our volunteer-driven community is united by a shared commitment to preserving these natural treasures for current and future generations.
+                  For over 60 years, the {ORG_ACRONYM} has been the dedicated guardian of the lakes nestled in the heart of Haliburton's wilderness. Our volunteer-driven community is united by a shared commitment to preserving these natural treasures for current and future generations.
                 </p>
                 
               </div>
@@ -220,7 +221,7 @@ export default function Home() {
               <div className="text-center mb-4">
                 <h2 className="h4 mb-2 text-primary">Our Protected Lakes</h2>
                 <p className="lead text-muted">
-                  From Redstone Lake to Little Redstone, Pelaw, Bitter, Tedious (Long), Burdock, and Coleman Lakes, our stewardship extends across seven pristine waters that form a remarkable ecosystem in the heart of Haliburton's wilderness.
+                  From Redstone Lake to Little Redstone, Pelaw, Bitter, Tedious (Long), Burdock, and Coleman Lakes, our stewardship extends across seven interconnected waters that form a remarkable ecosystem in the heart of Haliburton's wilderness.
                 </p>
               </div>
               <HeroMap />
@@ -624,7 +625,7 @@ export default function Home() {
         <div className="container text-center">
           <h2 className="mb-4">Be part of something special. Become a Member Today!</h2>
           <Link href="/membership" className="btn btn-lake-primary btn-lg">
-            Join RALA
+            Join {ORG_ACRONYM}
           </Link>
         </div>
       </section>

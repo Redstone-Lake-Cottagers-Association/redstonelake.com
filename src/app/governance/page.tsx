@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Governing Documents | Redstone Area Lakes Association',
+  title: `Governing Documents | ${ORG_NAME}`,
   description: 'RLCA governing documents — letters patent, by-laws, amendments and resolutions dating back to 1961.',
 }
 

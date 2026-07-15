@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -25,7 +26,7 @@ export default function Header() {
               </g>
           </svg>
             <span style={{ marginLeft: '0.5rem' }}>
-              <strong>Redstone Area Lakes Association</strong>
+              <strong>{ORG_NAME}</strong>
             </span>
           </Link>
           
@@ -50,7 +51,7 @@ export default function Header() {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  About RALA
+                  About {ORG_ACRONYM}
                 </a>
                 <ul className="dropdown-menu">
                   <li><Link href="/about" className="dropdown-item">About the Association</Link></li>

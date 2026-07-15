@@ -292,7 +292,7 @@ const WaterLevelComponent = () => {
               <div className="card-body p-4">
                 <div className="row align-items-center">
                   <div className="col-md-8">
-                    <h2 className="card-title h3 mb-3">Current Water Level</h2>
+                    <h2 className="card-title h3 mb-3">Current Redstone Lake Water Level</h2>
                     <div className="display-3 fw-bold mb-2">
                       {loading ? '-.---' : displayLevel.level.toFixed(3)} m
                     </div>
@@ -399,7 +399,7 @@ const WaterLevelComponent = () => {
                 <div className="card-body p-4">
                   <h3 className="card-title h4 d-flex align-items-center gap-2 mb-4">
                     <TrendingUp className="text-primary" size={24} />
-                    Water Level Trends (Full Year)
+                    Redstone Lake Water Level Trends (Full Year)
                   </h3>
                   
                   <div style={{ width: '100%', height: '400px' }}>

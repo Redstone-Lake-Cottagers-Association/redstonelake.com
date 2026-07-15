@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Get the Lead Out | Redstone Area Lakes Association',
+  title: `Get the Lead Out | ${ORG_NAME}`,
   description: 'Lead fishing tackle kills common loons. Trade in your lead weights and tackle for a free limited edition custom lure.',
 }
 
@@ -59,7 +60,7 @@ export default function GetTheLeadOutPage() {
               </a>
             </li>
             <li>
-              <Link href="/nature-watch">RALA Nature Watch — share your loon sightings →</Link>
+              <Link href="/nature-watch">{ORG_ACRONYM} Nature Watch — share your loon sightings →</Link>
             </li>
           </ul>
         </div>

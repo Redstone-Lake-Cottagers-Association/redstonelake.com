@@ -22,6 +22,11 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Brand toggle: "legacy" (Redstone Lake Cottagers Association) or "rala"
+# (Redstone Area Lakes Association). Inlined at build time — see src/lib/branding.ts
+ARG NEXT_PUBLIC_BRAND=legacy
+ENV NEXT_PUBLIC_BRAND=$NEXT_PUBLIC_BRAND
+
 RUN npm run build
 
 # Production image, copy all the files and run next

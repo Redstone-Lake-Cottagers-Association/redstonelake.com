@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import pages from '@/data/site-pages.json'
+import { ORG_NAME } from '@/lib/branding'
 
 /* Renders a page migrated from the legacy WordPress site by its slug. */
 export function getLegacyPage(slug: string) {
@@ -10,7 +11,7 @@ export function legacyMetadata(slug: string, description?: string) {
   const page = getLegacyPage(slug)
   if (!page) return {}
   return {
-    title: `${page.title.replace(/&#\d+;|&[a-z]+;/g, '')} | Redstone Area Lakes Association`,
+    title: `${page.title.replace(/&#\d+;|&[a-z]+;/g, '')} | ${ORG_NAME}`,
     ...(description ? { description } : {}),
   }
 }

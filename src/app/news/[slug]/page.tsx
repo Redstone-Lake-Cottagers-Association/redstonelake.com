@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import posts from '@/data/news-posts.json'
+import { ORG_NAME } from '@/lib/branding'
 
 interface Props {
   params: { slug: string }
@@ -14,7 +15,7 @@ export function generateMetadata({ params }: Props) {
   const post = posts.find(p => p.slug === params.slug)
   if (!post) return {}
   return {
-    title: `${post.title.replace(/&#\d+;|&[a-z]+;/g, '')} | Redstone Area Lakes Association`,
+    title: `${post.title.replace(/&#\d+;|&[a-z]+;/g, '')} | ${ORG_NAME}`,
     description: post.excerpt,
   }
 }

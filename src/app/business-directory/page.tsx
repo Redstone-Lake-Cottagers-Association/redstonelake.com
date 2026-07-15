@@ -2,9 +2,10 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import listings from '@/data/business-directory.json'
 import sponsorData from '@/data/sponsors.json'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Sponsors & Business Directory | Redstone Area Lakes Association',
+  title: `Sponsors & Business Directory | ${ORG_NAME}`,
   description:
     'Our sponsors — whose generous support funds our work on the lakes — and local businesses and organizations serving the Redstone group of lakes.',
 }

@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import LakeHealthExplorer from '@/components/LakeHealthExplorer'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Lake Health Data | Redstone Area Lakes Association',
+  title: `Lake Health Data | ${ORG_NAME}`,
   description:
     'Decades of provincial water quality data for the Redstone group of lakes — phosphorus, water clarity, calcium, chloride and sulphate from the Ontario Lake Partner Program.',
 }

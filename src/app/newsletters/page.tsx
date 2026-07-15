@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllNewsletters, NEWSLETTER_REVALIDATE, type Newsletter } from '@/lib/newsletters'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Newsletters | Redstone Area Lakes Association',
+  title: `Newsletters | ${ORG_NAME}`,
   description: 'Archive of our monthly newsletters. Become a member to get your copy directly in your inbox.',
 }
 

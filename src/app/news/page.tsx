@@ -3,10 +3,11 @@ import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
 import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'News & Articles | Redstone Area Lakes Association',
-  description: 'Community news, conservation insights and updates from the Redstone Area Lakes Association.',
+  title: `News & Articles | ${ORG_NAME}`,
+  description: `Community news, conservation insights and updates from the ${ORG_NAME}.`,
 }
 
 export const revalidate = NEWSLETTER_REVALIDATE

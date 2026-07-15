@@ -7,6 +7,10 @@ app = 'redstonelake-com'
 primary_region = 'yyz'
 
 [build]
+  # Flip to "rala" (and redeploy) to rebrand the site to the new association
+  # name once the non-profit application clears and members are notified.
+  [build.args]
+    NEXT_PUBLIC_BRAND = "legacy"
 
 [http_service]
   internal_port = 3000

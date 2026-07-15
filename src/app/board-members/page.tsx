@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import boardData from '@/data/board-members.json'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Board Members | Redstone Area Lakes Association',
-  description: 'The volunteer board of directors and committee members of the Redstone Area Lakes Association.',
+  title: `Board Members | ${ORG_NAME}`,
+  description: `The volunteer board of directors and committee members of the ${ORG_NAME}.`,
 }
 
 function initials(name: string) {

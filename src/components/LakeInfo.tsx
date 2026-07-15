@@ -398,7 +398,7 @@ export default function LakeInfo() {
                       color: 'white',
                       fontWeight: 700,
                       fontSize: '0.75rem'
-                    }}>Water level</span>
+                    }}>Redstone Lake water level</span>
                   </div>
                   <div className="d-flex align-items-center justify-content-between">
                     <div>
@@ -432,7 +432,7 @@ export default function LakeInfo() {
                           color: 'white',
                           fontWeight: 700,
                           fontSize: '0.75rem'
-                        }}>Water level</span>
+                        }}>Redstone Lake water level</span>
                       </div>
                       <div className="d-flex align-items-center justify-content-between">
                         <div>
@@ -454,7 +454,7 @@ export default function LakeInfo() {
                            color: 'white',
                            fontWeight: 700,
                            fontSize: '0.75rem'
-                         }}>Water level</span>
+                         }}>Redstone Lake water level</span>
                        </div>
                        <div className="d-flex align-items-center justify-content-between">
                          <div>

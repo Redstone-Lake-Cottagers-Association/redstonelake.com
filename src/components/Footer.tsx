@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -21,7 +22,7 @@ export default function Footer() {
           <div className="col-md-3">
             <h5>About Us</h5>
             <ul className="list-unstyled">
-              <li><Link href="/about" className="text-white-50">About RALA</Link></li>
+              <li><Link href="/about" className="text-white-50">About {ORG_ACRONYM}</Link></li>
               <li><Link href="/membership" className="text-white-50">Membership</Link></li>
               <li><Link href="/board-members" className="text-white-50">Board Members</Link></li>
               <li><Link href="/volunteers" className="text-white-50">Volunteers</Link></li>
@@ -74,7 +75,7 @@ export default function Footer() {
         
         <div className="row">
           <div className="col-12 text-center">
-            <p className="mb-0">&copy; {currentYear} Redstone Area Lakes Association</p>
+            <p className="mb-0">&copy; {currentYear} {ORG_NAME}</p>
           </div>
         </div>
       </div>

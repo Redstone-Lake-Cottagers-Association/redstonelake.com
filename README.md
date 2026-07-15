@@ -82,3 +82,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For website-related inquiries: website@redstonelake.com
 
 For general RLCA information, visit our website or contact the association directly.
+## Brand toggle (RLCA → RALA)
+
+The 2026 AGM approved renaming the association to the Redstone Area Lakes
+Association (RALA), but the site stays on the legacy name until the
+non-profit status application clears and members are formally notified.
+
+The name everywhere on the site comes from `src/lib/branding.ts`, driven by
+the build-time env var `NEXT_PUBLIC_BRAND`:
+
+- **Production:** edit `fly.toml` → `[build.args]` → set `NEXT_PUBLIC_BRAND = "rala"`,
+  commit and push (the deploy rebuilds with the new name).
+- **Local dev:** add `NEXT_PUBLIC_BRAND=rala` to `.env.local` and restart `next dev`.
+
+Unset or any other value renders the legacy name (Redstone Lake Cottagers Association).

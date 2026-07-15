@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: 'Contact Us | Redstone Area Lakes Association',
-  description: 'Get in touch with the Redstone Area Lakes Association.',
+  title: `Contact Us | ${ORG_NAME}`,
+  description: `Get in touch with the ${ORG_NAME}.`,
 }
 
 const contacts = [
