@@ -58,6 +58,26 @@ export default function ContactPage() {
           </div>
 
           <div className="card lake-card mt-4">
+            <div className="card-body">
+              <h5 className="mb-2">Official Organization Details</h5>
+              <ul className="list-unstyled mb-2 small">
+                <li><strong>Legal name:</strong> Redstone Lake Cottagers Association</li>
+                <li><strong>Type:</strong> Ontario Not-for-Profit Corporation (incorporated August 16, 1961)</li>
+                <li><strong>Ontario Corporation Number (OCN):</strong> 114778</li>
+                <li><strong>Registered office:</strong> West Guilford, Ontario, Canada</li>
+                <li><strong>Mailing address:</strong> RLCA, Box 3, West Guilford, Ontario K0M 2S0</li>
+              </ul>
+              <p className="small text-muted mb-0">
+                Verify our registration in the{' '}
+                <a href="https://www.obrpartner.mgcs.gov.on.ca/onbis/corporations/viewInstance/view.pub?id=280aa9d4fbca6577ccb365bb8f57e85a8b028ff989a4417163d9faefb51bbd20&_timestamp=2157795618925474" target="_blank" rel="noopener noreferrer">Ontario Business Registry record</a>{' '}
+                (or search the <a href="https://www.ontario.ca/page/ontario-business-registry" target="_blank" rel="noopener noreferrer">Ontario Business Registry</a>{' '}
+                for OCN 114778). The domains redstonelake.com, redstonelakes.com and redstonelakes.ca are owned
+                and operated by the association.
+              </p>
+            </div>
+          </div>
+
+          <div className="card lake-card mt-4">
             <div className="card-body text-center">
               <h5>Be part of something special. Become a Member today!</h5>
               <Link href="/membership" className="btn btn-lake-primary mt-2">Join RLCA</Link>
