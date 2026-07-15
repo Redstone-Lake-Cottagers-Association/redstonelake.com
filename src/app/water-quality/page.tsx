@@ -1,10 +1,44 @@
+import Link from 'next/link'
+
 export default function WaterQuality() {
   return (
     <div className="container py-5">
       <div className="row">
         <div className="col-lg-8">
           <h1 className="display-4 mb-4">Water Quality</h1>
-          
+
+          {/* The data itself, front and centre */}
+          <div className="row g-3 mb-4">
+            <div className="col-md-6 d-flex">
+              <div className="card lake-card w-100">
+                <div className="card-body d-flex flex-column">
+                  <h5 className="mb-2">📊 Lake Health Data Explorer</h5>
+                  <p className="text-muted flex-grow-1 mb-3">
+                    Nearly 30 years of phosphorus, water clarity, calcium and chloride measurements
+                    for all seven of our lakes, charted lake by lake.
+                  </p>
+                  <Link href="/lake-health" className="btn btn-lake-primary btn-sm align-self-start">
+                    Explore the Data
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-6 d-flex">
+              <div className="card lake-card w-100">
+                <div className="card-body d-flex flex-column">
+                  <h5 className="mb-2">🌊 Live Water Level</h5>
+                  <p className="text-muted flex-grow-1 mb-3">
+                    The current Redstone Lake level from Parks Canada, refreshed every 15 minutes,
+                    with this year charted against the historical range.
+                  </p>
+                  <Link href="/#water-level-monitor" className="btn btn-outline-primary btn-sm align-self-start">
+                    View Water Levels
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="card lake-card mb-4">
             <div className="card-body">
               <h3>Protecting Our Lakes</h3>
@@ -51,6 +85,9 @@ export default function WaterQuality() {
                   </ul>
                 </div>
               </div>
+              <p className="mb-0">
+                <Link href="/lake-health">See what this monitoring has found — explore the results →</Link>
+              </p>
             </div>
           </div>
 
