@@ -643,7 +643,7 @@ export default function Home() {
               <img key={s.name} src={s.image} alt={s.name} title={s.name} style={{ height: '44px', width: 'auto', maxWidth: '140px', objectFit: 'contain' }} />
             ))}
           </div>
-          <Link href="/sponsors" className="small">Meet our sponsors →</Link>
+          <Link href="/business-directory" className="small">Meet our sponsors →</Link>
         </div>
       </section>
 

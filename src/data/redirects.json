@@ -338,5 +338,10 @@
     "source": "/shoreline-naturalization",
     "destination": "/news/shoreline-naturalization-with-abbey-gardens",
     "permanent": true
+  },
+  {
+    "source": "/sponsors",
+    "destination": "/business-directory",
+    "permanent": true
   }
 ]

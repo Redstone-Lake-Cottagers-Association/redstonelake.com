@@ -88,8 +88,7 @@ export default function Header() {
                   <li><Link href="/galleries" className="dropdown-item">Photo Galleries</Link></li>
                   <li><Link href="/photo-contest" className="dropdown-item">Photo Contest</Link></li>
                   <li><Link href="/contests" className="dropdown-item">Contests</Link></li>
-                  <li><Link href="/sponsors" className="dropdown-item">Our Sponsors</Link></li>
-                  <li><Link href="/business-directory" className="dropdown-item">Business Directory</Link></li>
+                  <li><Link href="/business-directory" className="dropdown-item">Sponsors &amp; Directory</Link></li>
                   <li><Link href="/municipal-bylaws" className="dropdown-item">Municipal By-Laws</Link></li>
                   <li><Link href="/initiatives" className="dropdown-item">Initiatives</Link></li>
                   <li><Link href="/nature-watch" className="dropdown-item">Nature Watch</Link></li>

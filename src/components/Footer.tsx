@@ -36,8 +36,7 @@ export default function Footer() {
             <ul className="list-unstyled">
               <li><Link href="/community-connection" className="text-white-50">Community Connection</Link></li>
               <li><Link href="/galleries" className="text-white-50">Photo Galleries</Link></li>
-              <li><Link href="/sponsors" className="text-white-50">Our Sponsors</Link></li>
-              <li><Link href="/business-directory" className="text-white-50">Business Directory</Link></li>
+              <li><Link href="/business-directory" className="text-white-50">Sponsors &amp; Directory</Link></li>
               <li><Link href="/municipal-bylaws" className="text-white-50">Municipal By-Laws</Link></li>
               <li><Link href="/initiatives" className="text-white-50">Initiatives</Link></li>
               <li><Link href="/contests" className="text-white-50">Contests</Link></li>
