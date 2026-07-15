@@ -120,6 +120,17 @@ const CHECKS: Check[] = [
     },
   },
   {
+    id: 'air-quality',
+    name: 'Air quality (Open-Meteo CAMS model)',
+    source: 'air-quality-api.open-meteo.com',
+    url: 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=45.18&longitude=-78.54&current=us_aqi',
+    validate: (s, _c, b) => {
+      if (s !== 200) throw new Error(`HTTP ${s}`)
+      const d = JSON.parse(b)
+      if (typeof d?.current?.us_aqi !== 'number') throw new Error('no AQI in response')
+    },
+  },
+  {
     id: 'mapbox',
     name: 'Mapbox (style API + token)',
     source: 'api.mapbox.com',

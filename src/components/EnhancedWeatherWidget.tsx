@@ -32,12 +32,17 @@ interface WeatherWidgetProps {
 export default function EnhancedWeatherWidget({ onExpand, showForecast = true }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [forecast, setForecast] = useState<ForecastDay[]>([])
+  const [airQuality, setAirQuality] = useState<{ aqi: number | null; category: string | null; pm25: number; source: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tempUnit, setTempUnit] = useState<'C' | 'F' | null>(null)
 
   useEffect(() => {
     fetchWeatherData()
+    fetch('/api/air-quality')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (d && !d.error) setAirQuality(d) })
+      .catch(() => {})
     
     // Load temperature unit preference from localStorage
     const savedUnit = localStorage.getItem('weather-temp-unit') as 'C' | 'F'
@@ -271,10 +276,12 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
           </div>
           {showForecast && (
             <div className="weather-forecast-section mt-3" aria-hidden="true">
-              <div className="row g-0" style={{ height: '30px' }}>
+              <div className="row g-0" style={{ height: '64px' }}>
                 {Array.from({ length: 7 }).map((_, index) => (
-                  <div key={index} className="col text-center d-flex flex-column align-items-center justify-content-center" style={{ height: '30px' }}>
-                    <div className="icon-box skeleton" />
+                  <div key={index} className="col text-center d-flex flex-column align-items-center justify-content-center" style={{ height: '64px', minWidth: 0 }}>
+                    <div className="day-label skeleton" style={{ width: '26px', height: '9px' }} />
+                    <div className="icon-box skeleton mt-1" />
+                    <div className="temps-box skeleton mt-1" />
                     <div className="temps-box skeleton mt-1" />
                   </div>
                 ))}
@@ -376,25 +383,40 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
               </div>
             </div>
             <div className="text-muted fw-medium" style={{ marginTop: '4px' }}>{weather.desc}</div>
+            {forecast[0] && (
+              <div style={{ marginTop: '2px', fontSize: '0.9rem', color: '#334155' }}>
+                <span className="fw-semibold">Today: high {convertTemp(forecast[0].temp_max)}°</span>
+                <span className="text-muted"> · low {convertTemp(forecast[0].temp_min)}°</span>
+              </div>
+            )}
           </div>
           <div className="col-5">
             <div className="small">
               <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
-                <span>☔️</span>
+                <span className="me-2">☔️ <span className="text-muted">Rain</span></span>
                 <span className="fw-medium">{weather.pop !== undefined ? `${weather.pop}%` : '0%'}</span>
               </div>
               <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
-                <span>💧</span>
+                <span className="me-2">💧 <span className="text-muted">Humidity</span></span>
                 <span className="fw-medium">{weather.humidity}%</span>
               </div>
               <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
-                <span>☁️</span>
+                <span className="me-2">☁️ <span className="text-muted">Clouds</span></span>
                 <span className="fw-medium">{weather.clouds}%</span>
               </div>
-              <div className="d-flex justify-content-between">
-                <span>💨</span>
+              <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
+                <span className="me-2">💨 <span className="text-muted">Wind</span></span>
                 <span className="fw-medium">{weather.wind.speed} km/h</span>
               </div>
+              {airQuality && airQuality.aqi !== null && (
+                <div
+                  className="d-flex justify-content-between"
+                  title={`Air quality index ${airQuality.aqi} (PM2.5 ${airQuality.pm25} µg/m³) — ${airQuality.source === 'openaq' ? `observed at the ${(airQuality as any).station} monitor, ${(airQuality as any).distanceKm} km away` : 'modelled, Open-Meteo/CAMS'}`}
+                >
+                  <span className="me-2 text-nowrap">🌫️ <span className="text-muted">Air</span></span>
+                  <span className="fw-medium text-nowrap">{airQuality.category === 'Unhealthy for sensitive groups' ? 'Sensitive' : airQuality.category}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -411,16 +433,17 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
       {/* 7-Day Forecast - Minimal */}
       {showForecast && (
         <div className="weather-forecast-section mt-3">
-          <div className="row g-0" style={{ height: '30px' }}>
+          <div className="row g-0" style={{ height: '64px' }}>
             {forecast.slice(0, 7).map((day, index) => (
-              <div key={index} className="col text-center d-flex flex-column align-items-center justify-content-center" style={{ height: '30px' }}>
+              <div key={index} className="col text-center d-flex flex-column align-items-center justify-content-center" style={{ height: '64px', minWidth: 0 }}>
+                <div className="day-label text-muted">
+                  {index === 0 ? 'Today' : day.date === 'Tomorrow' ? 'Tmrw' : day.date}
+                </div>
                 <div className="icon-box">
                   <span className="icon-emoji">{getWeatherIcon(day.icon)}</span>
                 </div>
-                <div className="temps-box text-muted mt-1">
-                  <span className="fw-bold">{convertTemp(day.temp_max)}°</span>
-                  <span className="opacity-75">|{convertTemp(day.temp_min)}°</span>
-                </div>
+                <div className="temps-box fw-bold mt-1">{convertTemp(day.temp_max)}°</div>
+                <div className="temps-box temps-low">{convertTemp(day.temp_min)}°</div>
               </div>
             ))}
           </div>
@@ -446,10 +469,25 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
         }
         .icon-emoji { display: inline-block; width: 1em; text-align: center; }
         .temps-box {
-          width: 42px;
+          width: 30px;
           height: 10px;
-          font-size: 9px;
+          font-size: 9.5px;
           line-height: 1;
+          white-space: nowrap;
+          color: #334155;
+        }
+        .temps-box.temps-low {
+          color: #64748b;
+          font-weight: 500;
+          margin-top: 1px;
+        }
+        .day-label {
+          font-size: 8.5px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          line-height: 1;
+          margin-bottom: 2px;
         }
         .skeleton {
           background: rgba(0,0,0,0.12);

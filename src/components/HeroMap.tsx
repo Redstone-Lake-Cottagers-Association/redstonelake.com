@@ -144,7 +144,8 @@ export default function HeroMap() {
           .setLngLat(lake.coordinates)
           .setPopup(new window.mapboxgl.Popup({
             offset: 25,
-            className: 'lake-popup'
+            className: 'lake-popup',
+            focusAfterOpen: false
           }).setHTML(popupHtml(lake)))
           .addTo(map.current)
         })

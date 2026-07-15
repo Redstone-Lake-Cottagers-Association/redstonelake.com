@@ -513,7 +513,7 @@ export default function InteractiveLakeMap() {
           new window.mapboxgl.Marker({ color: '#ea580c', scale: 0.8 })
             .setLngLat(lake.coordinates)
             .setPopup(
-              new window.mapboxgl.Popup({ offset: 25 }).setHTML(
+              new window.mapboxgl.Popup({ offset: 25, focusAfterOpen: false }).setHTML(
                 `<strong>${lake.name}</strong><br/><a href="/lake-health?lake=${lake.id}#explore">View water quality data →</a>`
               )
             )
@@ -604,7 +604,7 @@ export default function InteractiveLakeMap() {
             sections.push(r.render(f))
             if (sections.length >= 4) break
           }
-          new window.mapboxgl.Popup({ maxWidth: '320px' })
+          new window.mapboxgl.Popup({ maxWidth: '320px', focusAfterOpen: false })
             .setLngLat(e.lngLat)
             .setHTML(sections.join('<hr style="margin:6px 0;border-color:#e2e8f0"/>'))
             .addTo(m)

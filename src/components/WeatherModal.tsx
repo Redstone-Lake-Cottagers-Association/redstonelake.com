@@ -119,20 +119,19 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
   const [activeTab, setActiveTab] = useState<'current' | 'daily' | 'radar' | 'alerts'>('current')
   const [cachedAt, setCachedAt] = useState<string | null>(null)
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C')
-  const [chartVisibility, setChartVisibility] = useState({
-    temperature: true,
-    precipitation: true,
-    humidity: true,
-    wind: true
-  })
-  const [dailyChartVisibility, setDailyChartVisibility] = useState({
-    temperature: true,
-    precipitation: true,
-    humidity: true,
-    wind: true
-  })
+  const [aqHourly, setAqHourly] = useState<{ time: string[]; aqi: number[] } | null>(null)
+  const [aqMeta, setAqMeta] = useState<{ aqi: number; category: string; source: string; station?: string; distanceKm?: number } | null>(null)
 
   useEffect(() => {
+    fetch('/api/air-quality')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (d && !d.error) {
+          setAqMeta(d)
+          if (d.hourly?.time?.length) setAqHourly(d.hourly)
+        }
+      })
+      .catch(() => {})
     if (isOpen) {
       fetchDetailedWeatherData()
     }
@@ -184,22 +183,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
     return Math.round(celsius)
   }
 
-  // Toggle chart visibility
-  const toggleChartVisibility = (metric: keyof typeof chartVisibility) => {
-    setChartVisibility(prev => ({
-      ...prev,
-      [metric]: !prev[metric]
-    }))
-  }
-
   // Toggle daily chart visibility
-  const toggleDailyChartVisibility = (metric: keyof typeof dailyChartVisibility) => {
-    setDailyChartVisibility(prev => ({
-      ...prev,
-      [metric]: !prev[metric]
-    }))
-  }
-
   const fetchDetailedWeatherData = async () => {
     try {
       setLoading(true)
@@ -578,193 +562,157 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                         </div>
                       </div>
 
-                      {/* Hourly Weather Chart */}
+                      {/* Hourly Weather Charts — one real scale per unit */}
                       <div className="mt-5">
-                      <h6 className="text-white mb-3">24-Hour Forecast</h6>
+                        <h6 className="text-white mb-3">24-Hour Forecast</h6>
                         <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-                          <svg width="100%" height="200" viewBox="0 0 800 200" style={{ overflow: 'visible' }}>
-                            {/* Grid lines */}
-                            {[0, 1, 2, 3, 4].map(i => (
-                              <line key={`grid-${i}`} x1="60" y1={20 + i * 30} x2="740" y2={20 + i * 30} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            ))}
-                            
-                            {/* Precipitation bars (background) */}
-                            {chartVisibility.precipitation && hourlyForecast.map((hour, index) => {
-                              const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                              const barHeight = (hour.pop / 100) * 120
-                              return (
-                                <rect
-                                  key={`precip-${index}`}
-                                  x={x - 10}
-                                  y={140 - barHeight}
-                                  width="20"
-                                  height={barHeight}
-                                  fill="rgba(54, 162, 235, 0.2)"
-                                  stroke="rgba(54, 162, 235, 0.4)"
-                                  strokeWidth="1"
-                                />
-                              )
-                            })}
-                            
-                            {/* Temperature line */}
-                            {chartVisibility.temperature && (
-                              <polyline
-                                points={hourlyForecast.map((hour, index) => {
-                                  const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                  const tempRange = Math.max(...hourlyForecast.map(h => convertTemp(h.temp))) - Math.min(...hourlyForecast.map(h => convertTemp(h.temp)))
-                                  const minTemp = Math.min(...hourlyForecast.map(h => convertTemp(h.temp)))
-                                  const normalizedTemp = tempRange > 0 ? (convertTemp(hour.temp) - minTemp) / tempRange : 0.5
-                                  const y = 140 - (normalizedTemp * 120)
-                                  return `${x},${y}`
-                                }).join(' ')}
-                                fill="none"
-                                stroke="#ffc107"
-                                strokeWidth="3"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            )}
-                            
-                            {/* Humidity line */}
-                            {chartVisibility.humidity && (
-                              <polyline
-                                points={hourlyForecast.map((hour, index) => {
-                                  const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                  const humidity = hour.humidity ?? 50
-                                  const y = 140 - ((humidity / 100) * 120)
-                                  return `${x},${y}`
-                                }).join(' ')}
-                                fill="none"
-                                stroke="#17a2b8"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray="5,5"
-                              />
-                            )}
-                            
-                            {/* Wind speed line */}
-                            {chartVisibility.wind && (
-                              <polyline
-                                points={hourlyForecast.map((hour, index) => {
-                                  const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                  const windSpeed = hour.wind_speed ?? 0
-                                  const maxWind = Math.max(...hourlyForecast.map(h => h.wind_speed ?? 0))
-                                  const normalizedWind = maxWind > 0 ? (windSpeed / maxWind) : 0
-                                  const y = 140 - (normalizedWind * 120)
-                                  return `${x},${y}`
-                                }).join(' ')}
-                                fill="none"
-                                stroke="#28a745"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray="3,3"
-                              />
-                            )}
-                            
-                            {/* Temperature points and labels */}
-                            {chartVisibility.temperature && hourlyForecast.map((hour, index) => {
-                              const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                              const tempRange = Math.max(...hourlyForecast.map(h => convertTemp(h.temp))) - Math.min(...hourlyForecast.map(h => convertTemp(h.temp)))
-                              const minTemp = Math.min(...hourlyForecast.map(h => convertTemp(h.temp)))
-                              const normalizedTemp = tempRange > 0 ? (convertTemp(hour.temp) - minTemp) / tempRange : 0.5
-                              const y = 140 - (normalizedTemp * 120)
-                              return (
-                                <g key={`temp-point-${index}`}>
-                                  <circle cx={x} cy={y} r="4" fill="#ffc107" stroke="#fff" strokeWidth="2" />
-                                  {(index % 2 === 0 || hourlyForecast.length <= 8) && (
-                                    <text x={x} y={y - 10} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">
-                                      {convertTemp(hour.temp)}°
-                                    </text>
+                          {(() => {
+                            const W = 800
+                            const PADL = 48
+                            const PADR = 14
+                            const n = hourlyForecast.length
+                            const xAt = (i: number) => PADL + i * ((W - PADL - PADR) / Math.max(1, n - 1))
+                            const temps = hourlyForecast.map(h => convertTemp(h.temp))
+                            const tMin = Math.floor(Math.min(...temps)) - 1
+                            const tMax = Math.ceil(Math.max(...temps)) + 1
+                            const winds = hourlyForecast.map(h => Math.round(h.wind_speed ?? 0))
+                            const wMax = Math.max(10, Math.ceil(Math.max(...winds) / 5) * 5)
+
+                            const grid = (y: number) => (
+                              <line x1={PADL} y1={y} x2={W - PADR} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                            )
+                            const tick = (y: number, label: string) => (
+                              <text x={PADL - 6} y={y + 3} textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">{label}</text>
+                            )
+
+                            // Temperature panel: real degree scale
+                            const T_TOP = 16
+                            const T_BOT = 108
+                            const tY = (v: number) => T_BOT - ((v - tMin) / (tMax - tMin)) * (T_BOT - T_TOP)
+                            const tMid = Math.round((tMin + tMax) / 2)
+
+                            // Percent panel: true 0–100 axis shared by rain chance and humidity
+                            const P_TOP = 12
+                            const P_BOT = 104
+                            const pY = (v: number) => P_BOT - (v / 100) * (P_BOT - P_TOP)
+
+                            // Wind panel: km/h from zero
+                            const W_TOP = 12
+                            const W_BOT = 96
+                            const wY = (v: number) => W_BOT - (v / wMax) * (W_BOT - W_TOP)
+
+                            return (
+                              <>
+                                <div className="small text-white-50 mb-1">Temperature (°{tempUnit})</div>
+                                <svg width="100%" height="124" viewBox={`0 0 ${W} 124`} style={{ overflow: 'visible' }}>
+                                  {[tMin, tMid, tMax].map(v => (
+                                    <g key={v}>{grid(tY(v))}{tick(tY(v), `${v}°`)}</g>
+                                  ))}
+                                  <polyline
+                                    points={temps.map((t, i) => `${xAt(i)},${tY(t)}`).join(' ')}
+                                    fill="none" stroke="#ffc107" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                                  />
+                                  {temps.map((t, i) => (
+                                    <g key={i}>
+                                      <circle cx={xAt(i)} cy={tY(t)} r="4" fill="#ffc107" stroke="#fff" strokeWidth="2" />
+                                      {(i % 2 === 0 || n <= 8) && (
+                                        <text x={xAt(i)} y={tY(t) - 10} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{t}°</text>
+                                      )}
+                                    </g>
+                                  ))}
+                                </svg>
+
+                                <div className="small text-white-50 mb-1 mt-3 d-flex align-items-center gap-3">
+                                  <span>Rain chance &amp; humidity (%)</span>
+                                  <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                    <span style={{ width: '10px', height: '10px', background: 'rgba(54,162,235,0.55)', display: 'inline-block' }} /> rain chance
+                                  </span>
+                                  <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                    <span style={{ width: '14px', borderTop: '2px dashed #17a2b8', display: 'inline-block' }} /> humidity
+                                  </span>
+                                </div>
+                                <svg width="100%" height="112" viewBox={`0 0 ${W} 112`} style={{ overflow: 'visible' }}>
+                                  {[0, 50, 100].map(v => (
+                                    <g key={v}>{grid(pY(v))}{tick(pY(v), `${v}%`)}</g>
+                                  ))}
+                                  {hourlyForecast.map((hour, i) => {
+                                    const h = Math.max(0, pY(0) - pY(hour.pop ?? 0))
+                                    return (
+                                      <rect key={i} x={xAt(i) - 9} y={pY(hour.pop ?? 0)} width="18" height={h}
+                                        fill="rgba(54,162,235,0.35)" stroke="rgba(54,162,235,0.6)" strokeWidth="1" />
+                                    )
+                                  })}
+                                  <polyline
+                                    points={hourlyForecast.map((hour, i) => `${xAt(i)},${pY(hour.humidity ?? 50)}`).join(' ')}
+                                    fill="none" stroke="#17a2b8" strokeWidth="2" strokeDasharray="5,5" strokeLinecap="round"
+                                  />
+                                </svg>
+
+                                <div className="small text-white-50 mb-1 mt-3">Wind (km/h)</div>
+                                <svg width="100%" height="128" viewBox={`0 0 ${W} 128`} style={{ overflow: 'visible' }}>
+                                  {[0, wMax / 2, wMax].map(v => (
+                                    <g key={v}>{grid(wY(v))}{tick(wY(v), `${v}`)}</g>
+                                  ))}
+                                  <polyline
+                                    points={winds.map((w, i) => `${xAt(i)},${wY(w)}`).join(' ')}
+                                    fill="none" stroke="#28a745" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                  />
+                                  {winds.map((w, i) => (
+                                    <circle key={i} cx={xAt(i)} cy={wY(w)} r="3" fill="#28a745" stroke="#fff" strokeWidth="1" />
+                                  ))}
+                                  {hourlyForecast.map((hour, i) =>
+                                    i % 2 === 0 || n <= 8 ? (
+                                      <text key={i} x={xAt(i)} y={122} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">{hour.time}</text>
+                                    ) : null
                                   )}
-                                </g>
-                              )
-                            })}
-                            
-                            {/* Humidity points */}
-                            {chartVisibility.humidity && hourlyForecast.map((hour, index) => {
-                              if (hour.humidity !== undefined) {
-                                const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                const y = 140 - ((hour.humidity / 100) * 120)
-                                return (
-                                  <circle key={`humidity-point-${index}`} cx={x} cy={y} r="3" fill="#17a2b8" stroke="#fff" strokeWidth="1" />
-                                )
-                              }
-                              return null
-                            })}
-                            
-                            {/* Wind points */}
-                            {chartVisibility.wind && hourlyForecast.map((hour, index) => {
-                              if (hour.wind_speed !== undefined) {
-                                const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                const maxWind = Math.max(...hourlyForecast.map(h => h.wind_speed ?? 0))
-                                const normalizedWind = maxWind > 0 ? ((hour.wind_speed ?? 0) / maxWind) : 0
-                                const y = 140 - (normalizedWind * 120)
-                                return (
-                                  <circle key={`wind-point-${index}`} cx={x} cy={y} r="3" fill="#28a745" stroke="#fff" strokeWidth="1" />
-                                )
-                              }
-                              return null
-                            })}
-                            
-                            {/* Time labels */}
-                            {hourlyForecast.map((hour, index) => {
-                              if (index % 2 === 0 || hourlyForecast.length <= 8) {
-                                const x = 60 + (index * (680 / (hourlyForecast.length - 1)))
-                                return (
-                                  <text key={`time-${index}`} x={x} y={165} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">
-                                    {hour.time}
-                                  </text>
-                                )
-                              }
-                              return null
-                            })}
-                            
-                            {/* Y-axis labels */}
-                            <text x="50" y="25" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">High</text>
-                            <text x="50" y="80" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">Mid</text>
-                            <text x="50" y="145" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">Low</text>
-                          </svg>
-                          
-                          {/* Interactive Legend Below Chart */}
-                          <div className="d-flex justify-content-center gap-4 mt-3">
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: chartVisibility.temperature ? 1 : 0.5 }}
-                              onClick={() => toggleChartVisibility('temperature')}
-                            >
-                              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffc107', marginRight: '6px' }}></div>
-                              <small className="text-white">Temperature</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: chartVisibility.precipitation ? 1 : 0.5 }}
-                              onClick={() => toggleChartVisibility('precipitation')}
-                            >
-                              <div style={{ width: '12px', height: '12px', backgroundColor: 'rgba(54, 162, 235, 0.6)', marginRight: '6px' }}></div>
-                              <small className="text-white">Rain %</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: chartVisibility.humidity ? 1 : 0.5 }}
-                              onClick={() => toggleChartVisibility('humidity')}
-                            >
-                              <div style={{ width: '12px', height: '2px', backgroundColor: '#17a2b8', marginRight: '6px', borderStyle: 'dashed', borderWidth: '1px 0' }}></div>
-                              <small className="text-white">Humidity</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: chartVisibility.wind ? 1 : 0.5 }}
-                              onClick={() => toggleChartVisibility('wind')}
-                            >
-                              <div style={{ width: '12px', height: '2px', backgroundColor: '#28a745', marginRight: '6px', borderStyle: 'dotted', borderWidth: '1px 0' }}></div>
-                              <small className="text-white">Wind</small>
-                            </div>
-                          </div>
+                                </svg>
+
+                                {aqHourly && aqHourly.aqi.length > 1 && (() => {
+                                  const an = aqHourly.aqi.length
+                                  const axAt = (i: number) => PADL + i * ((W - PADL - PADR) / Math.max(1, an - 1))
+                                  const aMax = Math.max(100, Math.ceil(Math.max(...aqHourly.aqi) / 25) * 25)
+                                  const A_TOP = 12
+                                  const A_BOT = 96
+                                  const aY = (v: number) => A_BOT - (v / aMax) * (A_BOT - A_TOP)
+                                  const hourLabel = (t: string) => {
+                                    const h = new Date(t).getHours()
+                                    return h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`
+                                  }
+                                  return (
+                                    <>
+                                      <div className="small text-white-50 mb-1 mt-3">
+                                        Air quality (US AQI){aqMeta && ` — now ${aqMeta.aqi}, ${aqMeta.category}`}
+                                        {aqMeta?.source === 'openaq' && aqMeta.station && (
+                                          <span className="ms-2" style={{ fontSize: '0.68rem' }}>
+                                            observed at {aqMeta.station} ({aqMeta.distanceKm} km); forecast modelled
+                                          </span>
+                                        )}
+                                      </div>
+                                      <svg width="100%" height="128" viewBox={`0 0 ${W} 128`} style={{ overflow: 'visible' }}>
+                                        {grid(aY(0))}{tick(aY(0), '0')}
+                                        {grid(aY(50))}{tick(aY(50), '50')}
+                                        <text x={PADL + 4} y={aY(50) - 4} fill="rgba(255,255,255,0.45)" fontSize="9">≤50 good · ≤100 moderate</text>
+                                        {grid(aY(100))}{tick(aY(100), '100')}
+                                        {aMax > 100 && <>{grid(aY(aMax))}{tick(aY(aMax), `${aMax}`)}</>}
+                                        <polyline
+                                          points={aqHourly.aqi.map((v, i) => `${axAt(i)},${aY(v)}`).join(' ')}
+                                          fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                                        />
+                                        {aqHourly.aqi.map((v, i) => (
+                                          <circle key={i} cx={axAt(i)} cy={aY(v)} r="3" fill="#a78bfa" stroke="#fff" strokeWidth="1" />
+                                        ))}
+                                        {aqHourly.time.map((t, i) =>
+                                          i % 3 === 0 ? (
+                                            <text key={i} x={axAt(i)} y={122} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">{hourLabel(t)}</text>
+                                          ) : null
+                                        )}
+                                      </svg>
+                                    </>
+                                  )
+                                })()}
+                              </>
+                            )
+                          })()}
                         </div>
                       </div>
 
@@ -798,190 +746,111 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                   {/* 7-Day Forecast Tab */}
                   {activeTab === 'daily' && (
                     <div>
-                      {/* 7-Day Weather Chart */}
+                      {/* 7-Day Weather Charts — one real scale per unit */}
                       <div className="mb-4">
-                        <h6 className="text-white mb-3">7-Day Temperature & Rain Forecast</h6>
+                        <h6 className="text-white mb-3">7-Day Forecast</h6>
                         <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-                          <svg width="100%" height="250" viewBox="0 0 800 250" style={{ overflow: 'visible' }}>
-                            {/* Grid lines */}
-                            {[0, 1, 2, 3, 4, 5].map(i => (
-                              <line key={`grid-${i}`} x1="80" y1={30 + i * 30} x2="720" y2={30 + i * 30} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            ))}
-                            
-                            {/* Precipitation bars (background) */}
-                            {dailyChartVisibility.precipitation && forecast.map((day, index) => {
-                              const x = 80 + (index * (640 / (forecast.length - 1)))
-                              const barHeight = (day.pop / 100) * 150
-                              return (
-                                <rect
-                                  key={`precip-${index}`}
-                                  x={x - 15}
-                                  y={180 - barHeight}
-                                  width="30"
-                                  height={barHeight}
-                                  fill="rgba(54, 162, 235, 0.2)"
-                                  stroke="rgba(54, 162, 235, 0.4)"
-                                  strokeWidth="1"
-                                />
-                              )
-                            })}
-                            
-                            {/* Humidity line */}
-                            {dailyChartVisibility.humidity && (
-                              <polyline
-                                points={forecast.map((day, index) => {
-                                  const x = 80 + (index * (640 / (forecast.length - 1)))
-                                  const y = 180 - ((day.humidity / 100) * 150)
-                                  return `${x},${y}`
-                                }).join(' ')}
-                                fill="none"
-                                stroke="#17a2b8"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray="5,5"
-                              />
-                            )}
-                            
-                            {/* Wind speed line */}
-                            {dailyChartVisibility.wind && (
-                              <polyline
-                                points={forecast.map((day, index) => {
-                                  const x = 80 + (index * (640 / (forecast.length - 1)))
-                                  const maxWind = Math.max(...forecast.map(d => d.wind_speed))
-                                  const normalizedWind = maxWind > 0 ? (day.wind_speed / maxWind) : 0
-                                  const y = 180 - (normalizedWind * 150)
-                                  return `${x},${y}`
-                                }).join(' ')}
-                                fill="none"
-                                stroke="#28a745"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray="3,3"
-                              />
-                            )}
-                            
-                            {/* Temperature range bars */}
-                            {dailyChartVisibility.temperature && forecast.map((day, index) => {
-                              const x = 80 + (index * (640 / (forecast.length - 1)))
-                              const allMaxTemps = forecast.map(d => convertTemp(d.temp_max))
-                              const allMinTemps = forecast.map(d => convertTemp(d.temp_min))
-                              const tempRange = Math.max(...allMaxTemps) - Math.min(...allMinTemps)
-                              const minOverallTemp = Math.min(...allMinTemps)
-                              
-                              const maxTempY = 180 - ((convertTemp(day.temp_max) - minOverallTemp) / tempRange * 150)
-                              const minTempY = 180 - ((convertTemp(day.temp_min) - minOverallTemp) / tempRange * 150)
-                              const barHeight = minTempY - maxTempY
-                              
-                              return (
-                                <g key={`temp-range-${index}`}>
-                                  {/* Temperature range bar */}
-                                  <rect
-                                    x={x - 8}
-                                    y={maxTempY}
-                                    width="16"
-                                    height={barHeight}
-                                    fill="rgba(255, 193, 7, 0.3)"
-                                    stroke="rgba(255, 193, 7, 0.6)"
-                                    strokeWidth="2"
-                                    rx="8"
+                          {(() => {
+                            const W = 800
+                            const PADL = 48
+                            const PADR = 14
+                            const n = forecast.length
+                            const xAt = (i: number) => PADL + i * ((W - PADL - PADR) / Math.max(1, n - 1))
+                            const highs = forecast.map(d => convertTemp(d.temp_max))
+                            const lows = forecast.map(d => convertTemp(d.temp_min))
+                            const tMin = Math.floor(Math.min(...lows)) - 1
+                            const tMax = Math.ceil(Math.max(...highs)) + 1
+                            const winds = forecast.map(d => Math.round((d as any).wind_speed ?? 0))
+                            const wMax = Math.max(10, Math.ceil(Math.max(...winds) / 5) * 5)
+
+                            const grid = (y: number) => (
+                              <line x1={PADL} y1={y} x2={W - PADR} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                            )
+                            const tick = (y: number, label: string) => (
+                              <text x={PADL - 6} y={y + 3} textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">{label}</text>
+                            )
+
+                            const T_TOP = 18
+                            const T_BOT = 116
+                            const tY = (v: number) => T_BOT - ((v - tMin) / (tMax - tMin)) * (T_BOT - T_TOP)
+                            const tMid = Math.round((tMin + tMax) / 2)
+
+                            const P_TOP = 12
+                            const P_BOT = 104
+                            const pY = (v: number) => P_BOT - (v / 100) * (P_BOT - P_TOP)
+
+                            const W_TOP = 12
+                            const W_BOT = 96
+                            const wY = (v: number) => W_BOT - (v / wMax) * (W_BOT - W_TOP)
+
+                            return (
+                              <>
+                                <div className="small text-white-50 mb-1">Daily high &amp; low (°{tempUnit})</div>
+                                <svg width="100%" height="164" viewBox={`0 0 ${W} 164`} style={{ overflow: 'visible' }}>
+                                  {[tMin, tMid, tMax].map(v => (
+                                    <g key={v}>{grid(tY(v))}{tick(tY(v), `${v}°`)}</g>
+                                  ))}
+                                  {forecast.map((day, i) => {
+                                    const hi = convertTemp(day.temp_max)
+                                    const lo = convertTemp(day.temp_min)
+                                    return (
+                                      <g key={i}>
+                                        <rect x={xAt(i) - 6} y={tY(hi)} width="12" height={Math.max(4, tY(lo) - tY(hi))}
+                                          rx="6" fill="rgba(255,193,7,0.35)" stroke="#ffc107" strokeWidth="1.5" />
+                                        <text x={xAt(i)} y={tY(hi) - 8} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{hi}°</text>
+                                        <text x={xAt(i)} y={tY(lo) + 16} textAnchor="middle" fill="rgba(255,255,255,0.65)" fontSize="10">{lo}°</text>
+                                        <text x={xAt(i)} y={146} textAnchor="middle" fill="rgba(255,255,255,0.85)" fontSize="11" fontWeight="600">{day.date}</text>
+                                        <text x={xAt(i)} y={161} textAnchor="middle" fontSize="12">{getWeatherIcon(day.icon)}</text>
+                                      </g>
+                                    )
+                                  })}
+                                </svg>
+
+                                <div className="small text-white-50 mb-1 mt-3 d-flex align-items-center gap-3">
+                                  <span>Rain chance &amp; humidity (%)</span>
+                                  <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                    <span style={{ width: '10px', height: '10px', background: 'rgba(54,162,235,0.55)', display: 'inline-block' }} /> rain chance
+                                  </span>
+                                  <span className="d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                                    <span style={{ width: '14px', borderTop: '2px dashed #17a2b8', display: 'inline-block' }} /> humidity
+                                  </span>
+                                </div>
+                                <svg width="100%" height="112" viewBox={`0 0 ${W} 112`} style={{ overflow: 'visible' }}>
+                                  {[0, 50, 100].map(v => (
+                                    <g key={v}>{grid(pY(v))}{tick(pY(v), `${v}%`)}</g>
+                                  ))}
+                                  {forecast.map((day, i) => {
+                                    const pop = (day as any).pop ?? 0
+                                    return (
+                                      <rect key={i} x={xAt(i) - 9} y={pY(pop)} width="18" height={Math.max(0, pY(0) - pY(pop))}
+                                        fill="rgba(54,162,235,0.35)" stroke="rgba(54,162,235,0.6)" strokeWidth="1" />
+                                    )
+                                  })}
+                                  <polyline
+                                    points={forecast.map((day, i) => `${xAt(i)},${pY(day.humidity ?? 50)}`).join(' ')}
+                                    fill="none" stroke="#17a2b8" strokeWidth="2" strokeDasharray="5,5" strokeLinecap="round"
                                   />
-                                  
-                                  {/* Max temp point */}
-                                  <circle cx={x} cy={maxTempY} r="4" fill="#ffc107" stroke="#fff" strokeWidth="2" />
-                                  <text x={x} y={maxTempY - 8} textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">
-                                    {convertTemp(day.temp_max)}°
-                                  </text>
-                                  
-                                  {/* Min temp point */}
-                                  <circle cx={x} cy={minTempY} r="4" fill="#17a2b8" stroke="#fff" strokeWidth="2" />
-                                  <text x={x} y={minTempY + 18} textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize="10">
-                                    {convertTemp(day.temp_min)}°
-                                  </text>
-                                </g>
-                              )
-                            })}
-                            
-                            {/* Humidity points */}
-                            {dailyChartVisibility.humidity && forecast.map((day, index) => {
-                              const x = 80 + (index * (640 / (forecast.length - 1)))
-                              const y = 180 - ((day.humidity / 100) * 150)
-                              return (
-                                <circle key={`humidity-point-${index}`} cx={x} cy={y} r="3" fill="#17a2b8" stroke="#fff" strokeWidth="1" />
-                              )
-                            })}
-                            
-                            {/* Wind points */}
-                            {dailyChartVisibility.wind && forecast.map((day, index) => {
-                              const x = 80 + (index * (640 / (forecast.length - 1)))
-                              const maxWind = Math.max(...forecast.map(d => d.wind_speed))
-                              const normalizedWind = maxWind > 0 ? (day.wind_speed / maxWind) : 0
-                              const y = 180 - (normalizedWind * 150)
-                              return (
-                                <circle key={`wind-point-${index}`} cx={x} cy={y} r="3" fill="#28a745" stroke="#fff" strokeWidth="1" />
-                              )
-                            })}
-                            
-                            {/* Day labels and weather icons */}
-                            {forecast.map((day, index) => {
-                              const x = 80 + (index * (640 / (forecast.length - 1)))
-                              return (
-                                <g key={`day-label-${index}`}>
-                                  <text x={x} y={210} textAnchor="middle" fill="rgba(255,255,255,0.9)" fontSize="11" fontWeight="bold">
-                                    {day.date}
-                                  </text>
-                                  <text x={x} y={225} textAnchor="middle" fontSize="16">
-                                    {getWeatherIcon(day.icon)}
-                                  </text>
-                                </g>
-                              )
-                            })}
-                            
-                            {/* Y-axis labels */}
-                            <text x="70" y="35" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">High</text>
-                            <text x="70" y="105" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">Mid</text>
-                            <text x="70" y="175" textAnchor="end" fill="rgba(255,255,255,0.6)" fontSize="10">Low</text>
-                          </svg>
-                          
-                          {/* Interactive Legend */}
-                          <div className="d-flex justify-content-center gap-4 mt-3">
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: dailyChartVisibility.temperature ? 1 : 0.5 }}
-                              onClick={() => toggleDailyChartVisibility('temperature')}
-                            >
-                              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffc107', marginRight: '6px' }}></div>
-                              <small className="text-white">Temperature</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: dailyChartVisibility.precipitation ? 1 : 0.5 }}
-                              onClick={() => toggleDailyChartVisibility('precipitation')}
-                            >
-                              <div style={{ width: '12px', height: '12px', backgroundColor: 'rgba(54, 162, 235, 0.6)', marginRight: '6px' }}></div>
-                              <small className="text-white">Rain %</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: dailyChartVisibility.humidity ? 1 : 0.5 }}
-                              onClick={() => toggleDailyChartVisibility('humidity')}
-                            >
-                              <div style={{ width: '12px', height: '2px', backgroundColor: '#17a2b8', marginRight: '6px', borderStyle: 'dashed', borderWidth: '1px 0' }}></div>
-                              <small className="text-white">Humidity</small>
-                            </div>
-                            
-                            <div 
-                              className="d-flex align-items-center" 
-                              style={{ cursor: 'pointer', opacity: dailyChartVisibility.wind ? 1 : 0.5 }}
-                              onClick={() => toggleDailyChartVisibility('wind')}
-                            >
-                              <div style={{ width: '12px', height: '2px', backgroundColor: '#28a745', marginRight: '6px', borderStyle: 'dotted', borderWidth: '1px 0' }}></div>
-                              <small className="text-white">Wind</small>
-                            </div>
-                          </div>
+                                </svg>
+
+                                <div className="small text-white-50 mb-1 mt-3">Wind (km/h)</div>
+                                <svg width="100%" height="112" viewBox={`0 0 ${W} 112`} style={{ overflow: 'visible' }}>
+                                  {[0, wMax / 2, wMax].map(v => (
+                                    <g key={v}>{grid(wY(v))}{tick(wY(v), `${v}`)}</g>
+                                  ))}
+                                  <polyline
+                                    points={winds.map((w, i) => `${xAt(i)},${wY(w)}`).join(' ')}
+                                    fill="none" stroke="#28a745" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                  />
+                                  {winds.map((w, i) => (
+                                    <circle key={i} cx={xAt(i)} cy={wY(w)} r="3" fill="#28a745" stroke="#fff" strokeWidth="1" />
+                                  ))}
+                                  {forecast.map((day, i) => (
+                                    <text key={i} x={xAt(i)} y={108} textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10">{day.date}</text>
+                                  ))}
+                                </svg>
+                              </>
+                            )
+                          })()}
                         </div>
                       </div>
 
