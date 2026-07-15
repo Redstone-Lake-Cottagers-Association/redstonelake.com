@@ -7,6 +7,7 @@ import WaterLevelComponent from '@/components/WaterLevelComponent'
 import HeroMap from '@/components/HeroMap'
 import newsIndex from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
+import NewsletterStrip from '@/components/NewsletterStrip'
 import sponsorData from '@/data/sponsors.json'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
@@ -589,6 +590,9 @@ export default function Home() {
           <div className="text-center mb-4">
             <h3 className="h4 mb-3 text-primary">News & Articles</h3>
           </div>
+
+          <NewsletterStrip />
+
           <div className="row g-4">
             {latestPosts.map(post => (
               <div key={post.slug} className="col-md-6 col-lg-4 d-flex">
