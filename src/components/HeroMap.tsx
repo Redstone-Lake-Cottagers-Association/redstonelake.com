@@ -8,16 +8,33 @@ declare global {
   }
 }
 
-// Lake locations - Precise RLCA coordinates
+// Lake centroids from the County of Haliburton GIS lakes layer; each lake gets
+// its own distinct pin colour, echoed in the legend below the map. `id`
+// matches the lake-health explorer; hasGauge marks the one lake with a live
+// water-level gauge (Parks Canada station 17 on Redstone).
 const LAKES = [
-  { name: 'Redstone Lake', coordinates: [-78.53708715953942, 45.17283012667944], color: '#0284c7', slug: 'redstone-lake' },
-  { name: 'Little Redstone Lake', coordinates: [-78.56998432916856, 45.207970577781346], color: '#0d9488', slug: 'little-redstone-lake' },
-  { name: 'Pelaw Lake', coordinates: [-78.5408542205793, 45.22045294890792], color: '#0d9488', slug: 'pelaw-lake' },
-  { name: 'Bitter Lake', coordinates: [-78.57648763236138, 45.17216205718878], color: '#059669', slug: 'bitter-lake' },
-  { name: 'Tedious Lake', coordinates: [-78.57482565443063, 45.16500688295296], color: '#f97316', slug: 'tedious-lake' },
-  { name: 'Burdock Lake', coordinates: [-78.58715595440152, 45.17247753540227], color: '#1e40af', slug: 'burdock-lake' },
-  { name: 'Coleman Lake', coordinates: [-78.54504027355213, 45.15411155709159], color: '#0f172a', slug: 'coleman-lake' }
+  { id: 'redstone', name: 'Redstone Lake', coordinates: [-78.5328, 45.17969], color: '#0284c7', hasGauge: true },
+  { id: 'little-redstone', name: 'Little Redstone Lake', coordinates: [-78.56998, 45.2157], color: '#0d9488', hasGauge: false },
+  { id: 'pelaw', name: 'Pelaw Lake', coordinates: [-78.54372, 45.21756], color: '#7c3aed', hasGauge: false },
+  { id: 'bitter', name: 'Bitter Lake', coordinates: [-78.57593, 45.17299], color: '#15803d', hasGauge: false },
+  { id: 'tedious', name: 'Long (Tedious) Lake', coordinates: [-78.57552, 45.1639], color: '#ea580c', hasGauge: false },
+  { id: 'burdock', name: 'Burdock Lake', coordinates: [-78.58639, 45.17215], color: '#1e3a8a', hasGauge: false },
+  { id: 'coleman', name: 'Coleman Lake', coordinates: [-78.54549, 45.15417], color: '#be185d', hasGauge: false },
 ]
+
+function popupHtml(lake: (typeof LAKES)[number]): string {
+  const linkStyle = 'display:block;margin-top:4px;font-weight:600;color:#0f4c81;text-decoration:none;font-size:12.5px;'
+  const waterLevel = lake.hasGauge
+    ? `<a href="/lake-health#water-level" style="${linkStyle}">💧 Live water level →</a>`
+    : `<span style="${linkStyle}color:#94a3b8;cursor:not-allowed;" title="No water-level gauge on this lake">💧 Water level — not available for this lake</span>`
+  return `
+    <div style="color:#334155;font-family:'Inter',sans-serif;line-height:1.45;min-width:210px;">
+      <strong style="color:#0f172a;font-size:14px;">${lake.name}</strong>
+      <a href="/lake-health?lake=${lake.id}#explore" style="${linkStyle}">🔬 Water quality data →</a>
+      ${waterLevel}
+      <a href="/lake-map?lat=${lake.coordinates[1]}&lng=${lake.coordinates[0]}&zoom=13.5" style="${linkStyle}">🗺️ Zoom in on the lake map →</a>
+    </div>`
+}
 
 const MAP_CENTER = [-78.55, 45.19]
 
@@ -128,12 +145,7 @@ export default function HeroMap() {
           .setPopup(new window.mapboxgl.Popup({
             offset: 25,
             className: 'lake-popup'
-          }).setHTML(`
-            <div style="color: #334155; font-family: 'Inter', sans-serif; line-height: 1.4;">
-              <strong style="color: #0f172a; font-size: 14px;">${lake.name}</strong><br/>
-              <span style="color: #64748b; font-size: 12px;">Protected by RLCA</span>
-            </div>
-          `))
+          }).setHTML(popupHtml(lake)))
           .addTo(map.current)
         })
       })
@@ -206,6 +218,26 @@ export default function HeroMap() {
           }}
           className="mapbox-container"
         />
+      )}
+
+      {/* Legend: one distinct colour per lake; click a pin for actions */}
+      {!plain && (
+        <div className="d-flex flex-wrap justify-content-center gap-3 mt-2 small text-muted">
+          {LAKES.map(lake => (
+            <span key={lake.id} className="d-inline-flex align-items-center gap-1">
+              <svg width="11" height="14" viewBox="0 0 27 41" aria-hidden="true">
+                <path
+                  d="M13.5 0C6.04 0 0 6.04 0 13.5c0 9.8 12.1 26 13.5 27.5C14.9 39.5 27 23.3 27 13.5 27 6.04 20.96 0 13.5 0z"
+                  fill={lake.color}
+                />
+              </svg>
+              {lake.name.replace(/ Lake$/, '')}
+            </span>
+          ))}
+          <span className="d-inline-flex align-items-center" style={{ fontSize: '0.72rem' }}>
+            — click a pin for water data &amp; map
+          </span>
+        </div>
       )}
 
       <style jsx>{`

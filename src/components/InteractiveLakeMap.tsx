@@ -115,6 +115,18 @@ interface Layers {
   topo: boolean
 }
 
+// Deep links: /lake-map?lat=45.18&lng=-78.53&zoom=13.5 opens on that spot
+// (used by the homepage lake pins) and skips the find-me overlay
+function deepLinkTarget(): { center: [number, number]; zoom: number } | null {
+  if (typeof window === 'undefined') return null
+  const p = new URLSearchParams(window.location.search)
+  const lat = parseFloat(p.get('lat') || '')
+  const lng = parseFloat(p.get('lng') || '')
+  if (!isFinite(lat) || !isFinite(lng)) return null
+  const zoom = parseFloat(p.get('zoom') || '')
+  return { center: [lng, lat], zoom: isFinite(zoom) ? zoom : 13.5 }
+}
+
 export default function InteractiveLakeMap() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
@@ -132,7 +144,7 @@ export default function InteractiveLakeMap() {
   })
   const [zoom, setZoom] = useState(11)
   const [parcelStatus, setParcelStatus] = useState<'idle' | 'loading' | 'error'>('idle')
-  const [locatePrompt, setLocatePrompt] = useState(true)
+  const [locatePrompt, setLocatePrompt] = useState(() => deepLinkTarget() === null)
   const [locateStatus, setLocateStatus] = useState<'idle' | 'locating' | 'denied' | 'unavailable'>('idle')
   const [satellite, setSatellite] = useState(false)
   const geolocateRef = useRef<any>(null)
@@ -203,11 +215,14 @@ export default function InteractiveLakeMap() {
       preloadIcon(BOAT_DATA_URI, 'boat-icon', boatImgRef)
       preloadIcon(DAM_DATA_URI, 'dam-icon', damImgRef)
 
+      const target = deepLinkTarget()
+      if (target) userNavigatedRef.current = true
       const m = new window.mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
-        bounds: INITIAL_BOUNDS,
-        fitBoundsOptions: { padding: 20 },
+        ...(target
+          ? { center: target.center, zoom: target.zoom }
+          : { bounds: INITIAL_BOUNDS, fitBoundsOptions: { padding: 20 } }),
       })
       map.current = m
       // Default view sits half a zoom level wider than the fitted lake bounds —
