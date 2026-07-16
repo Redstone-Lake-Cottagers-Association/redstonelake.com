@@ -131,6 +131,17 @@ const CHECKS: Check[] = [
     },
   },
   {
+    id: 'inaturalist',
+    name: 'Wildlife sightings (iNaturalist API)',
+    source: 'api.inaturalist.org',
+    url: 'https://api.inaturalist.org/v1/observations/species_counts?nelat=45.245&nelng=-78.475&swlat=45.135&swlng=-78.625&verifiable=true&per_page=1',
+    validate: (s, _c, b) => {
+      if (s !== 200) throw new Error(`HTTP ${s}`)
+      const d = JSON.parse(b)
+      if (!d?.total_results) throw new Error('no species counts returned')
+    },
+  },
+  {
     id: 'mapbox',
     name: 'Mapbox (style API + token)',
     source: 'api.mapbox.com',

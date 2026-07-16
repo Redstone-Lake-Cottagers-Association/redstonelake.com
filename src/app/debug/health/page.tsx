@@ -19,6 +19,7 @@ const LOCAL_CHECKS: { id: string; name: string; url: string; expectJson?: boolea
   { id: 'api-news', name: 'Internal: /api/newsletters', url: '/api/newsletters', expectJson: true },
   { id: 'api-token', name: 'Internal: /api/mapbox-token', url: '/api/mapbox-token', expectJson: true },
   { id: 'api-aq', name: 'Internal: /api/air-quality', url: '/api/air-quality', expectJson: true },
+  { id: 'api-inat', name: 'Internal: /api/inaturalist', url: '/api/inaturalist?mode=species', expectJson: true },
   { id: 'data-bathy', name: 'Static: bathymetry.geojson', url: '/map-data/bathymetry.geojson' },
   { id: 'data-lakes', name: 'Static: our-lakes.geojson', url: '/map-data/our-lakes.geojson' },
   { id: 'data-wetlands', name: 'Static: wetlands.geojson', url: '/map-data/wetlands.geojson' },

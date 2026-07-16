@@ -166,7 +166,7 @@ export default function Home() {
                   }}>conservation</span>
                 </h1>
                 <p className="lead mb-4 fs-3" style={{maxWidth: '600px', fontWeight: '400', lineHeight: '1.5', minHeight: '4.5rem'}}>
-                  Over 60 years of protecting lakes and building community in the Redstone River Watershed, Haliburton.
+                  Over 60 years of protecting lakes and building community in the Redstone group of lakes, Haliburton.
                 </p>
                 <div className="d-flex flex-column flex-sm-row gap-3">
                   <Link href="/membership" className="btn btn-lake-primary btn-lg" style={{fontSize: '1.1rem', padding: '1rem 2rem'}}>
@@ -465,11 +465,11 @@ export default function Home() {
       </section>
 
 
-      {/* Events & News Section */}
+      {/* News & Events Section */}
       <section id="events-news" className="py-6">
         <div className="container">
           <div className="text-center mb-5">
-            <h2 className="display-5 mb-3">Events & News</h2>
+            <h2 className="display-5 mb-3">News & Events</h2>
             <p className="lead text-muted">Stay connected with community events and conservation insights</p>
           </div>
 
@@ -592,7 +592,7 @@ export default function Home() {
 
           {/* News Articles */}
           <div className="text-center mb-4">
-            <h3 className="h4 mb-3 text-primary">News & Articles</h3>
+            <h3 className="h4 mb-3 text-primary">Latest News</h3>
           </div>
 
           <NewsletterStrip />
@@ -606,7 +606,7 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-4">
-            <Link href="/news" className="btn btn-outline-primary btn-lg">View All News & Articles</Link>
+            <Link href="/news" className="btn btn-outline-primary btn-lg">View All News & Events</Link>
           </div>
         </div>
       </section>

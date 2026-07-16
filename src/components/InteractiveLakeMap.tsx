@@ -26,6 +26,14 @@ const LAKES = [
   { id: 'pelaw', name: 'Pelaw Lake', coordinates: [-78.54372, 45.21756] },
 ]
 
+// Generous area of interest (~60 km around the lakes). Desktop browsers
+// without GPS fall back to IP-based positioning that can be a city away
+// (a member was placed in Sudbury) — a fix outside this box, or one with
+// tens-of-kilometres accuracy, is treated as unusable rather than flown to.
+const AOI = { minLat: 44.6, maxLat: 45.75, minLng: -79.45, maxLng: -77.65 }
+const inAreaOfInterest = (lat: number, lng: number) =>
+  lat >= AOI.minLat && lat <= AOI.maxLat && lng >= AOI.minLng && lng <= AOI.maxLng
+
 // Fits the seven lakes; the ANSI areas sit one pan to the west
 const INITIAL_BOUNDS: [[number, number], [number, number]] = [
   [-78.64, 45.13],
@@ -105,6 +113,7 @@ function geomArea(geom: any): number {
 interface Layers {
   bathymetry: boolean
   parcels: boolean
+  inat: boolean
   wetlands: boolean
   ansi: boolean
   wmu: boolean
@@ -114,6 +123,25 @@ interface Layers {
   aggregates: boolean
   topo: boolean
 }
+
+// Wildlife groups (iNaturalist "iconic taxa"): one colour per group, shared
+// by the map dots, the dropdown and the species chart
+// One clearly-distinct colour per group; the only green belongs to plants,
+// fungi wear toadstool red, and the big groups get maximum separation
+const INAT_GROUPS: { key: string; label: string; emoji: string; color: string }[] = [
+  { key: 'Plantae', label: 'Plants', emoji: '🌿', color: '#16a34a' },
+  { key: 'Insecta', label: 'Insects', emoji: '🦋', color: '#c026d3' },
+  { key: 'Fungi', label: 'Fungi', emoji: '🍄', color: '#dc2626' },
+  { key: 'Aves', label: 'Birds', emoji: '🐦', color: '#0ea5e9' },
+  { key: 'Amphibia', label: 'Amphibians', emoji: '🐸', color: '#0d9488' },
+  { key: 'Arachnida', label: 'Spiders', emoji: '🕷️', color: '#1e293b' },
+  { key: 'Mammalia', label: 'Mammals', emoji: '🦫', color: '#92400e' },
+  { key: 'Reptilia', label: 'Reptiles', emoji: '🐢', color: '#d97706' },
+  { key: 'Actinopterygii', label: 'Fish', emoji: '🐟', color: '#1d4ed8' },
+  { key: 'Mollusca', label: 'Molluscs', emoji: '🐚', color: '#94a3b8' },
+  { key: 'Animalia', label: 'Other animals', emoji: '🐾', color: '#7c3aed' },
+]
+const groupColor = (iconic: string) => INAT_GROUPS.find(g => g.key === iconic)?.color || '#c026d3'
 
 // Deep links: /lake-map?lat=45.18&lng=-78.53&zoom=13.5 opens on that spot
 // (used by the homepage lake pins) and skips the find-me overlay
@@ -133,6 +161,7 @@ export default function InteractiveLakeMap() {
   const [layers, setLayers] = useState<Layers>({
     bathymetry: true,
     parcels: true,
+    inat: true,
     wetlands: true,
     ansi: true,
     wmu: true,
@@ -144,14 +173,73 @@ export default function InteractiveLakeMap() {
   })
   const [zoom, setZoom] = useState(11)
   const [parcelStatus, setParcelStatus] = useState<'idle' | 'loading' | 'error'>('idle')
-  const [locatePrompt, setLocatePrompt] = useState(() => deepLinkTarget() === null)
-  const [locateStatus, setLocateStatus] = useState<'idle' | 'locating' | 'denied' | 'unavailable'>('idle')
+  // One overlay owns the whole find-me lifecycle: consent prompt → locating
+  // spinner → gone on success, or an alert the user dismisses
+  type Overlay = 'prompt' | 'locating' | 'outside' | 'denied' | 'unavailable' | null
+  const [overlay, setOverlay] = useState<Overlay>(() => (deepLinkTarget() === null ? 'prompt' : null))
+  const [outsideKm, setOutsideKm] = useState<number | null>(null)
+  // The locating state shows for at least this long so it never flashes
+  const locateStartRef = useRef(0)
+  const MIN_LOCATING_MS = 3000
+  const afterMinLocating = (fn: () => void) => {
+    const remaining = Math.max(0, MIN_LOCATING_MS - (Date.now() - locateStartRef.current))
+    setTimeout(fn, remaining)
+  }
   const [satellite, setSatellite] = useState(false)
   const geolocateRef = useRef<any>(null)
   const applyVisibilityRef = useRef<() => void>(() => {})
   const cancelledRef = useRef(false)
   const boatImgRef = useRef<HTMLImageElement | null>(null)
   const damImgRef = useRef<HTMLImageElement | null>(null)
+  // iNaturalist sightings: top species for the chart + observation points
+  const [inatSpecies, setInatSpecies] = useState<{ taxonId: number; name: string; common: string | null; count: number; iconic: string }[]>([])
+  const [inatTotal, setInatTotal] = useState<number | null>(null)
+  const [inatTaxa, setInatTaxa] = useState<number[]>([])
+  const [inatMenuOpen, setInatMenuOpen] = useState(false)
+  const inatMenuRef = useRef<HTMLDivElement | null>(null)
+  const openPopupsRef = useRef<any[]>([])
+  // Default view: the critters people come looking for — bears, loons,
+  // turtles, frogs and fish. Plants/insects/fungi are a checkbox away.
+  const DEFAULT_GROUPS = ['Aves', 'Mammalia', 'Reptilia', 'Amphibia', 'Actinopterygii']
+  const [inatGroups, setInatGroups] = useState<string[]>(DEFAULT_GROUPS)
+  const [inatSearch, setInatSearch] = useState('')
+  const allGroupsChecked = inatGroups.length === INAT_GROUPS.length
+  // Species picks (from the chart) and group picks (from the dropdown) are
+  // separate filter modes — engaging one clears the other
+  const toggleInatTaxon = (id: number) => {
+    setInatGroups(INAT_GROUPS.map(g => g.key))
+    setInatTaxa(t => (t.includes(id) ? t.filter(x => x !== id) : [...t, id]))
+  }
+  const toggleInatGroup = (key: string) => {
+    setInatTaxa([])
+    setInatGroups(g => (g.includes(key) ? g.filter(x => x !== key) : [...g, key]))
+  }
+  // "Everything" is a master checkbox: checking it remembers your current
+  // selection and selects all; unchecking restores what you had before
+  // (or clears everything if there is nothing to restore)
+  const prevSelectionRef = useRef<{ groups: string[]; taxa: number[] } | null>(null)
+  const setEverything = (on: boolean) => {
+    if (on) {
+      prevSelectionRef.current = { groups: inatGroups, taxa: inatTaxa }
+      setInatTaxa([])
+      setInatGroups(INAT_GROUPS.map(g => g.key))
+    } else {
+      const prev = prevSelectionRef.current
+      prevSelectionRef.current = null
+      const prevWasEverything = prev && prev.taxa.length === 0 && prev.groups.length === INAT_GROUPS.length
+      if (prev && !prevWasEverything) {
+        setInatGroups(prev.groups)
+        setInatTaxa(prev.taxa)
+      } else {
+        setInatTaxa([])
+        setInatGroups([])
+      }
+    }
+  }
+  const [inatLoading, setInatLoading] = useState(false)
+  const [inatRange, setInatRange] = useState<{ shown: number; total: number; oldest: string; unknown?: boolean } | null>(null)
+  const lastBarPctRef = useRef(0)
+
   // Once the user has located/declined, no automatic camera move may run —
   // a queued jumpTo would cancel their in-flight flyTo (the "inconsistent
   // find-me" bug: any camera command aborts an active animation)
@@ -244,8 +332,11 @@ export default function InteractiveLakeMap() {
       })
       m.addControl(geo, 'top-right')
       geolocateRef.current = geo
-      geo.on('geolocate', () => setLocateStatus('idle'))
-      geo.on('error', (err: any) => setLocateStatus(err?.code === 1 ? 'denied' : 'unavailable'))
+      geo.on('geolocate', (e: any) => {
+        const { latitude, longitude } = e?.coords || {}
+        if (latitude && !inAreaOfInterest(latitude, longitude)) setOverlay('outside')
+      })
+      geo.on('error', (err: any) => setOverlay(err?.code === 1 ? 'denied' : 'unavailable'))
 
       // Address search, biased to the Haliburton area
       const Geocoder = (window as any).MapboxGeocoder
@@ -501,8 +592,24 @@ export default function InteractiveLakeMap() {
           },
         })
 
+        // iNaturalist sightings (loaded async into the source)
+        m.addSource('inat', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+        m.addLayer({
+          id: 'inat-point',
+          type: 'circle',
+          source: 'inat',
+          paint: {
+            'circle-radius': 5,
+            'circle-color': '#c026d3',
+            'circle-stroke-color': '#fff',
+            'circle-stroke-width': 1.5,
+            'circle-opacity': 0.85,
+          },
+        })
+
         applyVisibilityRef.current()
         refreshParcels()
+        refreshInatRef.current()
       }
       m.on('style.load', setupLayers)
 
@@ -526,6 +633,18 @@ export default function InteractiveLakeMap() {
         // priority order, instead of overlapping popups.
         const note = (t: string) => `<div style="font-size:0.7rem;color:#64748b">${t}</div>`
         const RENDERERS: { layer: string; render: (f: any) => string }[] = [
+          {
+            layer: 'inat-point',
+            render: f => {
+              const p = f.properties
+              // fixed-size image box: the popup must not grow after placement,
+              // or Mapbox's auto-anchoring puts it outside the visible map
+              const img = p.photo
+                ? `<div style="width:180px;height:130px;border-radius:6px;overflow:hidden;margin-top:4px;background:#f1f5f9"><img src="${p.photo}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover"/></div>`
+                : ''
+              return `<strong>${p.name}</strong>${p.sciName && p.sciName !== p.name ? `<br/><em>${p.sciName}</em>` : ''}${img}<span style="font-size:0.72rem;color:#64748b">${p.date}${p.observer ? ` · by ${p.observer}` : ''}</span><br/><a href="${p.url}" target="_blank" rel="noopener" style="font-size:0.78rem">View on iNaturalist →</a>`
+            },
+          },
           {
             layer: 'dams-point',
             render: f => `<strong>${f.properties.DAM_NAME || 'Dam'}</strong>${f.properties.DAM_OWNERSHIP ? `<br/>Owner: ${f.properties.DAM_OWNERSHIP}` : ''}`,
@@ -604,10 +723,11 @@ export default function InteractiveLakeMap() {
             sections.push(r.render(f))
             if (sections.length >= 4) break
           }
-          new window.mapboxgl.Popup({ maxWidth: '320px', focusAfterOpen: false })
+          const popup = new window.mapboxgl.Popup({ maxWidth: '320px', focusAfterOpen: false })
             .setLngLat(e.lngLat)
-            .setHTML(sections.join('<hr style="margin:6px 0;border-color:#e2e8f0"/>'))
+            .setHTML(`<div style="max-height:280px;overflow-y:auto;padding-right:4px">${sections.join('<hr style="margin:6px 0;border-color:#e2e8f0"/>')}</div>`)
             .addTo(m)
+          openPopupsRef.current.push(popup)
         })
 
       m.on('moveend', refreshParcels)
@@ -664,6 +784,156 @@ export default function InteractiveLakeMap() {
     }
   }, [])
 
+  // iNaturalist data: species list once; observations follow the active filter
+  const inatGeojsonRef = useRef<any>({ type: 'FeatureCollection', features: [] })
+  const inatSpeciesRef = useRef<typeof inatSpecies>([])
+  inatSpeciesRef.current = inatSpecies
+  const refreshInatRef = useRef<() => void>(() => {})
+  refreshInatRef.current = () => {
+    const m = map.current
+    if (!m || !m.getSource || !m.getSource('inat')) {
+      // data can arrive before the style finishes loading — retry until ready
+      setTimeout(() => refreshInatRef.current(), 400)
+      return
+    }
+    if (m.getSource('inat')) m.getSource('inat').setData(inatGeojsonRef.current)
+    if (m.getLayer('inat-point')) {
+      const expr: any[] = ['match', ['get', 'iconic']]
+      INAT_GROUPS.forEach(g => expr.push(g.key, g.color))
+      expr.push('#c026d3')
+      m.setPaintProperty('inat-point', 'circle-color', expr)
+    }
+  }
+
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (inatMenuRef.current && !inatMenuRef.current.contains(e.target as Node)) setInatMenuOpen(false)
+    }
+    // Escape closes anything open on the map: popups, the species dropdown,
+    // and any dismissable find-me alert
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      openPopupsRef.current.forEach(p => p.remove())
+      openPopupsRef.current = []
+      document.querySelectorAll('.mapboxgl-popup').forEach(el => el.remove())
+      setInatMenuOpen(false)
+      setOverlay(o => (o === 'prompt' || o === 'locating' ? o : null))
+    }
+    document.addEventListener('click', close)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('click', close)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/inaturalist?mode=species')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (d?.species) {
+          setInatSpecies(d.species)
+          setInatTotal(d.totalSpecies)
+          inatSpeciesRef.current = d.species
+          refreshInatRef.current()
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const inatTaxaKey = inatTaxa.slice().sort((a, b) => a - b).join(',')
+  const nothingChecked = inatGroups.length === 0 && inatTaxa.length === 0
+
+  // Per-group cache: each group's observations are fetched once (resumable,
+  // page by page) and kept for the session. Toggling checkboxes then only
+  // recomposes locally — no refetching of everything on every change.
+  const groupStoreRef = useRef<Record<string, { features: any[]; total: number | null; nextCursor: string | null; complete: boolean }>>({})
+
+  // Groups needed right now: the checked ones, or (when filtering by species)
+  // the groups those species belong to
+  const requiredGroups = (inatTaxa.length > 0
+    ? Array.from(new Set(inatSpecies.filter(s => inatTaxa.includes(s.taxonId)).map(s => s.iconic)))
+    : inatGroups
+  ).filter(k => INAT_GROUPS.some(g => g.key === k))
+  const requiredKey = requiredGroups.slice().sort().join(',')
+
+  const recomposeInat = () => {
+    const store = groupStoreRef.current
+    let feats: any[] = []
+    for (const k of requiredGroups) feats = feats.concat(store[k]?.features || [])
+    if (inatTaxa.length > 0) feats = feats.filter(f => inatTaxa.includes(f.properties.taxonId))
+    inatGeojsonRef.current = { type: 'FeatureCollection', features: feats }
+    refreshInatRef.current()
+    const dates = feats.map(f => f.properties.date).filter(Boolean).sort()
+    const total = inatTaxa.length > 0
+      ? inatSpecies.filter(s => inatTaxa.includes(s.taxonId)).reduce((sum, s) => sum + s.count, 0)
+      : requiredGroups.reduce((sum, k) => sum + (store[k]?.total ?? 0), 0)
+    // some required group hasn't reported its total yet → progress % would lie
+    const unknown = inatTaxa.length === 0 && requiredGroups.some(k => (store[k]?.total ?? null) === null)
+    setInatRange(feats.length || total ? { shown: feats.length, total: Math.max(total, feats.length), oldest: dates[0] || '', unknown } : null)
+  }
+
+  useEffect(() => {
+    // a new view: close any open popups on the map
+    openPopupsRef.current.forEach(p => p.remove())
+    openPopupsRef.current = []
+    if (nothingChecked) {
+      inatGeojsonRef.current = { type: 'FeatureCollection', features: [] }
+      refreshInatRef.current()
+      setInatRange(null)
+      setInatLoading(false)
+      return
+    }
+    let cancelled = false
+    recomposeInat() // cached groups appear instantly
+
+    const store = groupStoreRef.current
+    const missing = requiredGroups.filter(k => !store[k]?.complete)
+    if (missing.length === 0) {
+      setInatLoading(false)
+      return
+    }
+    setInatLoading(true)
+    ;(async () => {
+      for (const key of missing) {
+        const entry = (store[key] = store[key] || { features: [], total: null, nextCursor: null, complete: false })
+        for (let page = 0; page < 40 && !entry.complete; page++) {
+          const params = new URLSearchParams({ mode: 'obs', groups: key })
+          if (entry.nextCursor) params.set('cursor', entry.nextCursor)
+          let d: any
+          try {
+            const r = await fetch(`/api/inaturalist?${params}`)
+            if (!r.ok) throw new Error(String(r.status))
+            d = await r.json()
+          } catch {
+            break // keep the partial; a later toggle resumes from the cursor
+          }
+          // discard before touching the shared cache — a cancelled run must
+          // not append (strict-mode double effects would duplicate features)
+          if (cancelled) return
+          if (entry.total === null) entry.total = d.totalResults ?? null
+          entry.features.push(...(d.features || []))
+          entry.nextCursor = d.nextCursor ? String(d.nextCursor) : null
+          if (!d.nextCursor) entry.complete = true
+          recomposeInat()
+        }
+      }
+      if (!cancelled) {
+        recomposeInat()
+        setInatLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requiredKey, inatTaxaKey, nothingChecked])
+
+  // The wildlife sidebar changes the map column's width — Mapbox only measures
+  // its container on init and window resize, so nudge it after the layout settles
+  useEffect(() => {
+    const t = setTimeout(() => map.current?.resize(), 80)
+    return () => clearTimeout(t)
+  }, [layers.inat, inatSpecies.length])
+
   // Base style switch — setStyle wipes custom layers; the style.load handler re-adds them
   useEffect(() => {
     const m = map.current
@@ -707,17 +977,18 @@ export default function InteractiveLakeMap() {
       safe('fishing-point', layers.poi)
       safe('aggregates-fill', layers.aggregates)
       safe('aggregates-line', layers.aggregates)
+      safe('inat-point', layers.inat)
       safe('lio-topo', layers.topo)
     }
   }, [layers])
 
   function requestLocation() {
-    setLocatePrompt(false)
     if (!navigator.geolocation) {
-      setLocateStatus('unavailable')
+      setOverlay('unavailable')
       return
     }
-    setLocateStatus('locating')
+    setOverlay('locating')
+    locateStartRef.current = Date.now()
 
     // Two independent paths, because each alone has failure modes:
     // 1. A raw position fix drives the camera directly — GeolocateControl's
@@ -725,29 +996,45 @@ export default function InteractiveLakeMap() {
     //    the camera, which caused the inconsistency.
     navigator.geolocation.getCurrentPosition(
       pos => {
+        const { latitude, longitude, accuracy } = pos.coords
+        if (!inAreaOfInterest(latitude, longitude) || accuracy > 30000) {
+          const rad = Math.PI / 180
+          const km = 6371 * Math.acos(Math.min(1,
+            Math.sin(45.18 * rad) * Math.sin(latitude * rad) +
+            Math.cos(45.18 * rad) * Math.cos(latitude * rad) * Math.cos((longitude + 78.54) * rad)))
+          afterMinLocating(() => {
+            setOutsideKm(Math.round(km))
+            setOverlay('outside')
+          })
+          return
+        }
+        afterMinLocating(() => setOverlay(null))
         userNavigatedRef.current = true
-        const lngLat: [number, number] = [pos.coords.longitude, pos.coords.latitude]
+        armFollowMe()
+        const lngLat: [number, number] = [longitude, latitude]
         // Camera moves don't need the style — only the map object itself
         let tries = 0
         const fly = () => {
           const m = map.current
           if (m) {
-            setLocateStatus('idle')
             m.flyTo({ center: lngLat, zoom: 15, essential: true })
           } else if (tries++ < 100) {
             setTimeout(fly, 200)
           } else {
-            setLocateStatus('unavailable')
+            setOverlay('unavailable')
           }
         }
         fly()
       },
-      err => setLocateStatus(err.code === 1 ? 'denied' : 'unavailable'),
+      err => afterMinLocating(() => setOverlay(err.code === 1 ? 'denied' : 'unavailable')),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
     )
 
-    // 2. Arm the follow-me control for the live blue dot — but only trigger it
-    //    when it is OFF, so repeated clicks can't toggle tracking back off.
+  }
+
+  // Arm the follow-me control for the live blue dot — but only trigger it
+  // when it is OFF, so repeated clicks can't toggle tracking back off.
+  function armFollowMe() {
     let tries = 0
     const arm = () => {
       const geo: any = geolocateRef.current
@@ -762,7 +1049,7 @@ export default function InteractiveLakeMap() {
   }
 
   function declineLocation() {
-    setLocatePrompt(false)
+    setOverlay(null)
     userNavigatedRef.current = true
     // Bring the default view one zoom level closer for people staying map-wide
     const m = map.current
@@ -785,15 +1072,6 @@ export default function InteractiveLakeMap() {
   return (
     <div>
       <div className="map-control-bar d-flex flex-wrap align-items-center gap-2 mb-2">
-        <button
-          type="button"
-          className={`layer-chip layer-chip-satellite ${satellite ? 'active' : ''}`}
-          onClick={() => setSatellite(s => !s)}
-          aria-pressed={satellite}
-        >
-          🛰️ Satellite
-        </button>
-        <span className="map-control-divider" aria-hidden="true" />
         {toggles.map(t => (
           <button
             key={t.key}
@@ -807,32 +1085,332 @@ export default function InteractiveLakeMap() {
             {t.label}
           </button>
         ))}
+
+        {/* Wildlife sightings: dropdown with per-species checkboxes */}
+        <div className="position-relative" ref={inatMenuRef}>
+          <button
+            type="button"
+            className={`layer-chip ${layers.inat ? 'active' : ''}`}
+            onClick={() => setInatMenuOpen(o => !o)}
+            aria-expanded={inatMenuOpen}
+          >
+            <span className="layer-chip-dot" style={{ background: '#c026d3' }} />
+            Wildlife{inatTaxa.length > 0 ? ` (${inatTaxa.length})` : !allGroupsChecked ? ` (${inatGroups.length})` : ''} ▾
+          </button>
+          {inatMenuOpen && (
+            <div
+              className="position-absolute bg-white border rounded-3 shadow p-2 mt-1"
+              style={{ zIndex: 20, minWidth: '260px', maxHeight: '320px', overflowY: 'auto' }}
+            >
+              <label className="d-flex align-items-center gap-2 small fw-semibold py-1 border-bottom mb-1" style={{ cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={layers.inat}
+                  onChange={() => setLayers(l => ({ ...l, inat: !l.inat }))}
+                />
+                Show sightings on the map
+              </label>
+              <label className="d-flex align-items-center gap-2 small py-1" style={{ cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={allGroupsChecked && inatTaxa.length === 0}
+                  onChange={e => setEverything(e.target.checked)}
+                />
+                <span className="fst-italic">Everything</span>
+              </label>
+              {INAT_GROUPS.map(g => (
+                <label key={g.key} className="d-flex align-items-center gap-2 small py-1" style={{ cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={inatGroups.includes(g.key)}
+                    onChange={() => toggleInatGroup(g.key)}
+                  />
+                  <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: g.color, flex: '0 0 auto' }} />
+                  <span>{g.emoji} {g.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
+      <div className="row g-3">
+        <div className={layers.inat && inatSpecies.length > 0 ? 'col-lg-8 col-xl-9' : 'col-12'}>
       <div className="position-relative">
         <div ref={mapContainer} style={{ height: '70vh', minHeight: '420px', borderRadius: '12px', overflow: 'hidden' }} />
 
-        {/* Location consent overlay — shown before any browser permission prompt */}
-        {locatePrompt && (
+        {/* Base-style toggle lives on the map, like every map app */}
+        <button
+          type="button"
+          onClick={() => setSatellite(s => !s)}
+          className="position-absolute d-inline-flex align-items-center justify-content-center gap-1 border-0"
+          style={{
+            left: '10px',
+            bottom: '36px',
+            zIndex: 4,
+            width: '104px',
+            background: 'rgba(255,255,255,0.92)',
+            borderRadius: '8px',
+            padding: '5px 10px',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            color: '#0f172a',
+            boxShadow: '0 1px 6px rgba(15,23,42,0.3)',
+          }}
+          title={satellite ? 'Switch to map view' : 'Switch to satellite view'}
+        >
+          {satellite ? '🗺️ Map' : '🛰️ Satellite'}
+        </button>
+
+        {/* Find-me overlay: consent → locating spinner → gone, or an alert */}
+        {overlay && (
           <div
             className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
             style={{ background: 'rgba(15,23,42,0.35)', borderRadius: '12px', zIndex: 5 }}
           >
             <div className="card lake-card text-center mx-3" style={{ maxWidth: '380px' }}>
               <div className="card-body">
-                <div className="fs-2 mb-1" aria-hidden="true">📍</div>
-                <h5 className="mb-2">Focus in on where you are?</h5>
-                <p className="text-muted small mb-3">
-                  We can zoom the map to your location — your browser will ask for permission
-                  first. Your location stays on your device; it is never sent to us.
-                </p>
-                <div className="d-flex gap-2 justify-content-center">
-                  <button type="button" className="btn btn-lake-primary btn-sm" onClick={requestLocation}>
-                    OK, find me
-                  </button>
-                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={declineLocation}>
-                    No thanks
-                  </button>
+                {overlay === 'prompt' && (
+                  <>
+                    <div className="fs-2 mb-1" aria-hidden="true">📍</div>
+                    <h5 className="mb-2">Focus in on where you are?</h5>
+                    <p className="text-muted small mb-3">
+                      We can zoom the map to your location — your browser will ask for permission
+                      first. Your location stays on your device; it is never sent to us.
+                    </p>
+                    <div className="d-flex gap-2 justify-content-center">
+                      <button type="button" className="btn btn-lake-primary btn-sm" onClick={requestLocation}>
+                        OK, find me
+                      </button>
+                      <button type="button" className="btn btn-outline-secondary btn-sm" onClick={declineLocation}>
+                        No thanks
+                      </button>
+                    </div>
+                  </>
+                )}
+                {overlay === 'locating' && (
+                  <>
+                    <div className="spinner-border text-primary mb-2" role="status" style={{ width: '2rem', height: '2rem' }}>
+                      <span className="visually-hidden">Locating…</span>
+                    </div>
+                    <h5 className="mb-2">Locating you…</h5>
+                    <p className="text-muted small mb-3">
+                      Waiting for your device to report a position.
+                    </p>
+                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={declineLocation}>
+                      Cancel
+                    </button>
+                  </>
+                )}
+                {overlay === 'outside' && (
+                  <>
+                    <div className="fs-2 mb-1" aria-hidden="true">🧭</div>
+                    <h5 className="mb-2">We can&rsquo;t seem to find you near our lakes</h5>
+                    <p className="text-muted small mb-3">
+                      Your device reported a location
+                      {outsideKm !== null && outsideKm > 0 ? ` about ${outsideKm} km from the lakes` : ' well outside the area'}
+                      {' '}(common on computers without GPS). You can manually type your address in
+                      the search box at the top-left of the map to find your location.
+                    </p>
+                    <button type="button" className="btn btn-lake-primary btn-sm" onClick={declineLocation}>
+                      OK
+                    </button>
+                  </>
+                )}
+                {overlay === 'denied' && (
+                  <>
+                    <div className="fs-2 mb-1" aria-hidden="true">📍</div>
+                    <h5 className="mb-2">Location permission declined</h5>
+                    <p className="text-muted small mb-3">
+                      No problem — showing the full lake area. You can also type your address in
+                      the search box at the top-left of the map.
+                    </p>
+                    <button type="button" className="btn btn-lake-primary btn-sm" onClick={declineLocation}>
+                      OK
+                    </button>
+                  </>
+                )}
+                {overlay === 'unavailable' && (
+                  <>
+                    <div className="fs-2 mb-1" aria-hidden="true">📍</div>
+                    <h5 className="mb-2">We couldn&rsquo;t get your location</h5>
+                    <p className="text-muted small mb-3">
+                      Showing the full lake area instead. You can also type your address in the
+                      search box at the top-left of the map.
+                    </p>
+                    <button type="button" className="btn btn-lake-primary btn-sm" onClick={declineLocation}>
+                      OK
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+        </div>
+
+        {layers.inat && inatSpecies.length > 0 && (
+          <div className="col-lg-4 col-xl-3">
+            <div className="card lake-card h-100" style={{ maxHeight: '70vh', minHeight: '420px' }}>
+              <div className="card-body py-3 d-flex flex-column position-relative" style={{ minHeight: 0 }}>
+                <h6 className="mb-1">
+                  🦉 Wildlife spotted
+                  {inatTotal ? <span className="text-muted fw-normal small"> — {inatTotal.toLocaleString()} species</span> : null}
+                </h6>
+                {/* Status bar: fixed height in all states — no layout shift */}
+                <div className="mb-1">
+                  <div className="d-flex justify-content-between" style={{ fontSize: '0.68rem', lineHeight: '1.4' }}>
+                    <span className="text-muted text-truncate">
+                      {nothingChecked
+                        ? 'Select a group to show sightings'
+                        : inatLoading
+                          ? !inatRange
+                            ? 'Gathering sightings…'
+                            : inatRange.unknown ? 'Checking what’s new…' : 'Loading sightings…'
+                          : 'All sightings loaded'}
+                    </span>
+                    <span className="text-muted flex-shrink-0 ps-2">
+                      {inatRange
+                        ? inatLoading
+                          ? inatRange.unknown
+                            ? `${inatRange.shown.toLocaleString()} so far`
+                            : `${inatRange.shown.toLocaleString()} of ${inatRange.total.toLocaleString()}`
+                          : `${inatRange.shown.toLocaleString()} · 100%`
+                        : ' '}
+                    </span>
+                  </div>
+                  <div className="progress" style={{ height: '5px' }}>
+                    {inatLoading && (!inatRange || inatRange.unknown) ? (
+                      // grey indeterminate: we don't yet know how much is coming
+                      <div
+                        ref={() => { lastBarPctRef.current = 0 }}
+                        className="progress-bar progress-bar-striped progress-bar-animated"
+                        style={{ width: '100%', background: 'rgba(108,117,125,0.45)' }}
+                      />
+                    ) : (
+                      (() => {
+                        const pct = inatRange
+                          ? inatLoading ? Math.max(4, Math.round((inatRange.shown / Math.max(1, inatRange.total)) * 100)) : 100
+                          : 0
+                        // animate growth only — a shrinking bar snaps instantly
+                        const grew = pct >= lastBarPctRef.current
+                        lastBarPctRef.current = pct
+                        return (
+                          <>
+                            <div
+                              className="progress-bar"
+                              style={{
+                                width: `${pct}%`,
+                                background: inatLoading || !inatRange ? '#c026d3' : '#198754',
+                                transition: grew ? 'width 0.3s ease, background 0.4s ease' : 'background 0.4s ease',
+                              }}
+                            />
+                            {inatLoading && inatRange && (
+                              <div className="progress-bar progress-bar-striped progress-bar-animated" style={{ width: `${100 - pct}%`, background: 'rgba(192,38,211,0.3)' }} />
+                            )}
+                          </>
+                        )
+                      })()
+                    )}
+                  </div>
+                </div>
+                  <div className="row g-0 pb-1 border-bottom mb-2">
+                  <div className="col-12">
+                    <label className="d-flex align-items-center gap-1 py-1 mb-0" style={{ cursor: 'pointer', fontSize: '0.72rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={allGroupsChecked && inatTaxa.length === 0}
+                        onChange={e => setEverything(e.target.checked)}
+                      />
+                      <span className="fst-italic fw-semibold">Everything</span>
+                    </label>
+                  </div>
+                  {INAT_GROUPS.filter(g => inatSpecies.some(s => s.iconic === g.key)).map(g => (
+                    <div key={g.key} className="col-6">
+                      <label className="d-flex align-items-center gap-1 py-1 mb-0" style={{ cursor: 'pointer', fontSize: '0.72rem' }}>
+                        <input
+                          type="checkbox"
+                          checked={inatGroups.includes(g.key)}
+                          onChange={() => toggleInatGroup(g.key)}
+                        />
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.color, flex: '0 0 auto' }} />
+                        <span className="text-truncate">{g.emoji} {g.label}</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  type="search"
+                  className="form-control form-control-sm mb-2"
+                  placeholder={nothingChecked ? 'Select a group to search' : 'Search'}
+                  value={inatSearch}
+                  onChange={e => setInatSearch(e.target.value)}
+                  disabled={nothingChecked}
+                  aria-label="Search species"
+                />
+                <div className="flex-grow-1" style={{ overflowY: 'auto', minHeight: 0 }}>
+                  {(() => {
+                    const q = inatSearch.trim().toLowerCase()
+                    const visible = inatSpecies
+                      .filter(s => (allGroupsChecked || inatGroups.includes(s.iconic)))
+                      .filter(s => !q || `${s.common || ''} ${s.name}`.toLowerCase().includes(q))
+                    const shown = visible.slice(0, 40)
+                    if (shown.length === 0) {
+                      return <div className="text-muted small py-2">No species match{q ? ` “${inatSearch.trim()}”` : ''}.</div>
+                    }
+                    const max = Math.max(...shown.map(s => s.count))
+                    const meta = visible.length > shown.length
+                      ? <div className="text-muted mb-1" style={{ fontSize: '0.65rem' }}>Top {shown.length} of {visible.length} matching species — search to narrow</div>
+                      : null
+                    return <>{meta}{shown.map(s => {
+                      const active = inatTaxa.includes(s.taxonId)
+                      return (
+                        <button
+                          key={s.taxonId}
+                          type="button"
+                          onClick={() => toggleInatTaxon(s.taxonId)}
+                          className="w-100 border-0 bg-transparent p-0 text-start d-flex align-items-center gap-2 mb-1"
+                          style={{ cursor: 'pointer' }}
+                          aria-pressed={active}
+                        >
+                          <span className="text-truncate" style={{ width: '108px', flex: '0 0 auto', fontSize: '0.75rem', fontWeight: active ? 700 : 400 }}>
+                            {s.common || s.name}
+                          </span>
+                          <span className="flex-grow-1" style={{ height: '12px', background: 'rgba(15,23,42,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+                            <span
+                              style={{
+                                display: 'block',
+                                height: '100%',
+                                width: `${Math.max(4, (s.count / max) * 100)}%`,
+                                background: groupColor(s.iconic),
+                                opacity: active || inatTaxa.length === 0 ? 1 : 0.35,
+                                borderRadius: '6px',
+                              }}
+                            />
+                          </span>
+                          <span className="text-muted text-end" style={{ width: '28px', flex: '0 0 auto', fontSize: '0.72rem' }}>{s.count}</span>
+                        </button>
+                      )
+                    })}</>
+                  })()}
+                </div>
+                <div className="pt-2 mt-1 border-top d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                  {inatTaxa.length > 0 || !allGroupsChecked ? (
+                    <button type="button" className="btn btn-sm btn-outline-primary py-0" style={{ fontSize: '0.72rem' }} onClick={() => setEverything(true)}>
+                      Show all
+                    </button>
+                  ) : (
+                    <span className="text-muted" style={{ fontSize: '0.65rem' }}>
+                      {inatRange ? `${inatRange.shown.toLocaleString()} of ${inatRange.total.toLocaleString()} sightings, back to ${inatRange.oldest}` : ''}
+                    </span>
+                  )}
+                  <a
+                    href="https://www.inaturalist.org/observations?nelat=45.245&nelng=-78.475&swlat=45.135&swlng=-78.625"
+                    target="_blank" rel="noopener noreferrer" className="text-muted" style={{ fontSize: '0.65rem' }}
+                  >
+                    iNaturalist →
+                  </a>
                 </div>
               </div>
             </div>
@@ -844,10 +1422,8 @@ export default function InteractiveLakeMap() {
         {layers.parcels && zoom < PARCEL_MIN_ZOOM && <span>Zoom in to see property parcels</span>}
         {parcelStatus === 'loading' && <span>Loading parcels…</span>}
         {parcelStatus === 'error' && <span>Parcel service unavailable right now</span>}
-        {locateStatus === 'locating' && <span>Finding your location…</span>}
-        {locateStatus === 'denied' && <span>Location permission declined — showing the full lake area</span>}
-        {locateStatus === 'unavailable' && <span>Location unavailable — showing the full lake area</span>}
       </div>
+
 
       {/* Full legend */}
       <div className="card lake-card mt-2">
@@ -879,6 +1455,7 @@ export default function InteractiveLakeMap() {
               swatch={<img src={BOAT_DATA_URI} alt="" width={18} height={18} />}
             />
             <LegendItem label="Licensed pit / quarry" swatch={<Box bg="rgba(120,113,108,0.4)" border="1.5px solid #44403c" />} />
+            <LegendItem label="Wildlife sighting (iNaturalist)" swatch={<span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#c026d3', border: '1.5px solid #fff', boxShadow: '0 0 0 1px rgba(0,0,0,0.15)', display: 'inline-block' }} />} />
             <LegendItem label="Wildlife management unit boundary" swatch={<Line color="#7c3aed" dashed />} />
             <LegendItem
               label="Your location (blue dot follows you)"

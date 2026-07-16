@@ -5,7 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `About Us | ${ORG_NAME}`,
   description:
-    'A volunteer-run cottagers’ association protecting seven lakes in the Redstone River watershed, Haliburton, since 1961.',
+    'A volunteer-run cottagers’ association protecting the Redstone Group of Lakes in Haliburton County since 1961.',
 }
 
 const OBR_URL =
@@ -31,7 +31,7 @@ const PILLARS = [
     title: 'Build community',
     text: 'The AGM every July, monthly newsletters, contests, galleries and get-togethers — sixty years of neighbours becoming friends.',
     href: '/#events-news',
-    link: 'Events & News',
+    link: 'News & Events',
   },
 ]
 
@@ -44,7 +44,7 @@ export default function AboutPage() {
             <h1 className="mb-3">About the {ORG_NAME}</h1>
             <p className="lead text-muted mx-auto" style={{ maxWidth: '660px' }}>
               A volunteer-run cottagers&rsquo; association protecting the lakes — and the community —
-              of the Redstone River watershed in Haliburton County since 1961.
+              of the Redstone Group of Lakes in Haliburton County since 1961.
             </p>
           </div>
 
@@ -78,6 +78,12 @@ export default function AboutPage() {
               <strong>Burdock</strong> and <strong>Coleman</strong>. Deep, cold and clean, they are
               classic Canadian Shield lake trout waters — a fishery found in only about one per cent
               of Ontario&rsquo;s lakes.
+            </p>
+            <p>
+              Our lakes sit at the heart of the Redstone River watershed — 235 km² of country
+              stretching from Upper Redstone Lake inside Algonquin Park down to Green Lake near
+              West Guilford. The association&rsquo;s stewardship covers the chain of seven cottage
+              lakes within it.
             </p>
           </div>
 

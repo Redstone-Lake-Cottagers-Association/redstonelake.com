@@ -15,6 +15,7 @@ verify or refresh it. Live-service health can be checked any time at **/debug/he
 | Newsletters | `https://us14.campaign-archive.com/feed?u=abfff5b565ccb6c32026c05ab&id=754031d995` | `src/lib/newsletters.ts` → /newsletters, homepage strip | Mailchimp RSS; feed ID changes if the Mailchimp audience is recreated |
 | Property parcels | `https://gis.haliburtoncounty.ca/arcgis/rest/services/Public/SearchLayers_2/MapServer/0/query` | /lake-map (live per-viewport query, zoom ≥ 13) | County of Haliburton GIS; assessment fabric © Teranet/MPAC. CORS allows our domain. Fields: ARN, ADDRESS, TOWNSHIP |
 | Ontario topo overlay | `https://ws.lioservices.lrc.gov.on.ca/arcgis1/rest/services/LIO_Cartographic/LIO_Topographic/MapServer/tile/{z}/{y}/{x}` | /lake-map raster toggle | Land Information Ontario cached tiles, Web Mercator z0–19 |
+| Wildlife sightings | `https://api.inaturalist.org/v1/…` (observations + species_counts for the association bbox; proxied and cached 6 h by `/api/inaturalist`; docs at api.inaturalist.org/v2/docs) | /lake-map sightings layer + species chart | Community-contributed data © individual observers; ~1,000 species / 3,300 observations in-area as of July 2026 |
 | Mapbox | `mapbox://styles/mapbox/outdoors-v12`, `satellite-streets-v12`, geocoder plugin v5.0.3 | /lake-map, HeroMap | Token via `/api/mapbox-token` (`NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` Fly secret). Geocoder plugin lives under `api.mapbox.com/mapbox-gl-js/plugins/…` (NOT `api.mapbox.com/mapbox-gl-geocoder/…`) |
 
 ## Static extracts in `public/map-data/` (refresh manually)

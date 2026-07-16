@@ -13,15 +13,21 @@ const DUES = [
   { term: '3 Years', price: '$80' },
 ]
 
-const BENEFITS = [
-  'Monthly email newsletter',
-  'Confirmation letter of membership',
-  'Map of the Redstone Group of Lakes',
-  'Two membership signs (dock and driveway)',
-  'Discounts with local businesses — Superior Propane and participating insurance companies',
-  'FOCA membership benefits and discounts',
-  'Water quality monitoring alerts',
-  'A vote at the Annual General Meeting (second Saturday in July)',
+// Each benefit links to the part of the site (or partner) that delivers it
+const BENEFITS: { text: string; href?: string; linkText?: string; external?: boolean }[] = [
+  { text: 'Monthly email newsletter — ', href: '/newsletters', linkText: 'browse the archive' },
+  { text: 'Confirmation letter of membership' },
+  { text: 'Map of the Redstone Group of Lakes — ', href: '/lake-map', linkText: 'explore the interactive version' },
+  { text: 'Two membership signs (dock and driveway)' },
+  { text: 'Discounts with local businesses — Superior Propane and participating insurance companies' },
+  {
+    text: 'FOCA membership benefits and discounts — ',
+    href: 'https://foca.on.ca/member-services/benefits/',
+    linkText: 'see the full list',
+    external: true,
+  },
+  { text: 'Water quality monitoring alerts — ', href: '/lake-health', linkText: 'see the lake data' },
+  { text: 'A vote at the Annual General Meeting (second Saturday in July) — ', href: '/agm', linkText: 'AGM archive' },
 ]
 
 export default function Membership() {
@@ -69,9 +75,15 @@ export default function Membership() {
               <h4 className="mb-3">What you get</h4>
               <ul className="list-unstyled mb-0">
                 {BENEFITS.map(b => (
-                  <li key={b} className="d-flex gap-2 mb-2">
+                  <li key={b.text} className="d-flex gap-2 mb-2">
                     <span style={{ color: '#2f7d5c' }}>✓</span>
-                    <span>{b}</span>
+                    <span>
+                      {b.text}
+                      {b.href && b.external && (
+                        <a href={b.href} target="_blank" rel="noopener noreferrer">{b.linkText}</a>
+                      )}
+                      {b.href && !b.external && <Link href={b.href}>{b.linkText}</Link>}
+                    </span>
                   </li>
                 ))}
               </ul>

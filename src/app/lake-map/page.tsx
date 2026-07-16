@@ -58,7 +58,13 @@ export default function LakeMapPage() {
               >
                 Land Information Ontario
               </a>
-              . Base map © Mapbox and OpenStreetMap contributors.
+              . Wildlife sightings from{' '}
+              <a href="https://www.inaturalist.org/" target="_blank" rel="noopener noreferrer">
+                iNaturalist
+              </a>{' '}
+              community observations, © their respective observers — identifications are
+              community-verified but not authoritative. Base map © Mapbox and OpenStreetMap
+              contributors.
             </div>
           </div>
         </div>

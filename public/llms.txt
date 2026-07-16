@@ -1,7 +1,8 @@
 # Redstone Lake Cottagers Association
 
 > Volunteer-run, not-for-profit cottagers' association (founded 1961) protecting
-> seven lakes in the Redstone River watershed, Haliburton County, Ontario,
+> the seven lakes of the Redstone group (within the Redstone River
+> watershed), Haliburton County, Ontario,
 > Canada: Redstone, Little Redstone, Pelaw, Bitter, Long (Tedious), Burdock and
 > Coleman Lakes. At the July 2026 AGM members approved renaming the association
 > to the Redstone Area Lakes Association (RALA); the change takes effect once
@@ -18,7 +19,7 @@ Key facts:
 
 ## Main pages
 - [Home](/): live water level, weather, fire-ban status, events and news
-- [News & Articles](/news): community news archive since 2021, with search
+- [News & Events](/news): community news, events and updates since 2021, with search
 - [Events](/events): upcoming and past community events
 - [Lake Health Data](/lake-health): ~30 years of provincial water quality data
   (phosphorus, clarity, calcium, chloride, sulphate) for all seven lakes

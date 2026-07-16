@@ -7,7 +7,7 @@ import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
-  title: `News & Articles | ${ORG_NAME}`,
+  title: `News & Events | ${ORG_NAME}`,
   description: `Community news, conservation insights and updates from the ${ORG_NAME}.`,
 }
 
@@ -25,7 +25,7 @@ export default async function NewsPage() {
   return (
     <div className="container py-5">
       <div className="text-center mb-5">
-        <h1 className="display-4 mb-3">News & Articles</h1>
+        <h1 className="display-4 mb-3">News & Events</h1>
         <p className="lead text-muted">
           Community news, conservation insights and updates from around our lakes
         </p>

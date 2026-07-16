@@ -47,7 +47,10 @@ async function analyzeWithClaude(
 ): Promise<DysartFireBanResponse['aiAnalysis'] | undefined> {
   try {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+    const primaryModel = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+    // Overloads are usually model-specific (July 2026: claude-sonnet-5 529'd
+    // while other models were fine) — fall back to Haiku for this simple task
+    const models = [...new Set([primaryModel, 'claude-haiku-4-5-20251001'])];
     if (!apiKey) {
       if (debug) debugMessages.push('AI disabled: ANTHROPIC_API_KEY not set');
       return undefined;
@@ -57,23 +60,36 @@ async function analyzeWithClaude(
     const system = 'You extract structured fire-ban policy from municipal alerts. Respond with strict JSON only, no prose.';
     const userPrompt = `From the following alerts from Dysart et al, determine if a fire ban is currently in effect. Classify ban type strictly as one of: "total", "restricted", or "none". Include effective dates if present. Return strict JSON with keys: hasFireBan (boolean), banType ("total"|"restricted"|"none"), effectiveFrom (ISO 8601 string or null), effectiveTo (ISO 8601 string or null), summary (string, one sentence), confidence (0..1).\n\nRules:\n- If no ban is in effect, set hasFireBan=false and banType="none".\n- If partial restrictions (e.g., time-of-day, specific activities) are in effect, use banType="restricted".\n- If all open flames/outdoor burning are prohibited, use banType="total".\n\nSource URL: ${sourceUrl}\n\nAlerts:\n${text}`;
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 400,
-        thinking: { type: 'disabled' },
-        system,
-        messages: [
-          { role: 'user', content: [ { type: 'text', text: userPrompt } ] }
-        ]
-      })
-    });
+    // Anthropic occasionally returns transient 529 overloaded_error — retry
+    // with backoff, then fall back to the next model in the chain
+    let resp: Response | null = null;
+    outer: for (const model of models) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
+        const body: Record<string, unknown> = {
+          model,
+          max_tokens: 400,
+          system,
+          messages: [
+            { role: 'user', content: [ { type: 'text', text: userPrompt } ] }
+          ]
+        };
+        // thinking must be explicitly disabled on Sonnet 5; older models reject the param
+        if (model.startsWith('claude-sonnet-5')) body.thinking = { type: 'disabled' };
+        resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify(body)
+        });
+        if (resp.ok) break outer;
+        if (resp.status < 500 && resp.status !== 429) break outer; // non-retryable
+      }
+    }
+    if (!resp) return undefined;
 
     if (!resp.ok) {
       if (debug) {
@@ -285,8 +301,20 @@ export async function GET(request: NextRequest) {
           summary: 'No alerts are currently posted by the Municipality of Dysart et al.',
           confidence: 1
         };
+      } else if (!results.alerts.some(a => /fire|burn|ban|flame/i.test(`${a.title} ${a.description}`))) {
+        // No alert even mentions fire — classify deterministically and skip the
+        // AI call entirely (most alerts are road closures etc.; this keeps
+        // Claude usage to the rare fire-related alert, a few calls per season)
+        results.hasActiveBan = false;
+        results.summary.status = 'none';
+        results.aiAnalysis = {
+          hasFireBan: false,
+          banType: 'none',
+          summary: 'No fire-related alerts are posted by the municipality.',
+          confidence: 0.95
+        };
       } else {
-        // AI analysis (required to interpret alerts)
+        // AI analysis (required to interpret fire-related alerts)
         const ai = await analyzeWithClaude(results.alerts, results.sourceUrl, debug, aiDebugMessages);
         if (ai) {
           results.aiAnalysis = ai;
@@ -297,8 +325,20 @@ export async function GET(request: NextRequest) {
           if (!results.summary.primaryAlert && results.alerts.length > 0) {
             results.summary.primaryAlert = results.alerts[0];
           }
+        } else if (!results.alerts.some(a => /fire|burn|ban|flame/i.test(`${a.title} ${a.description}`))) {
+          // AI unavailable, but no alert even mentions fire — safe to report
+          // no fire alert deterministically. (Confirming a REAL ban still
+          // requires classification, so that direction stays 'error'.)
+          results.hasActiveBan = false;
+          results.summary.status = 'none';
+          results.aiAnalysis = {
+            hasFireBan: false,
+            banType: 'none',
+            summary: 'No fire-related alerts are posted by the municipality (keyword check; AI classifier unavailable).',
+            confidence: 0.9
+          };
         } else {
-          // AI unavailable - cannot determine fire ban status
+          // AI unavailable and alerts mention fire - cannot determine status
           results.hasActiveBan = false;
           results.summary.status = 'error';
           if (debug) {
@@ -338,7 +378,11 @@ export async function GET(request: NextRequest) {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'public, max-age=0, s-maxage=21600'
+        // An error status must never be cached downstream — the next request
+        // should retry immediately instead of pinning 'unavailable' for 6 h
+        'Cache-Control': results.summary.status === 'error'
+          ? 'no-store'
+          : 'public, max-age=0, s-maxage=21600'
       },
     });
   } catch (error) {

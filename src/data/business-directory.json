@@ -90,5 +90,57 @@
     "phone": "705-455-7653",
     "address": null,
     "email": "troy@troyausten.ca"
+  },
+  {
+    "slug": "haliburton-forest-events",
+    "name": "Haliburton Forest & Wild Life Reserve",
+    "categories": [
+      "Community Links"
+    ],
+    "description": "Trails, tours, stargazing and year-round events at the 100,000-acre forest next door — the events calendar our newsletters often point to.",
+    "website": "https://www.haliburtonforest.com/things-to-do/",
+    "image": null,
+    "phone": null,
+    "address": null,
+    "email": null
+  },
+  {
+    "slug": "abbey-gardens-events",
+    "name": "Abbey Gardens",
+    "categories": [
+      "Community Links"
+    ],
+    "description": "Workshops, markets and programs in West Guilford — our partner for shoreline naturalization and native plants.",
+    "website": "https://abbeygardens.ca/",
+    "image": null,
+    "phone": null,
+    "address": null,
+    "email": null
+  },
+  {
+    "slug": "haliburton-highlands-land-trust",
+    "name": "Haliburton Highlands Land Trust",
+    "categories": [
+      "Community Links"
+    ],
+    "description": "Conservation news, hikes and events from the land trust protecting the Highlands' natural areas.",
+    "website": "https://www.haliburtonlandtrust.ca/intro-to-news-and-events/",
+    "image": null,
+    "phone": null,
+    "address": null,
+    "email": null
+  },
+  {
+    "slug": "turtle-guardians",
+    "name": "Turtle Guardians",
+    "categories": [
+      "Community Links"
+    ],
+    "description": "Grassroots turtle conservation — report injured turtles (705-457-1222, text 705-854-2888) and join their programs.",
+    "website": "https://www.turtleguardians.com/",
+    "image": null,
+    "phone": "705-457-1222",
+    "address": null,
+    "email": null
   }
 ]
