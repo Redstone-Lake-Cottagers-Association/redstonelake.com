@@ -92,6 +92,58 @@
     "email": "troy@troyausten.ca"
   },
   {
+    "slug": "norm-barry-hot-tub-cottage-maintenance",
+    "name": "Norm Barry Hot Tub & Cottage Maintenance",
+    "categories": [
+      "Cottage Services"
+    ],
+    "description": "Property maintenance, security checks, and hot tub sales, service and maintenance for cottages across the Haliburton Highlands.",
+    "website": "https://www.normbarry.ca/",
+    "image": "/images/sponsors/norm-barry.png",
+    "phone": "705-457-0153",
+    "address": null,
+    "email": null
+  },
+  {
+    "slug": "k-and-r-self-storage",
+    "name": "K and R Self Storage",
+    "categories": [
+      "Storage"
+    ],
+    "description": "Indoor and outdoor self-storage right on Kennisis Lake Road — handy for cottagers needing space for boats, gear and seasonal equipment.",
+    "website": "https://www.facebook.com/61567710264723/",
+    "image": "/images/sponsors/k-and-r-self-storage.png",
+    "phone": "705-754-2255",
+    "address": "4475 Kennisis Lake Rd, Haliburton, ON K0M 1S0, Canada",
+    "email": null
+  },
+  {
+    "slug": "amanda-tancredi-troy-austen-real-estate-team",
+    "name": "Amanda Tancredi — Troy Austen Real Estate Team",
+    "categories": [
+      "Real Estate Brokers"
+    ],
+    "description": "Sales representative with the Troy Austen Real Estate Team, RE/MAX Professionals North, serving buyers and sellers across the Haliburton Highlands.",
+    "website": "https://www.troyausten.ca/",
+    "image": "/images/sponsors/amanda-tancredi.jpg",
+    "phone": null,
+    "address": null,
+    "email": null
+  },
+  {
+    "slug": "paisley-partners-navacord",
+    "name": "Paisley Partners | Navacord",
+    "categories": [
+      "Insurance"
+    ],
+    "description": "Insurance brokerage and Navacord broker partner providing personal, cottage and commercial insurance.",
+    "website": "https://www.paisley-partners.com/",
+    "image": "/images/sponsors/paisley-partners.png",
+    "phone": null,
+    "address": null,
+    "email": null
+  },
+  {
     "slug": "haliburton-forest-events",
     "name": "Haliburton Forest & Wild Life Reserve",
     "categories": [
