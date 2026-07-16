@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1088.0",
     "@types/bootstrap": "^5.2.10",
     "bootstrap": "^5.3.7",
     "lucide-react": "^0.535.0",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "13.5.11",
+    "puppeteer-core": "^25.3.0",
     "typescript": "^5"
   }
 }

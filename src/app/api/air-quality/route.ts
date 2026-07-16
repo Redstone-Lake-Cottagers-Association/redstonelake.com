@@ -177,7 +177,22 @@ export async function GET() {
     daily = Array.from(byDay.entries()).map(([date, aqi]) => ({ date, aqi, past: date < today }))
   }
 
-  let current: Record<string, unknown> | null = observed
+  // The MECP monitor is authoritative — during wildfire smoke events it reads
+  // far above the coarse regional model, and that's the reading that matters.
+  // We only annotate the divergence so readers understand why the numbers
+  // differ; an extreme cap (>800 µg/m³) guards against instrument glitches.
+  let modelDisagreement: number | null = null
+  let usable = observed
+  const modelAqi = model?.current?.us_aqi
+  if (usable && (usable.pm25 as number) > 800) {
+    usable = null // beyond plausible even for dense smoke: treat as a glitch
+  }
+  if (usable && typeof modelAqi === 'number') {
+    const oa = usable.aqi as number
+    if (oa > modelAqi * 2 && oa - modelAqi > 40) modelDisagreement = modelAqi
+  }
+
+  let current: Record<string, unknown> | null = usable
   if (!current && typeof model?.current?.us_aqi === 'number') {
     current = {
       pm25: model.current.pm2_5,
@@ -191,5 +206,5 @@ export async function GET() {
   if (!current) {
     return NextResponse.json({ error: 'Air quality data unavailable' }, { status: 502 })
   }
-  return NextResponse.json({ ...current, hourly, daily, monthly, cachedAt: new Date().toISOString() })
+  return NextResponse.json({ ...current, modelDisagreement, hourly, daily, monthly, cachedAt: new Date().toISOString() })
 }

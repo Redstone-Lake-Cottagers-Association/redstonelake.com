@@ -180,7 +180,7 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
       </div>
       <button
         type="button"
-        className="btn btn-link p-0 small weather-cta-link"
+        className="btn btn-link p-0 small weather-cta-link ms-2 flex-shrink-0"
         onClick={onExpand}
         aria-label="Open full forecast"
       >
@@ -195,7 +195,7 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
         <div className="weather-current-section position-relative">
           {renderHeader()}
           <div className="row align-items-center">
-            <div className="col-7">
+            <div className="col-7 col-sm-7">
               <div className="position-relative" style={{ marginTop: '16px' }}>
                 <div className="h2 mb-1" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>--°{tempUnit || ''}</div>
                 {/* Temperature Unit Toggle - Superscript style placeholder */}
@@ -311,7 +311,7 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
         {renderHeader()}
         
         <div className="row align-items-center">
-          <div className="col-7">
+          <div className="col-7 col-sm-7">
             <div className="position-relative" style={{ marginTop: '16px' }}>
               <div className="d-flex align-items-center mb-1">
                 <span className="h2 mb-0 me-2" style={{ display: 'inline-block', minWidth: '80px', textAlign: 'left' }}>{convertTemp(weather.temp)}°{tempUnit || ''}</span>
@@ -390,8 +390,8 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
               </div>
             )}
           </div>
-          <div className="col-5">
-            <div className="small">
+          <div className="col-12 col-sm-5">
+            <div className="small weather-stats">
               <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
                 <span className="me-2">☔️ <span className="text-muted">Rain</span></span>
                 <span className="fw-medium">{weather.pop !== undefined ? `${weather.pop}%` : '0%'}</span>
@@ -414,7 +414,9 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                   title={`Air quality index ${airQuality.aqi} (PM2.5 ${airQuality.pm25} µg/m³) — ${airQuality.source === 'openaq' ? `observed at the ${airQuality.station} monitor, ${airQuality.distanceKm} km away` : 'modelled, Open-Meteo/CAMS'}. Open the full forecast for history and outlook.`}
                 >
                   <span className="me-2 text-nowrap">🌫️ <span className="text-muted">Air</span></span>
-                  <span className="fw-medium text-nowrap">{airQuality.category === 'Unhealthy for sensitive groups' ? 'Sensitive' : airQuality.category}</span>
+                  <span className="fw-medium text-end">{
+                    ({ 'Unhealthy for sensitive groups': 'Sensitive', 'Very unhealthy': 'Very poor' } as Record<string, string>)[airQuality.category || ''] || airQuality.category
+                  }</span>
                 </div>
               )}
             </div>

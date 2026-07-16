@@ -14,6 +14,7 @@ export default function Footer() {
               <li><Link href="/" className="text-white-50">Home</Link></li>
               <li><Link href="/water-quality" className="text-white-50">Water Quality</Link></li>
               <li><Link href="/news" className="text-white-50">News</Link></li>
+              <li><Link href="/events" className="text-white-50">Events</Link></li>
               <li><Link href="/newsletters" className="text-white-50">Newsletters</Link></li>
               <li><Link href="/new-cottager-guide" className="text-white-50">New Cottager Guide</Link></li>
               <li><Link href="/contribute" className="text-white-50">Contribute to This Site</Link></li>

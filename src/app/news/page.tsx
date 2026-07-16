@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
-import NewsCard from '@/components/NewsCard'
+import eventsData from '@/data/events.json'
+import NewsExplorer from '@/components/NewsExplorer'
 import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
 
@@ -14,6 +15,12 @@ export const revalidate = NEWSLETTER_REVALIDATE
 
 export default async function NewsPage() {
   const latestNewsletters = await getLatestNewsletters(4)
+  const allNewsletters = await getLatestNewsletters(200)
+  const now = Date.now()
+  const upcomingEvents = (eventsData as { id: number; title: string; date: string; icon: string }[])
+    .filter(e => new Date(e.date).getTime() >= now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3)
 
   return (
     <div className="container py-5">
@@ -24,10 +31,42 @@ export default async function NewsPage() {
         </p>
       </div>
 
+      <NewsExplorer
+        posts={posts}
+        newsletters={allNewsletters.map(n => ({ label: n.label, url: n.url, title: n.title }))}
+        events={(eventsData as any[]).map(e => ({ id: e.id, title: e.title, date: e.date, icon: e.icon, type: e.type, description: e.description }))}
+      >
+      {/* Events strip — the events calendar lives at /events */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card lake-card">
+            <div className="card-body py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div style={{ minWidth: 0 }}>
+                <span className="fw-semibold me-2">📅 Events</span>
+                {upcomingEvents.length > 0 ? (
+                  <span className="text-muted small">
+                    Next up:{' '}
+                    {upcomingEvents.map((e, i) => (
+                      <span key={e.id}>
+                        {i > 0 && ' · '}
+                        {e.icon} {e.title} ({new Date(e.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })})
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  <span className="text-muted small">No upcoming events on the calendar right now.</span>
+                )}
+              </div>
+              <Link href="/events" className="small fw-semibold flex-shrink-0">All events →</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Latest newsletters — pulled live from the Mailchimp archive */}
       {latestNewsletters.length > 0 && (
-        <div className="row justify-content-center mb-5">
-          <div className="col-lg-10">
+        <div className="row mb-5">
+          <div className="col-12">
             <div className="card lake-card">
               <div className="card-body">
                 <div className="d-flex align-items-baseline justify-content-between flex-wrap gap-2 mb-2">
@@ -55,13 +94,7 @@ export default async function NewsPage() {
         </div>
       )}
 
-      <div className="row g-4">
-        {posts.map(post => (
-          <div key={post.slug} className="col-md-6 col-lg-4 d-flex">
-            <NewsCard post={post} />
-          </div>
-        ))}
-      </div>
+      </NewsExplorer>
     </div>
   )
 }

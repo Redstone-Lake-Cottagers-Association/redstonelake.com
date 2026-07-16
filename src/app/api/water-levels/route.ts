@@ -49,6 +49,16 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
+
+    // Parks Canada sometimes publishes the newest point with a null reading,
+    // which renders as "NaN m" downstream — drop non-numeric points
+    for (const key of ['current', 'average', 'max', 'min']) {
+      if (Array.isArray(data?.[key])) {
+        data[key] = data[key].filter(
+          (p: any) => p && p.y !== null && p.y !== undefined && isFinite(parseFloat(p.y))
+        );
+      }
+    }
     
     // Save to in-memory cache
     memoryCache.set(cacheKey, { data, ts: Date.now() });

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import MembershipForm from '@/components/MembershipForm'
 import type { Metadata } from 'next'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
@@ -34,6 +35,7 @@ export default function Membership() {
               Your membership funds water quality monitoring, shoreline preservation and community
               programs across our seven lakes — and it comes with real benefits.
             </p>
+            <a href="#register" className="btn btn-lake-primary">Register or Renew Now ↓</a>
           </div>
 
           {/* Dues */}
@@ -56,6 +58,12 @@ export default function Membership() {
             </div>
           </div>
 
+          <div className="row justify-content-center mb-5" id="register">
+            <div className="col-lg-10">
+              <MembershipForm />
+            </div>
+          </div>
+
           <div className="row g-4 mb-5">
             <div className="col-md-6">
               <h4 className="mb-3">What you get</h4>
@@ -71,25 +79,11 @@ export default function Membership() {
 
             <div className="col-md-6">
               <h4 className="mb-3">How to join</h4>
-              <div className="card lake-card mb-3">
-                <div className="card-body py-3">
-                  <h6 className="mb-1">Pay by Interac e-Transfer®</h6>
-                  <p className="mb-0 text-muted">
-                    Send your dues to{' '}
-                    <a href="mailto:treasurer@redstonelake.com">treasurer@redstonelake.com</a>{' '}
-                    from your financial institution.
-                  </p>
-                </div>
-              </div>
-              <div className="card lake-card mb-3">
-                <div className="card-body py-3">
-                  <h6 className="mb-1">Pay by Cheque</h6>
-                  <p className="mb-0 text-muted">
-                    Mail your completed form and payment to:<br />
-                    <strong>RLCA</strong>, Box 3, West Guilford, Ontario K0M 2S0
-                  </p>
-                </div>
-              </div>
+              <p className="text-muted">
+                Fill in the registration form below, then pay your dues by Interac
+                e-Transfer® to <strong>treasurer@redstonelake.com</strong> — or mail a cheque
+                with your details to <strong>RLCA</strong>, Box 3, West Guilford, Ontario K0M 2S0.
+              </p>
               <p className="text-muted small mb-0">
                 Questions about joining or renewing? Email{' '}
                 <a href="mailto:membership@redstonelake.com">membership@redstonelake.com</a>.

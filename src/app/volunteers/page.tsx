@@ -107,12 +107,12 @@ export default function VolunteersPage() {
             <div className="col-md-6 d-flex">
               <div className="card lake-card w-100">
                 <div className="card-body">
-                  <h5 className="mb-2">🔬 Lake Stewards <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2025</span></h5>
+                  <h5 className="mb-2">🔬 Lake Stewards <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2026</span></h5>
                   <ul className="list-unstyled small mb-0">
                     {[
                       ['Redstone', 'Lewis McIntosh'],
                       ['Little Redstone', 'Peter Sergejewich'],
-                      ['Bitter', 'Ken McMullen'],
+                      ['Bitter', 'Laura Sim'],
                       ['Burdock', 'Laurie Kerr'],
                       ['Coleman', 'Chris Jones'],
                       ['Pelaw', 'Ed Payne'],
@@ -130,14 +130,14 @@ export default function VolunteersPage() {
             <div className="col-md-6 d-flex">
               <div className="card lake-card w-100">
                 <div className="card-body d-flex flex-column">
-                  <h5 className="mb-2">🛟 Buoy Stewards <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2021</span></h5>
+                  <h5 className="mb-2">🛟 Buoy Stewards <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2026</span></h5>
                   <p className="small mb-2">
-                    Robert Chausse, Vince Duchene, Mike Manning, Carrie North, Ted Rule,
-                    Dan Schottlander, Peter Sergejewich, Gord Simpson and Barry Smith.
+                    Peter Sergejewich, Geoffrey North, Barry Smith, Ted Rule, Mike Quinn,
+                    Rob Chausse and Paul Kalydy.
                   </p>
                   <p className="text-muted small mb-3">
-                    Spot a correction, or want your bay&rsquo;s buoy on this list?{' '}
-                    <a href="mailto:privatebuoys@redstonelake.com">Let the buoy program know</a>.
+                    Want your bay&rsquo;s buoy on this list?{' '}
+                    <a href="mailto:privatebuoys@redstonelake.com">Volunteer with the buoy program</a>.
                   </p>
                   <h5 className="mb-2 mt-auto">🤝 Committee <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2026</span></h5>
                   <ul className="list-unstyled small mb-0">

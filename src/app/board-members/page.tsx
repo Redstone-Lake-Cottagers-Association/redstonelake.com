@@ -34,7 +34,7 @@ function MemberRow({ member }: { member: { name: string; role: string; years: nu
           <span className="ms-2 text-nowrap">· {member.years} {member.years === 1 ? 'year' : 'years'} of service</span>
         </div>
       </div>
-      <div className="text-end small">
+      <div className="text-end small" style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
         {member.emails.map(email => (
           <div key={email}>
             <a href={`mailto:${email}`}>{email}</a>

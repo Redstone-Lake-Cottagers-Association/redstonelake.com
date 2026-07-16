@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[0]['changeFrequency'] }[] = [
     { path: '', priority: 1.0, changeFrequency: 'daily' },
     { path: '/news', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/events', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/lake-health', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/lake-map', priority: 0.7, changeFrequency: 'yearly' },
     { path: '/membership', priority: 0.9, changeFrequency: 'monthly' },

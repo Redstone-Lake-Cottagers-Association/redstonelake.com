@@ -172,21 +172,40 @@ export default function LakeInfo() {
     }
   }
 
+  // During fire season (Apr 1 – Oct 31) the county by-law bans daytime burning
+  // even with no municipal fire ban — that state shows amber, not green
+  const inFireSeason = () => {
+    const now = new Date()
+    const m = now.getMonth() + 1
+    return m >= 4 && m <= 10
+  }
+
+  const seasonState = {
+    status: 'season',
+    message: 'No daytime burning',
+    color: '#d97706',
+    alert: null,
+    data: null as DysartFireBanResponse | null,
+  }
+
   const getFireBanStatus = () => {
-    if (fireBanLoading) return { 
-      status: 'loading', 
-      message: 'Loading...', 
-      color: '#6c757d', 
+    if (fireBanLoading) return {
+      status: 'loading',
+      message: 'Loading...',
+      color: '#6c757d',
       alert: null,
       data: null
     }
-    
-    if (!fireBanData) return { 
-      status: 'safe', 
-      message: 'No fire ban', 
-      color: '#198754', 
-      alert: null,
-      data: null
+
+    if (!fireBanData) {
+      if (inFireSeason()) return seasonState
+      return {
+        status: 'safe',
+        message: 'No fire restrictions',
+        color: '#198754',
+        alert: null,
+        data: null
+      }
     }
     
     const { summary, aiAnalysis } = fireBanData;
@@ -217,9 +236,10 @@ export default function LakeInfo() {
       };
     }
 
+    if (inFireSeason()) return { ...seasonState, data: fireBanData }
     return {
       status: 'safe',
-      message: 'No fire ban',
+      message: 'No fire restrictions',
       color: '#198754',
       alert: null,
       data: fireBanData
@@ -303,16 +323,21 @@ export default function LakeInfo() {
                         <line x1="6" y1="19" x2="18" y2="6" stroke="#dc3545" strokeWidth="3" strokeLinecap="round" />
                       </svg>
                     </span>
-                  ) : fireBanStatus.status === 'restricted' ? '⚠️' : fireBanStatus.status === 'safe' ? '✅' : fireBanStatus.status === 'loading' ? '🔥' : '❌'}
+                  ) : fireBanStatus.status === 'restricted' ? '⚠️' : fireBanStatus.status === 'season' ? '🌙' : fireBanStatus.status === 'safe' ? '✅' : fireBanStatus.status === 'loading' ? '🔥' : '❌'}
                 </div>
                 <div className="flex-grow-1">
                   <div className="d-flex align-items-center">
                     <span className="fireban-title me-2">{fireBanStatus.message}</span>
                   </div>
 
+                  {fireBanStatus.status === 'season' && (
+                    <div className="small" style={{ opacity: 0.85 }}>
+                      Fire season (Apr 1 – Oct 31): open-air fires only 7 p.m. – 7 a.m.
+                    </div>
+                  )}
                   {fireBanStatus.status === 'safe' && (
                     <div className="small" style={{ opacity: 0.85 }}>
-                      Daytime burning still prohibited in fire season
+                      Outside fire season — no municipal fire ban in effect
                     </div>
                   )}
 
@@ -448,7 +473,7 @@ export default function LakeInfo() {
                 
                 return (
                                        <div>
-                       <div className="d-flex align-items-center justify-content-between mb-2">
+                       <div className="d-flex align-items-center justify-content-between flex-wrap gap-1 mb-2">
                          <span className="badge me-2 px-2 py-1" style={{
                            backgroundColor: 'rgba(255,255,255,0.2)',
                            border: '1px solid rgba(255,255,255,0.6)',
@@ -585,7 +610,7 @@ export default function LakeInfo() {
             }
           }}
         >
-          <div className="modal-dialog modal-dialog-centered modal-xl" style={{maxWidth: '1100px'}}>
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" style={{maxWidth: '1100px'}}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title d-flex align-items-center">

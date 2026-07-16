@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-// Health checks for every external dependency documented in docs/DATA-SOURCES.md.
+// Health checks for every external dependency documented in docs/DATA-SOURCES.txt.
 // Server-side so browser CORS never skews the results.
 
 interface Check {

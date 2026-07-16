@@ -9,12 +9,16 @@ import newsIndex from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
 import NewsletterStrip from '@/components/NewsletterStrip'
 import sponsorData from '@/data/sponsors.json'
+import eventsData from '@/data/events.json'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
-// Premier ($995) sponsors sort first and render larger than standard ($250) sponsors
-const sponsors = [...sponsorData.sponsors].sort(
-  (a, b) => (b.tier === 'premier' ? 1 : 0) - (a.tier === 'premier' ? 1 : 0)
-)
+// Sponsors sort and size by sponsorship level (amounts from Donna, July 2026)
+const sponsors = [...sponsorData.sponsors].sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
+const TIER_SIZE: Record<string, { h: number; w: number }> = {
+  premier: { h: 72, w: 220 },
+  gold: { h: 58, w: 180 },
+  standard: { h: 46, w: 150 },
+}
 
 const latestPosts = newsIndex.slice(0, 6)
 
@@ -39,34 +43,7 @@ export default function Home() {
   const [showMoreMonths, setShowMoreMonths] = useState(false)
   const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
 
-  const events: Event[] = [
-    {
-      id: 1,
-      title: "Concert on the Lake",
-      date: "July 4, 2026",
-      day: "04",
-      month: "JUL",
-      type: "Community Event",
-      status: "past",
-      icon: "🎸",
-      color: "#0369a1",
-      description: "Riff Raff performed classic 80s–90s pop rock from the dock of Brian & Kristina Davidson on Redstone Lake.",
-      details: "Held July 4, 2026 at 1:30 pm from the dock of Brian & Kristina Davidson on Redstone Lake, featuring Riff Raff with Rick Litwin, who cottages on Kelly Lake in the Haliburton Forest. Thank you to everyone who came out by boat and dock to enjoy the music."
-    },
-    {
-      id: 2,
-      title: "2026 Annual General Meeting",
-      date: "July 11, 2026",
-      day: "11",
-      month: "JUL",
-      type: "Annual Meeting",
-      status: "past",
-      icon: "📅",
-      color: "#14536b",
-      description: "Members approved the name change to Redstone Area Lakes Association, affirmed the board, and heard from guest speakers.",
-      details: "Highlights: the special resolution renaming the association to Redstone Area Lakes Association (RALA) passed; directors were affirmed for 2026–27; presentations from Tegan Legge (Haliburton Forest), Jess Kidd (environmental monitoring on our lakes) and keynote speaker Dani Lindamood (Water Watchers). See the News section for a full recap and the presentation downloads."
-    }
-  ]
+  const events: Event[] = eventsData as Event[]
 
   // Filter and group events by month and year
   const getFilteredAndGroupedEvents = (events: Event[], showMore: boolean) => {
@@ -505,7 +482,7 @@ export default function Home() {
                   <span className="text-muted small">
                     No upcoming events on file — hosting a concert, cleanup or get-together? We&apos;d love to spread the word.
                   </span>
-                  <Link href="/contact" className="btn btn-outline-primary btn-sm flex-shrink-0">Submit an event</Link>
+                  <Link href="/events" className="btn btn-outline-primary btn-sm flex-shrink-0">All events</Link>
                 </div>
               )}
               {Object.entries(groupedEvents).map(([monthKey, monthEvents]) => {
@@ -641,8 +618,20 @@ export default function Home() {
           <p className="text-muted small text-uppercase mb-3" style={{ letterSpacing: '0.08em' }}>
             Thank you to our 2026 sponsors
           </p>
+          <div className="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-3">
+            {sponsors.filter(s => s.tier === 'premier').map(s => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={s.name}
+                src={s.image}
+                alt={s.name}
+                title={s.name}
+                style={{ height: '84px', width: 'auto', maxWidth: '260px', objectFit: 'contain' }}
+              />
+            ))}
+          </div>
           <div className="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-2">
-            {sponsors.map(s => (
+            {sponsors.filter(s => s.tier !== 'premier').map(s => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={s.name}
@@ -650,9 +639,9 @@ export default function Home() {
                 alt={s.name}
                 title={s.name}
                 style={{
-                  height: s.tier === 'premier' ? '72px' : '56px',
+                  height: `${(TIER_SIZE[s.tier] || TIER_SIZE.standard).h}px`,
                   width: 'auto',
-                  maxWidth: s.tier === 'premier' ? '220px' : '170px',
+                  maxWidth: `${(TIER_SIZE[s.tier] || TIER_SIZE.standard).w}px`,
                   objectFit: 'contain'
                 }}
               />
@@ -675,7 +664,7 @@ export default function Home() {
       {/* Event Details Modal */}
       {showModal && selectedEvent && (
         <div className="modal show d-block" tabIndex={-1} style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div className="modal-content">
               <div className="modal-header" style={{borderBottom: `4px solid ${selectedEvent.color}`}}>
                 <div className="d-flex align-items-center">

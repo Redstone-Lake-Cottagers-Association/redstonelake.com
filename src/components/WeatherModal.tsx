@@ -302,7 +302,7 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="modal-dialog modal-dialog-centered modal-xl" style={{ maxWidth: '1100px' }}>
+      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" style={{ maxWidth: '1100px' }}>
         <div className="modal-content" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
           <div className="modal-header border-bottom border-light border-opacity-10 d-flex justify-content-between align-items-center">
             <h5 className="modal-title text-white mb-0">
@@ -877,6 +877,13 @@ export default function WeatherModal({ isOpen, onClose }: WeatherModalProps) {
                             {aqMeta.source === 'openaq'
                               ? ` — observed at the ${aqMeta.station} monitor, ${aqMeta.distanceKm} km away. History and forecast are modelled (Open-Meteo/CAMS).`
                               : ' — modelled for the lakes (Open-Meteo/CAMS).'}
+                            {(aqMeta as any).modelDisagreement != null && (
+                              <div className="mt-1" style={{ color: '#fbbf24' }}>
+                                ⚠️ The monitor is reading well above the regional model (AQI {(aqMeta as any).modelDisagreement}) —
+                                typical during wildfire smoke, when the local monitor is the better guide. The hourly and daily
+                                charts below are model-based and may understate current conditions.
+                              </div>
+                            )}
                           </div>
                         )}
                         <div className="p-3 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>

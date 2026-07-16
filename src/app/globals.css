@@ -28,6 +28,45 @@
   scroll-behavior: smooth;
 }
 
+/* Mobile guards: nothing may widen the page past the viewport ('clip' keeps
+   position:sticky working, unlike 'hidden'), and the brand must fit 390px */
+html,
+body {
+  overflow-x: clip;
+}
+
+@media (max-width: 480px) {
+  /* higher specificity: the base .navbar-brand rule appears later in this file */
+  .navbar .navbar-brand {
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  .navbar .navbar-brand svg {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+  }
+  .weather-widget h5 {
+    font-size: 1.05rem;
+  }
+}
+
+/* News search: the browser's native ✕ doubles our Clear button — hide it */
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Weather stats: two-column grid on phones so label+value pairs never wrap */
+@media (max-width: 575px) {
+  .weather-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    margin-top: 8px;
+  }
+}
+
 /* The sticky header must never cover an anchor target.
    scroll-padding-top handles href="#..." jumps; scroll-margin-top handles
    scrollIntoView() — together they cover every scroll-to on the site. */

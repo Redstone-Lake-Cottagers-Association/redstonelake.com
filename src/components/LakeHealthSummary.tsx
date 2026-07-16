@@ -33,6 +33,9 @@ function Dot({ status }: { status: Status }) {
 export default function LakeHealthSummary() {
   return (
     <div>
+      <div className="d-md-none text-muted text-center mb-1" style={{ fontSize: '0.7rem' }}>
+        Swipe sideways to see all measures →
+      </div>
       <div className="table-responsive mb-2">
         <table className="table table-sm align-middle mb-0" style={{ minWidth: '760px' }}>
           <thead>

@@ -1,0 +1,69 @@
+# Membership form delivery setup
+
+The registration form on /membership POSTs to `/api/membership`, which tries, in order:
+
+1. **Google Sheet webhook** (`MEMBERSHIP_SHEET_WEBHOOK` Fly secret) — preferred. Each
+   registration appends a row to a Google Sheet Donna can manage, and Google emails the
+   coordinators. No AWS needed.
+2. **AWS SES** (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` /
+   `MEMBERSHIP_FROM` secrets) — sends a plain email to membership@ and president@.
+3. Neither configured → the form falls back to a pre-filled email the applicant sends
+   themselves, so the flow never dead-ends.
+
+## Google Sheet setup (~5 minutes, one time)
+
+1. Create a Google Sheet named e.g. "RALA Membership Registrations" (use the association's
+   Google account so Donna and the president have access).
+2. Extensions → Apps Script, replace the contents with:
+
+```javascript
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents)
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const isTest = data.test === true
+  const sheetName = isTest ? 'Test submissions' : 'Registrations'
+  const sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName)
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Timestamp', 'Primary member', 'Primary email', 'Associate member',
+      'Associate email', 'Lake address', 'Phone', 'Mailing address', 'Term', 'Newsletter'])
+  }
+  sheet.appendRow([
+    new Date(), data.primaryName, data.primaryEmail, data.associateName || '',
+    data.associateEmail || '', data.lakeAddress, data.phone || '',
+    data.mailingAddress || '',
+    data.term === '3yr' ? '3 years ($80)' : '1 year ($30)',
+    data.newsletter ? 'Yes' : 'No',
+  ])
+  // Dev/preview submissions go only to the webmaster; real ones go to the
+  // coordinators with the webmaster CC'd on everything.
+  const WEBMASTER = 'andrewjohnmcgrath@gmail.com'
+  MailApp.sendEmail({
+    to: isTest ? WEBMASTER : 'membership@redstonelake.com,president@redstonelake.com',
+    cc: isTest ? '' : WEBMASTER,
+    subject: (isTest ? '[TEST] ' : '') + 'New membership registration — ' + data.primaryName,
+    body:
+      'A new registration just arrived via the website:\n\n' +
+      'Primary: ' + data.primaryName + ' <' + data.primaryEmail + '>\n' +
+      'Associate: ' + (data.associateName || '—') + '\n' +
+      'Lake address: ' + data.lakeAddress + '\n' +
+      'Term: ' + (data.term === '3yr' ? '3 years ($80)' : '1 year ($30)') + '\n\n' +
+      'Full details are in the ' + sheetName + ' sheet:\n' + ss.getUrl(),
+  })
+  return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON)
+}
+```
+
+3. Deploy → New deployment → type **Web app** → "Execute as: **Me**", "Who has access:
+   **Anyone**" → Deploy. Copy the web app URL (`https://script.google.com/macros/s/…/exec`).
+4. `fly secrets set MEMBERSHIP_SHEET_WEBHOOK="<that URL>" -a redstonelake-com`
+5. Test: submit the form on the site; a row should appear and both coordinators get an email.
+
+Troubleshooting: an HTTP 403 "Access Denied" from the /exec URL means "Who has
+access" is not set to Anyone — edit the deployment (Deploy → Manage deployments →
+pencil icon) and change it; the URL stays the same.
+
+Notes: the "Anyone" access is required for the site to POST; the URL is unguessable and the
+script only appends rows. Redeploying the script generates a NEW URL — update the secret if
+you ever edit it. Donna can also add her own notification rules in the Sheet
+(Tools → Notification settings).

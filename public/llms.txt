@@ -18,7 +18,8 @@ Key facts:
 
 ## Main pages
 - [Home](/): live water level, weather, fire-ban status, events and news
-- [News & Articles](/news): community news archive since 2021
+- [News & Articles](/news): community news archive since 2021, with search
+- [Events](/events): upcoming and past community events
 - [Lake Health Data](/lake-health): ~30 years of provincial water quality data
   (phosphorus, clarity, calcium, chloride, sulphate) for all seven lakes
 - [Membership](/membership): dues, benefits, how to join

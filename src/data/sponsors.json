@@ -2,52 +2,60 @@
   "year": 2026,
   "sponsors": [
     {
-      "name": "Team Cottage Country — Shirley Rule & Samantha Miller, Chestnut Park Real Estate",
-      "image": "/images/sponsors/team-cottage-country.png",
-      "website": "https://haliburtoncottagecountry.com/",
-      "tier": "standard"
-    },
-    {
       "name": "Vince Duchene — Re/Max Professionals North",
       "image": "/images/sponsors/vince-duchene.png",
       "website": "https://www.vinceduchene.ca/",
-      "tier": "standard"
-    },
-    {
-      "name": "Walsten Marine",
-      "image": "/images/sponsors/walsten-marine.png",
-      "website": "https://walstenmarine.com/",
-      "tier": "standard"
+      "tier": "premier",
+      "amount": 995
     },
     {
       "name": "Troy Austen Real Estate Team — Re/Max Professionals North",
       "image": "/images/sponsors/troy-austen.png",
       "website": "https://www.troyausten.ca/",
-      "tier": "standard"
+      "tier": "premier",
+      "amount": 845
     },
     {
-      "name": "Amanda Tancredi — Troy Austen Real Estate Team",
-      "image": "/images/sponsors/amanda-tancredi.jpg",
-      "website": "https://www.troyausten.ca/",
-      "tier": "standard"
+      "name": "Team Cottage Country — Shirley Rule & Samantha Miller, Chestnut Park Real Estate",
+      "image": "/images/sponsors/team-cottage-country.png",
+      "website": "https://haliburtoncottagecountry.com/",
+      "tier": "gold",
+      "amount": 595
+    },
+    {
+      "name": "Walsten Marine",
+      "image": "/images/sponsors/walsten-marine.png",
+      "website": "https://walstenmarine.com/",
+      "tier": "gold",
+      "amount": 595
     },
     {
       "name": "Norm Barry Hot Tub & Cottage Maintenance",
       "image": "/images/sponsors/norm-barry.png",
       "website": "https://www.normbarry.ca/",
-      "tier": "standard"
-    },
-    {
-      "name": "Paisley Partners | Navacord",
-      "image": "/images/sponsors/paisley-partners.png",
-      "website": "https://www.paisley-partners.com/",
-      "tier": "standard"
+      "tier": "gold",
+      "amount": 595
     },
     {
       "name": "K and R Self Storage",
       "image": "/images/sponsors/k-and-r-self-storage.png",
       "website": null,
-      "tier": "standard"
+      "tier": "standard",
+      "amount": 395
+    },
+    {
+      "name": "Amanda Tancredi — Troy Austen Real Estate Team",
+      "image": "/images/sponsors/amanda-tancredi.jpg",
+      "website": "https://www.troyausten.ca/",
+      "tier": "standard",
+      "amount": 250
+    },
+    {
+      "name": "Paisley Partners | Navacord",
+      "image": "/images/sponsors/paisley-partners.png",
+      "website": "https://www.paisley-partners.com/",
+      "tier": "standard",
+      "amount": 250
     }
   ]
 }

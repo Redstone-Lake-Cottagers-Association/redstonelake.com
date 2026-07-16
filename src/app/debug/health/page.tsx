@@ -140,8 +140,8 @@ export default function HealthPage() {
 
       <p className="small text-muted mt-4 mb-0">
         What each source is and how to refresh it is documented in{' '}
-        <a href="https://github.com/Redstone-Lake-Cottagers-Association/redstonelake.com/blob/main/docs/DATA-SOURCES.md" target="_blank" rel="noopener noreferrer">
-          docs/DATA-SOURCES.md
+        <a href="https://github.com/Redstone-Lake-Cottagers-Association/redstonelake.com/blob/main/docs/DATA-SOURCES.txt" target="_blank" rel="noopener noreferrer">
+          docs/DATA-SOURCES.txt
         </a>
         . This page is unlisted and excluded from search engines.
       </p>

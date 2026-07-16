@@ -66,13 +66,10 @@ export default function Header() {
                 </ul>
               </li>
               <li className="nav-item">
-                <Link href="/#water-level-monitor" className="nav-link">Water Level & Quality</Link>
+                <Link href="/lake-health" className="nav-link">Water Level & Quality</Link>
               </li>
               <li className="nav-item">
-                <Link href="/#events-news" className="nav-link">Events</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/news" className="nav-link">News</Link>
+                <Link href="/news" className="nav-link">News & Events</Link>
               </li>
               <li className="nav-item dropdown">
                 <a
