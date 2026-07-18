@@ -1,68 +1,72 @@
 # Contributing News & Events
 
 Anyone can add a news article or community event to the website — no coding
-required. Content lives in simple data files, and you propose changes through a
-GitHub pull request (PR). A site manager reviews it, and **once merged the site
-deploys automatically within a few minutes**.
+required.
+
+- **Events** are managed in a Google Sheet — no GitHub needed at all.
+- **News articles** live in simple data files, proposed through a GitHub pull
+  request (PR). A site manager reviews it, and **once merged the site deploys
+  automatically within a few minutes**.
 
 Questions? Email **website@redstonelake.com**.
 
 ---
 
-## The 2-minute version (GitHub web editor — no software needed)
+## Adding an event (no GitHub needed)
 
-1. Sign in to [GitHub](https://github.com) (free account).
-2. Open the file you want to change (links below), then click the **pencil icon** (Edit).
-   - Events: [`src/data/events.json`](src/data/events.json)
-   - News: [`src/data/news-index.json`](src/data/news-index.json) **and** [`src/data/news-posts.json`](src/data/news-posts.json)
-3. Make your edit following the templates below.
-4. Click **Commit changes…** → choose **"Create a new branch and start a pull request"** → **Propose changes**.
-5. On the next screen click **Create pull request**. Done — a site manager takes it from there.
+Events are read live from the association's **events Google Sheet** — the
+website shows every row whose **Status** is `Approved`, refreshed about every
+5 minutes.
 
----
+**Anyone** can propose an event with the form at
+[/events/submit](https://new.redstonelake.com/events/submit) — it lands in the
+sheet as `Pending` and the communications team + president get an email.
 
-## Adding an event
+**Board members / sheet editors** publish (or add) events directly in the sheet:
 
-Edit [`src/data/events.json`](src/data/events.json). It's a list — copy an
-existing entry, paste it at the end of the list (mind the commas between `}`
-and `{`), and fill in your values:
+1. Open the events sheet (link is in the notification emails), **"Event submissions"** tab.
+2. To approve a submission: set its **Status** dropdown to `Approved`. Done —
+   it appears on the site within ~5 minutes. Set `Rejected` to decline (the
+   submitter is not notified automatically).
+3. To add an event yourself: add a row, fill in the columns below, set Status
+   to `Approved`.
 
-```json
-{
-  "title": "Corn Roast & Regatta",
-  "date": "August 15, 2026",
-  "time": "2:00 pm",
-  "location": "The Redstone Sandbar",
-  "type": "Community Event",
-  "icon": "🌽",
-  "color": "#c2703d",
-  "description": "One or two sentences shown on event cards.",
-  "details": "The longer write-up shown when someone clicks the event — what to bring, how to RSVP, parking/docking notes, etc."
-}
-```
+### Event columns
 
-### Event fields
-
-| Field | Required? | Notes |
+| Column | Required? | Notes |
 |---|---|---|
-| `title` | ✅ | Event name |
-| `date` | ✅ | Human format: `"August 15, 2026"`. The site works out everything else (calendar badge, upcoming vs. past) from this — **you never need to update an event after it happens.** |
-| `time` | recommended | e.g. `"2:00 pm"`. Leave as `""` for all-day/unspecified, or use `"Not yet announced"` if the time genuinely isn't decided yet. |
-| `location` | recommended | Venue or description, e.g. `"Haliburton Forest Centre"`. Same rule: `""` if there isn't one, `"Not yet announced"` if it's still being decided. |
-| `type` | ✅ | Short category label, e.g. `Community Event`, `Annual Meeting`, `Fundraiser` |
-| `icon` | optional | A single emoji (defaults to 📅) |
-| `color` | optional | Accent hex colour for the card edge (defaults to lake blue `#0369a1`) |
-| `description` | ✅ | 1–2 sentences for cards and previews |
-| `details` | ✅ | Full text shown in the event pop-up and on the Events page |
+| `Status` | ✅ | `Pending` / `Approved` / `Rejected` — only `Approved` rows show on the site |
+| `Event title` | ✅ | Event name |
+| `Date` | ✅ | e.g. `August 15, 2026`. The site derives everything else (calendar badge, upcoming vs. past) — **events never need editing after they happen.** |
+| `Time` | recommended | e.g. `2:00 pm`. Blank = all-day/unspecified; `Not yet announced` is fine too. |
+| `Location` | recommended | Venue, e.g. `Haliburton Forest Centre`. Blank or `Not yet announced` both work. |
+| `Type` | ✅ | Short category label, e.g. `Community Event`, `Annual Meeting`, `Fundraiser` |
+| `Description` | ✅ | 1–2 sentences for cards and previews |
+| `Details` | ✅ | Full text shown in the event pop-up and on the Events page |
+| `Icon` | optional | A single emoji (defaults to 📅) |
+| `Color` | optional | Accent hex colour for the card edge (defaults to lake blue `#0369a1`) |
 
-**Do not** add `id`, `day`, `month`, or `status` fields — older versions of the
-file had them, but they're now derived automatically from `date`.
+Submitter contact columns (name/email/phone) are for follow-up only — they are
+**never shown on the website**.
 
-Where it appears: the homepage calendar + "Next Event" hero card, and the
+Where events appear: the homepage calendar + "Next Event" hero card, and the
 [/events](https://new.redstonelake.com/events) page. Events automatically move
 to "Past events" the day after they occur.
 
-## Adding a news article
+> Note for developers: `src/data/events.json` is only an emergency fallback if
+> the sheet is unreachable — don't add events there. Webhook/sheet setup lives
+> in `docs/MEMBERSHIP-FORM.txt`.
+
+---
+
+## Adding a news article (GitHub web editor — no software needed)
+
+1. Sign in to [GitHub](https://github.com) (free account).
+2. Open the file you want to change, then click the **pencil icon** (Edit):
+   [`src/data/news-index.json`](src/data/news-index.json) **and** [`src/data/news-posts.json`](src/data/news-posts.json)
+3. Make your edit following the templates below.
+4. Click **Commit changes…** → choose **"Create a new branch and start a pull request"** → **Propose changes**.
+5. On the next screen click **Create pull request**. Done — a site manager takes it from there.
 
 News lives in **two** files that must stay in sync (same entry in both):
 

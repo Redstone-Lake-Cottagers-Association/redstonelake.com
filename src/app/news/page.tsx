@@ -17,7 +17,7 @@ export default async function NewsPage() {
   const latestNewsletters = await getLatestNewsletters(4)
   const allNewsletters = await getLatestNewsletters(200)
   const now = Date.now()
-  const allEvents = getEvents()
+  const allEvents = await getEvents()
   const upcomingEvents = allEvents
     .filter(e => new Date(e.date).getTime() >= now)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())

@@ -30,7 +30,7 @@ function validate(b: unknown): EventSubmission | null {
 }
 
 // "2026-08-15" → "August 15, 2026" (parsed as local calendar date, not UTC,
-// so the day never shifts) — matches the date format in src/data/events.json.
+// so the day never shifts) — matches the date format used in the events sheet.
 function humanDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d).toLocaleDateString('en-US', {

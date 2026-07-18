@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic' // "upcoming vs past" depends on today's date
 
-export default function EventsPage() {
-  const events = getEvents().slice().sort(
+export default async function EventsPage() {
+  const events = (await getEvents()).slice().sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
   const now = new Date()
