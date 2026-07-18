@@ -69,6 +69,18 @@ export default function ContributePage() {
             </div>
           </div>
 
+          <div className="alert alert-info d-flex align-items-center gap-2 mb-4" role="note">
+            <span style={{ fontSize: '1.3rem' }}>📰</span>
+            <span>
+              Want to add a <strong>news article or community event</strong>? No coding needed — follow the
+              step-by-step guide in{' '}
+              <a href={`${REPO}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noopener noreferrer">
+                CONTRIBUTING.md
+              </a>{' '}
+              to propose it right from your browser.
+            </span>
+          </div>
+
           <h3 className="mb-3">Conventions</h3>
           <div className="article-content mb-4">
             <h5>Opening an issue</h5>

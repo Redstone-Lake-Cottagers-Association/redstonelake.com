@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
-import eventsData from '@/data/events.json'
+import { getEvents } from '@/lib/events'
 import NewsExplorer from '@/components/NewsExplorer'
 import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
@@ -17,7 +17,8 @@ export default async function NewsPage() {
   const latestNewsletters = await getLatestNewsletters(4)
   const allNewsletters = await getLatestNewsletters(200)
   const now = Date.now()
-  const upcomingEvents = (eventsData as { id: number; title: string; date: string; icon: string }[])
+  const allEvents = getEvents()
+  const upcomingEvents = allEvents
     .filter(e => new Date(e.date).getTime() >= now)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3)
@@ -34,7 +35,7 @@ export default async function NewsPage() {
       <NewsExplorer
         posts={posts}
         newsletters={allNewsletters.map(n => ({ label: n.label, url: n.url, title: n.title }))}
-        events={(eventsData as any[]).map(e => ({ id: e.id, title: e.title, date: e.date, icon: e.icon, type: e.type, description: e.description }))}
+        events={allEvents.map(e => ({ id: e.id, title: e.title, date: e.date, time: e.time, location: e.location, icon: e.icon, type: e.type, description: e.description }))}
       >
       {/* Events strip — the events calendar lives at /events */}
       <div className="row mb-4">

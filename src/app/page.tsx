@@ -9,7 +9,7 @@ import newsIndex from '@/data/news-index.json'
 import NewsCard from '@/components/NewsCard'
 import NewsletterStrip from '@/components/NewsletterStrip'
 import sponsorData from '@/data/sponsors.json'
-import eventsData from '@/data/events.json'
+import { getEvents, type LakeEvent } from '@/lib/events'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 // Sponsors sort and size by sponsorship level (amounts from Donna, July 2026)
@@ -22,20 +22,9 @@ const TIER_SIZE: Record<string, { h: number; w: number }> = {
 
 const latestPosts = newsIndex.slice(0, 6)
 
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  day: string;
-  month: string;
-  type: string;
-  status: 'upcoming' | 'past';
-  icon: string;
-  color: string;
-  description: string;
-  details: string;
-  monthName?: string;
-}
+// Events come pre-parsed from src/lib/events.ts; monthName is derived
+// at render time when grouping the homepage calendar by month.
+type Event = LakeEvent & { monthName?: string }
 
 export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
@@ -43,7 +32,7 @@ export default function Home() {
   const [showMoreMonths, setShowMoreMonths] = useState(false)
   const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
 
-  const events: Event[] = eventsData as Event[]
+  const events: Event[] = getEvents()
 
   // Hero strip: newest article + the next upcoming event (falling back to the most recent one)
   const latestNews = newsIndex[0]
@@ -180,7 +169,7 @@ export default function Home() {
                   Over 60 years of protecting lakes and building community in the Redstone group of lakes, Haliburton.
                 </p>
                 <div className="d-flex flex-column flex-sm-row gap-3">
-                  <Link href="/membership" className="btn btn-lake-primary btn-lg" style={{fontSize: '1.1rem', padding: '1rem 2rem'}}>
+                  <Link href="/membership" className="btn btn-lake-primary btn-lg hero-cta">
                     Join Our Community
                   </Link>
                 </div>
@@ -215,6 +204,11 @@ export default function Home() {
                           <span className="hero-strip-body">
                             <span className="hero-strip-label">{heroEventIsUpcoming ? 'Next Event' : 'Recent Event'}</span>
                             <span className="hero-strip-title">{heroEvent.icon} {heroEvent.title}</span>
+                            {(heroEvent.time || heroEvent.location) && (
+                              <span className="hero-strip-meta">
+                                {[heroEvent.time, heroEvent.location].filter(Boolean).join(' · ')}
+                              </span>
+                            )}
                             <span className="hero-strip-excerpt">{heroEvent.description}</span>
                             <span className="hero-strip-cta">Event details →</span>
                           </span>
@@ -730,7 +724,7 @@ export default function Home() {
                     <h4 className="modal-title mb-1">{selectedEvent.title}</h4>
                     <div className="d-flex align-items-center text-muted">
                       <span style={{fontSize: '1.2rem', marginRight: '0.5rem'}}>{selectedEvent.icon}</span>
-                      <small>{selectedEvent.type} • {selectedEvent.date}</small>
+                      <small>{selectedEvent.type} • {selectedEvent.date}{selectedEvent.time && ` • ${selectedEvent.time}`}</small>
                     </div>
                   </div>
                 </div>
@@ -741,6 +735,13 @@ export default function Home() {
                 ></button>
               </div>
               <div className="modal-body">
+                {(selectedEvent.time || selectedEvent.location) && (
+                  <div className="mb-3">
+                    <h6 className="text-primary mb-2">When &amp; Where</h6>
+                    {selectedEvent.time && <p className="text-muted mb-1">🕐 {selectedEvent.date} at {selectedEvent.time}</p>}
+                    {selectedEvent.location && <p className="text-muted mb-0">📍 {selectedEvent.location}</p>}
+                  </div>
+                )}
                 <div className="mb-3">
                   <h6 className="text-primary mb-2">Overview</h6>
                   <p className="text-muted">{selectedEvent.description}</p>

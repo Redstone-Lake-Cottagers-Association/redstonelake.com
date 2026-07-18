@@ -22,7 +22,13 @@ Website changes are managed by RLCA board members. To report issues or request u
 
 This is an open source project - anyone can download the code and make changes! We welcome contributions from the community.
 
-### How to Contribute
+### Adding News Articles or Events
+
+Community news and events are plain data files — you can add them without any
+coding, straight from the GitHub web editor. **See [CONTRIBUTING.md](CONTRIBUTING.md)**
+for step-by-step instructions, field references, and copy-paste templates.
+
+### How to Contribute (code)
 
 1. Fork this repository
 2. Make your changes

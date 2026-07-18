@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import eventsData from '@/data/events.json'
+import { getEvents, type LakeEvent as Event } from '@/lib/events'
 import { ORG_NAME } from '@/lib/branding'
 
 export const metadata: Metadata = {
@@ -8,23 +8,10 @@ export const metadata: Metadata = {
   description: 'Upcoming and past community events on the Redstone group of lakes.',
 }
 
-interface Event {
-  id: number
-  title: string
-  date: string
-  day: string
-  month: string
-  type: string
-  icon: string
-  color: string
-  description: string
-  details: string
-}
-
 export const dynamic = 'force-dynamic' // "upcoming vs past" depends on today's date
 
 export default function EventsPage() {
-  const events = (eventsData as Event[]).slice().sort(
+  const events = getEvents().slice().sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
   const now = new Date()
@@ -49,7 +36,12 @@ export default function EventsPage() {
               <h5 className="mb-1">{event.icon} {event.title}</h5>
               {isPast && <span className="badge bg-secondary">PAST EVENT</span>}
             </div>
-            <div className="small text-muted mb-2">{event.date} · {event.type}</div>
+            <div className="small text-muted mb-2">
+              {event.date}
+              {event.time && <> · 🕐 {event.time}</>}
+              {' · '}{event.type}
+            </div>
+            {event.location && <div className="small text-muted mb-2">📍 {event.location}</div>}
             <p className="mb-2">{event.description}</p>
             <p className="small text-muted mb-0">{event.details}</p>
           </div>

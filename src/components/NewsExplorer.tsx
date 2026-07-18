@@ -13,6 +13,8 @@ interface EventItem {
   id: number
   title: string
   date: string
+  time?: string
+  location?: string
   icon: string
   type: string
   description: string
@@ -47,7 +49,7 @@ export default function NewsExplorer({
     return {
       posts: posts.filter(p => match(`${p.title} ${p.excerpt || ''}`)),
       newsletters: newsletters.filter(n => match(`${n.label} ${n.title || ''}`)),
-      events: events.filter(e => match(`${e.title} ${e.description} ${e.type}`)),
+      events: events.filter(e => match(`${e.title} ${e.description} ${e.type} ${e.location || ''}`)),
     }
   }, [searching, query, posts, newsletters, events])
 
