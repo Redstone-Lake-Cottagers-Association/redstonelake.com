@@ -253,6 +253,12 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.6;
 }
 
+/* Hero CTA button (sized here rather than inline so short-viewport media queries can compact it) */
+.hero-cta {
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+}
+
 /* Hero news & event strip — under the hero CTA, bottom-aligned with the LakeInfo widget */
 .hero-strip {
   margin-top: auto;
@@ -312,6 +318,14 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.98rem;
   line-height: 1.35;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.hero-strip-meta {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  margin-top: 0.2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .hero-strip-excerpt {
@@ -1034,6 +1048,44 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline;
+}
+
+/* Short laptop screens (e.g. MacBook Air at default scaling): compact the hero
+   so the news strip and lake widget stay above the fold. Width-gated so it
+   never affects stacked mobile layouts. */
+@media (min-width: 992px) and (max-height: 830px) {
+  .hero-section {
+    padding-top: 1.75rem;
+    padding-bottom: 2rem;
+  }
+
+  .hero-section h1 {
+    font-size: clamp(1.9rem, 3.2vh + 0.9rem, 2.75rem);
+    margin-bottom: 0.85rem;
+  }
+
+  .hero-section .lead {
+    /* !important needed to out-rank Bootstrap's .fs-3 utility */
+    font-size: 1.05rem !important;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-cta {
+    font-size: 1rem;
+    padding: 0.65rem 1.5rem;
+  }
+
+  .hero-strip {
+    padding-top: 1.25rem;
+  }
+
+  .hero-strip-excerpt {
+    -webkit-line-clamp: 1;
+  }
+
+  .weather-widget {
+    padding: 1rem 1.25rem;
+  }
 }
 
 /* Responsive Design */
