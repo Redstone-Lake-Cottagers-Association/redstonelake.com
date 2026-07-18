@@ -5,7 +5,7 @@ One Google Sheet + Apps Script webhook handles BOTH website forms:
 - /membership → `/api/membership` → "Registrations" tab → emails membership@ + president@
 - /events/submit → `/api/event-submission` → "Event submissions" tab → emails
   communications@ + president@
-- Dev/preview submissions (test: true) go to "Test submissions" / "Test event
+- Dev/preview submissions (test: true) go to "Test registrations" / "Test event
   submissions" tabs and email ONLY the webmaster — same rule for both forms.
 
 The registration form on /membership POSTs to `/api/membership`, which tries, in order:
@@ -37,7 +37,7 @@ function doPost(e) {
 function handleMembership(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   const isTest = data.test === true
-  const sheetName = isTest ? 'Test submissions' : 'Registrations'
+  const sheetName = isTest ? 'Test registrations' : 'Registrations'
   const sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName)
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['Timestamp', 'Primary member', 'Primary email', 'Associate member',
