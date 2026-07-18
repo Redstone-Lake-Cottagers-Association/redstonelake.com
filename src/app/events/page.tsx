@@ -71,12 +71,9 @@ export default function EventsPage() {
                   Nothing on the calendar right now — check back soon, or watch the{' '}
                   <Link href="/newsletters">monthly newsletter</Link>.
                 </span>
-                <a
-                  href="mailto:communications@redstonelake.com?subject=Event%20submission"
-                  className="btn btn-lake-primary btn-sm flex-shrink-0"
-                >
+                <Link href="/events/submit" className="btn btn-lake-primary btn-sm flex-shrink-0">
                   Submit an Event
-                </a>
+                </Link>
               </div>
             </div>
           )}
@@ -92,12 +89,9 @@ export default function EventsPage() {
             <p className="text-muted mb-2">
               Running something the lake community should know about?
             </p>
-            <a
-              href="mailto:communications@redstonelake.com?subject=Event%20submission"
-              className="btn btn-outline-primary"
-            >
+            <Link href="/events/submit" className="btn btn-outline-primary">
               Submit an Event
-            </a>
+            </Link>
           </div>
         </div>
       </div>

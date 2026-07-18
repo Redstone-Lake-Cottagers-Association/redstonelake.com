@@ -1,4 +1,12 @@
-# Membership form delivery setup
+# Membership & event form delivery setup
+
+One Google Sheet + Apps Script webhook handles BOTH website forms:
+
+- /membership → `/api/membership` → "Registrations" tab → emails membership@ + president@
+- /events/submit → `/api/event-submission` → "Event submissions" tab → emails
+  communications@ + president@
+- Dev/preview submissions (test: true) go to "Test submissions" / "Test event
+  submissions" tabs and email ONLY the webmaster — same rule for both forms.
 
 The registration form on /membership POSTs to `/api/membership`, which tries, in order:
 
@@ -17,8 +25,16 @@ The registration form on /membership POSTs to `/api/membership`, which tries, in
 2. Extensions → Apps Script, replace the contents with:
 
 ```javascript
+// Dev/preview submissions go only to the webmaster; real ones go to the
+// coordinators with the webmaster CC'd on everything.
+const WEBMASTER = 'andrewjohnmcgrath@gmail.com'
+
 function doPost(e) {
   const data = JSON.parse(e.postData.contents)
+  return data.kind === 'event' ? handleEvent(data) : handleMembership(data)
+}
+
+function handleMembership(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   const isTest = data.test === true
   const sheetName = isTest ? 'Test submissions' : 'Registrations'
@@ -34,9 +50,6 @@ function doPost(e) {
     data.term === '3yr' ? '3 years ($80)' : '1 year ($30)',
     data.newsletter ? 'Yes' : 'No',
   ])
-  // Dev/preview submissions go only to the webmaster; real ones go to the
-  // coordinators with the webmaster CC'd on everything.
-  const WEBMASTER = 'andrewjohnmcgrath@gmail.com'
   MailApp.sendEmail({
     to: isTest ? WEBMASTER : 'membership@redstonelake.com,president@redstonelake.com',
     cc: isTest ? '' : WEBMASTER,
@@ -52,6 +65,53 @@ function doPost(e) {
   return ContentService.createTextOutput(JSON.stringify({ ok: true }))
     .setMimeType(ContentService.MimeType.JSON)
 }
+
+function handleEvent(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const isTest = data.test === true
+  const sheetName = isTest ? 'Test event submissions' : 'Event submissions'
+  const sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName)
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Timestamp', 'Submitted by', 'Email', 'Phone', 'Event title',
+      'Date', 'Time', 'Location', 'Type', 'Description', 'Details'])
+  }
+  sheet.appendRow([
+    new Date(), data.name, data.email, data.phone || '', data.title,
+    data.date, data.time || '', data.location || '', data.type || '',
+    data.description, data.details || '',
+  ])
+  // Ready-to-paste entry for src/data/events.json (see CONTRIBUTING.md)
+  const entry = { title: data.title, date: data.date }
+  if (data.time) entry.time = data.time
+  if (data.location) entry.location = data.location
+  entry.type = data.type || 'Community Event'
+  entry.description = data.description
+  entry.details = data.details || data.description
+  // seed: true = backfilling historical events into the sheet — no notification
+  if (data.seed === true) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+  MailApp.sendEmail({
+    to: isTest ? WEBMASTER : 'communications@redstonelake.com,president@redstonelake.com',
+    cc: isTest ? '' : WEBMASTER,
+    subject: (isTest ? '[TEST] ' : '') + 'New event submission — ' + data.title,
+    body:
+      'A community event was just submitted via the website:\n\n' +
+      'Event: ' + data.title + '\n' +
+      'Date: ' + data.date + (data.time ? ' at ' + data.time : '') + '\n' +
+      'Location: ' + (data.location || '(not provided)') + '\n' +
+      'Submitted by: ' + data.name + ' <' + data.email + '>' + (data.phone ? ' · ' + data.phone : '') + '\n\n' +
+      'Description: ' + data.description + '\n' +
+      (data.details ? '\nDetails: ' + data.details + '\n' : '') +
+      '\nFull details are in the "' + sheetName + '" tab:\n' + ss.getUrl() + '\n\n' +
+      'To publish it on the site, add this entry to src/data/events.json\n' +
+      '(step-by-step guide: CONTRIBUTING.md in the GitHub repo):\n\n' +
+      JSON.stringify(entry, null, 2),
+  })
+  return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON)
+}
 ```
 
 3. Deploy → New deployment → type **Web app** → "Execute as: **Me**", "Who has access:
@@ -63,7 +123,13 @@ Troubleshooting: an HTTP 403 "Access Denied" from the /exec URL means "Who has
 access" is not set to Anyone — edit the deployment (Deploy → Manage deployments →
 pencil icon) and change it; the URL stays the same.
 
+## Updating the script later (keeps the same URL)
+
+To change the script code (e.g. the event-handling update of July 2026): paste the new
+code, then Deploy → **Manage deployments** → pencil icon on the existing deployment →
+Version: **New version** → Deploy. The /exec URL stays the same, so no secret changes
+are needed. (Only "New deployment" generates a new URL.)
+
 Notes: the "Anyone" access is required for the site to POST; the URL is unguessable and the
-script only appends rows. Redeploying the script generates a NEW URL — update the secret if
-you ever edit it. Donna can also add her own notification rules in the Sheet
+script only appends rows. Donna can also add her own notification rules in the Sheet
 (Tools → Notification settings).
