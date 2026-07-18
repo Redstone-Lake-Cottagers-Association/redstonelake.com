@@ -45,6 +45,17 @@ export default function Home() {
 
   const events: Event[] = eventsData as Event[]
 
+  // Hero strip: newest article + the next upcoming event (falling back to the most recent one)
+  const latestNews = newsIndex[0]
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+  const futureEvents = events
+    .filter(event => new Date(event.date) >= startOfToday)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  const heroEvent = futureEvents[0] ??
+    [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+  const heroEventIsUpcoming = futureEvents.length > 0
+
   // Filter and group events by month and year
   const getFilteredAndGroupedEvents = (events: Event[], showMore: boolean) => {
     const now = new Date()
@@ -151,9 +162,9 @@ export default function Home() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="container">
-          <div className="row align-items-start">
-            <div className="col-lg-8">
-              <div>
+          <div className="row align-items-stretch">
+            <div className="col-lg-8 d-flex flex-column">
+              <div className="d-flex flex-column flex-grow-1">
                 <h1 className="display-2 fw-bold mb-4" style={{lineHeight: '1.1', minHeight: '3.5rem'}}>
                   Where <span style={{
                     fontWeight: '900',
@@ -172,6 +183,45 @@ export default function Home() {
                   <Link href="/membership" className="btn btn-lake-primary btn-lg" style={{fontSize: '1.1rem', padding: '1rem 2rem'}}>
                     Join Our Community
                   </Link>
+                </div>
+
+                {/* Latest news & next event strip */}
+                <div className="hero-strip">
+                  <div className="row g-3 align-items-stretch">
+                    <div className={heroEvent ? 'col-md-7' : 'col-12'}>
+                      <Link href={`/news/${latestNews.slug}`} className="hero-strip-card">
+                        {latestNews.featuredImage ? (
+                          <img src={latestNews.featuredImage} alt="" className="hero-strip-thumb" />
+                        ) : (
+                          <span className="hero-strip-thumb hero-strip-thumb-fallback" aria-hidden="true">📰</span>
+                        )}
+                        <span className="hero-strip-body">
+                          <span className="hero-strip-label">
+                            Latest News · {new Date(latestNews.date).toLocaleDateString('en-CA', { month: 'long', day: 'numeric' })}
+                          </span>
+                          <span className="hero-strip-title">{latestNews.title}</span>
+                          <span className="hero-strip-excerpt">{latestNews.excerpt}</span>
+                          <span className="hero-strip-cta">Read the full story →</span>
+                        </span>
+                      </Link>
+                    </div>
+                    {heroEvent && (
+                      <div className="col-md-5">
+                        <button type="button" className="hero-strip-card" onClick={() => openEventModal(heroEvent)}>
+                          <span className="hero-strip-datebadge" aria-hidden="true">
+                            <span className="hero-strip-datebadge-month">{heroEvent.month}</span>
+                            <span className="hero-strip-datebadge-day">{heroEvent.day}</span>
+                          </span>
+                          <span className="hero-strip-body">
+                            <span className="hero-strip-label">{heroEventIsUpcoming ? 'Next Event' : 'Recent Event'}</span>
+                            <span className="hero-strip-title">{heroEvent.icon} {heroEvent.title}</span>
+                            <span className="hero-strip-excerpt">{heroEvent.description}</span>
+                            <span className="hero-strip-cta">Event details →</span>
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
       </div>
             </div>
