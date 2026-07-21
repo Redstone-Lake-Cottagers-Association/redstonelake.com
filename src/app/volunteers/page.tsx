@@ -133,7 +133,7 @@ export default function VolunteersPage() {
                   <h5 className="mb-2">🛟 Buoy Stewards <span className="badge bg-secondary align-middle" style={{ fontSize: '0.65rem' }}>2026</span></h5>
                   <p className="small mb-2">
                     Peter Sergejewich, Geoffrey North, Barry Smith, Ted Rule, Mike Quinn,
-                    Rob Chausse and Paul Kalydy.
+                    Rob Chausse, Paul Kalydy and Eric Lucas.
                   </p>
                   <p className="text-muted small mb-3">
                     Want your bay&rsquo;s buoy on this list?{' '}
