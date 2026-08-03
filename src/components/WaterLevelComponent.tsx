@@ -35,6 +35,14 @@ interface ChartDataPoint {
   max?: number;
 }
 
+// Anchored to the left of the divider so it can never collide with the
+// "Projected" label inside the shaded area to its right
+const renderLatestReadingLabel = ({ viewBox }: { viewBox: { x: number; y: number } }) => (
+  <text x={viewBox.x - 6} y={viewBox.y + 14} textAnchor="end" fontSize={11} fill="#64748b">
+    Latest reading
+  </text>
+);
+
 const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {}) => {
   const [waterData, setWaterData] = useState<WaterData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -432,7 +440,7 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
                             String(name).charAt(0).toUpperCase() + String(name).slice(1)
                           ]}
                         />
-                        <Legend />
+                        <Legend wrapperStyle={{ paddingTop: 12 }} />
 
                         {projectionStart && lastChartDate && (
                           <ReferenceArea
@@ -440,7 +448,7 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
                             x2={lastChartDate}
                             fill="#94a3b8"
                             fillOpacity={0.08}
-                            label={{ value: 'Projected', position: 'insideTop', fontSize: 12, fill: '#64748b' }}
+                            label={{ value: 'Projected', position: 'insideTopRight', fontSize: 12, fill: '#64748b' }}
                           />
                         )}
                         {projectionStart && (
@@ -448,7 +456,7 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
                             x={projectionStart}
                             stroke="#64748b"
                             strokeDasharray="4 4"
-                            label={{ value: 'Latest reading', position: 'insideTopLeft', fontSize: 11, fill: '#64748b' }}
+                            label={renderLatestReadingLabel}
                           />
                         )}
 
