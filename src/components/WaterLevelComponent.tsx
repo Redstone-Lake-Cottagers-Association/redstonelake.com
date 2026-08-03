@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea, ReferenceLine } from 'recharts';
 import { Activity, Droplets, TrendingUp, Calendar } from 'lucide-react';
 
 interface WaterDataPoint {
@@ -136,46 +136,43 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
 
   const formatChartData = (data: WaterData | null): ChartDataPoint[] => {
     if (!data) return [];
-    
-    // Use current year data as the base timeline
+
+    // All series publish points at midnight Eastern (05:00 UTC), but the
+    // historical series carry last year's dates — key everything by
+    // month-day so the timeline spans the full year, not just the days
+    // with a current reading
+    const monthDay = (t: number) => {
+      const d = new Date(t);
+      return `${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    };
+
+    const chartYear = data.current?.length
+      ? new Date(data.current[0].t).getUTCFullYear()
+      : new Date().getFullYear();
+
     const combined: Record<string, ChartDataPoint> = {};
-    
-    // First, add all current year data points
-    data.current?.forEach((item: WaterDataPoint) => {
-      const date = new Date(item.t).toISOString().split('T')[0];
-      combined[date] = { 
-        date,
-        timestamp: item.t,
-        current: parseFloat(item.y)
-      };
-    });
-    
-    // Helper function to map historical data to current year dates
-    const mapHistoricalToCurrentYear = (historicalData: WaterDataPoint[], key: keyof ChartDataPoint) => {
-      historicalData.forEach((item: WaterDataPoint) => {
-        const historicalDate = new Date(item.t);
-        const month = historicalDate.getMonth();
-        const day = historicalDate.getDate();
-        
-        // Find the corresponding date in the current year data
-        const currentYearDate = Object.keys(combined).find(dateStr => {
-          const currentDate = new Date(dateStr);
-          return currentDate.getMonth() === month && currentDate.getDate() === day;
-        });
-        
-        if (currentYearDate && combined[currentYearDate]) {
-          (combined[currentYearDate] as any)[key] = parseFloat(item.y);
+
+    const addSeries = (series: WaterDataPoint[] | undefined, key: 'current' | 'average' | 'min' | 'max') => {
+      series?.forEach((item: WaterDataPoint) => {
+        const md = monthDay(item.t);
+        if (!combined[md]) {
+          const d = new Date(item.t);
+          combined[md] = {
+            date: `${chartYear}-${md}`,
+            timestamp: Date.UTC(chartYear, d.getUTCMonth(), d.getUTCDate()),
+          };
         }
+        combined[md][key] = parseFloat(item.y);
       });
     };
-    
-    // Map historical data to current year timeline
-    if (data.average) mapHistoricalToCurrentYear(data.average, 'average');
-    if (data.min) mapHistoricalToCurrentYear(data.min, 'min');
-    if (data.max) mapHistoricalToCurrentYear(data.max, 'max');
-    
+
+    addSeries(data.current, 'current');
+    addSeries(data.average, 'average');
+    addSeries(data.min, 'min');
+    addSeries(data.max, 'max');
+
     return Object.values(combined)
-      .sort((a, b) => a.timestamp - b.timestamp); // Show all available data
+      .sort((a, b) => a.timestamp - b.timestamp);
   };
 
   const getCurrentLevel = () => {
@@ -251,6 +248,11 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
   const chartData = formatChartData(waterData);
   const currentLevel = getCurrentLevel();
   const stats = getStatistics();
+
+  // Where observed readings end and the historical projection begins
+  const lastObserved = [...chartData].reverse().find((p) => p.current !== undefined);
+  const lastChartDate = chartData.length ? chartData[chartData.length - 1].date : undefined;
+  const projectionStart = lastObserved && lastObserved.date !== lastChartDate ? lastObserved.date : undefined;
 
   // Create placeholder data for consistent layout
   const placeholderStats = {
@@ -431,7 +433,25 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
                           ]}
                         />
                         <Legend />
-                        
+
+                        {projectionStart && lastChartDate && (
+                          <ReferenceArea
+                            x1={projectionStart}
+                            x2={lastChartDate}
+                            fill="#94a3b8"
+                            fillOpacity={0.08}
+                            label={{ value: 'Projected', position: 'insideTop', fontSize: 12, fill: '#64748b' }}
+                          />
+                        )}
+                        {projectionStart && (
+                          <ReferenceLine
+                            x={projectionStart}
+                            stroke="#64748b"
+                            strokeDasharray="4 4"
+                            label={{ value: 'Latest reading', position: 'insideTopLeft', fontSize: 11, fill: '#64748b' }}
+                          />
+                        )}
+
                         {/* Current year data */}
                         <Line 
                           type="monotone" 
@@ -471,6 +491,13 @@ const WaterLevelComponent = ({ showHeader = true }: { showHeader?: boolean } = {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  {projectionStart && (
+                    <p className="text-muted small mb-0 mt-2">
+                      Right of the latest reading, the chart shows the historical average,
+                      maximum and minimum for the rest of the year &mdash; a projection based on past
+                      years, not observed readings.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

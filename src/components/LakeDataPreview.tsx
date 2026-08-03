@@ -4,13 +4,13 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Droplets, FlaskConical } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, ReferenceArea, ReferenceLine, ResponsiveContainer } from 'recharts'
 import lakePartner from '@/data/lake-partner.json'
 import latestReadings from '@/data/lake-health-latest.json'
 import { METRICS, STATUS, classify, contextFor, type Reading, type Status } from '@/lib/water-guidelines'
 
-interface WaterDataPoint { t: string; y: string }
-interface WaterData { current?: WaterDataPoint[] }
+interface WaterDataPoint { t: number; y: string }
+interface WaterData { current?: WaterDataPoint[]; average?: WaterDataPoint[] }
 
 const READINGS = (latestReadings as { lakes: Record<string, Record<string, Reading>> }).lakes
 
@@ -72,10 +72,30 @@ export default function LakeDataPreview() {
       .finally(() => setLoading(false))
   }, [])
 
-  const levelSeries = (waterData?.current || [])
+  // Historical average indexed by day-of-year (its points carry last year's dates)
+  const avgByDay = new Map<string, number>()
+  ;(waterData?.average || []).forEach(p => {
+    const d = new Date(p.t)
+    avgByDay.set(`${d.getUTCMonth()}-${d.getUTCDate()}`, parseFloat(p.y))
+  })
+  const avgFor = (d: Date) => avgByDay.get(`${d.getUTCMonth()}-${d.getUTCDate()}`)
+
+  const levelSeries: { t: number; level?: number; average?: number }[] = (waterData?.current || [])
     .slice(-90)
-    .map(p => ({ t: new Date(p.t).getTime(), level: parseFloat(p.y) }))
-  const latest = levelSeries[levelSeries.length - 1]
+    .map(p => ({ t: p.t, level: parseFloat(p.y), average: avgFor(new Date(p.t)) }))
+  const latest = levelSeries.length ? levelSeries[levelSeries.length - 1] : undefined
+
+  // Project the historical average 30 days past the latest reading
+  const OUTLOOK_DAYS = 30
+  if (latest) {
+    for (let i = 1; i <= OUTLOOK_DAYS; i++) {
+      const t = latest.t + i * 86_400_000
+      const average = avgFor(new Date(t))
+      if (average !== undefined) levelSeries.push({ t, average })
+    }
+  }
+  const lastPoint = levelSeries[levelSeries.length - 1]
+  const hasOutlook = latest && lastPoint && lastPoint.t !== latest.t
 
   return (
     <div className="row g-4">
@@ -91,9 +111,9 @@ export default function LakeDataPreview() {
               <Droplets size={22} style={{ color: '#0369a1' }} />
               <h4 className="mb-0">Water Level</h4>
             </div>
-            <div className="text-muted small mb-2">Redstone Lake, last 90 days</div>
+            <div className="text-muted small mb-2">Redstone Lake, last 90 days + 30-day outlook</div>
             <div className="h3 fw-bold mb-2" style={{ color: '#0369a1', minHeight: '1.4em' }}>
-              {loading ? '—' : latest ? `${latest.level.toFixed(3)} m` : 'Live data unavailable'}
+              {loading ? '—' : latest?.level != null ? `${latest.level.toFixed(3)} m` : 'Live data unavailable'}
             </div>
             <div style={{ height: '190px' }}>
               {levelSeries.length > 1 && (
@@ -101,11 +121,25 @@ export default function LakeDataPreview() {
                   <LineChart data={levelSeries} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
                     <XAxis dataKey="t" hide />
                     <YAxis domain={['dataMin', 'dataMax']} hide />
+                    {hasOutlook && (
+                      <ReferenceArea x1={latest.t} x2={lastPoint.t} fill="#94a3b8" fillOpacity={0.08} />
+                    )}
+                    {hasOutlook && (
+                      <ReferenceLine x={latest.t} stroke="#64748b" strokeDasharray="3 3" strokeWidth={1} />
+                    )}
+                    <Line type="monotone" dataKey="average" stroke="#f49541" strokeWidth={1.5} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
                     <Line type="monotone" dataKey="level" stroke="#0369a1" strokeWidth={2} dot={false} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </div>
+            {!loading && latest && (
+              <div className="text-muted pt-1" style={{ fontSize: '0.68rem' }}>
+                <span style={{ color: '#0369a1' }}>—</span> observed ·{' '}
+                <span style={{ color: '#f49541' }}>- -</span> historical average
+                {hasOutlook ? ' · shaded = projected' : ''}
+              </div>
+            )}
             <span className="fw-semibold small mt-auto pt-2" style={{ color: '#0369a1' }}>
               See level trends &amp; history →
             </span>
