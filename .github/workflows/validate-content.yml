@@ -1,0 +1,16 @@
+name: Validate content
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  news-content:
+    name: News articles and topics
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm run validate:content

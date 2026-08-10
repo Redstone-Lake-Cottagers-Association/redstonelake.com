@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import posts from '@/data/news-posts.json'
 import { ORG_NAME } from '@/lib/branding'
+import { getTopicsForPost } from '@/lib/news-topics'
 
 interface Props {
   params: { slug: string }
@@ -42,6 +43,7 @@ export default function NewsArticle({ params }: Props) {
   if (!post) notFound()
 
   const isProtection = LAKE_PROTECTION_SLUGS.has(params.slug)
+  const topics = getTopicsForPost(post)
   const backHref = isProtection ? '/#essential-lake-protection' : '/news'
   const backLabel = isProtection ? '← Back to Lake Protection' : '← Back to News'
 
@@ -59,6 +61,21 @@ export default function NewsArticle({ params }: Props) {
                 <span key={cat} className="badge bg-light text-dark border">{cat}</span>
               ))}
             </div>
+
+            {topics.length > 0 && (
+              <div className="d-flex align-items-center flex-wrap gap-2 mb-4" aria-label="Article topics">
+                <span className="small text-muted me-1">Topics:</span>
+                {topics.map(topic => (
+                  <Link
+                    key={topic.slug}
+                    href={`/news/topics/${topic.slug}`}
+                    className="badge rounded-pill bg-primary text-white text-decoration-none"
+                  >
+                    {topic.label}
+                  </Link>
+                ))}
+              </div>
+            )}
 
             {post.featuredImage && (
               // eslint-disable-next-line @next/next/no-img-element

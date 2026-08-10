@@ -37,8 +37,8 @@ const CHECKS: Check[] = [
   },
   {
     id: 'newsletters',
-    name: 'Newsletter feed (Mailchimp RSS)',
-    source: 'Mailchimp campaign archive',
+    name: 'Newsletter fallback (Mailchimp RSS)',
+    source: 'Mailchimp public campaign feed',
     url: 'https://us14.campaign-archive.com/feed?u=abfff5b565ccb6c32026c05ab&id=754031d995',
     validate: (s, _c, b) => {
       if (s !== 200) throw new Error(`HTTP ${s}`)

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "npm run validate:content",
     "dev": "next dev",
     "build": "next build",
+    "validate:content": "node scripts/validate-news-content.mjs",
     "start": "next start",
     "lint": "next lint"
   },

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 interface Newsletter {
   label: string
   url: string
+  href: string
   title?: string
 }
 
@@ -34,7 +35,7 @@ export default function NewsletterStrip() {
           {newsletters.map(n => (
             <div key={n.url + n.label} className="col-md-6">
               <a
-                href={n.url}
+                href={n.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="d-flex align-items-baseline gap-3 py-2 px-3 rounded border text-decoration-none bg-white newsletter-row h-100"

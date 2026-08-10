@@ -47,7 +47,7 @@ export default function NewsExplorer({
       return terms.every(term => t.includes(term))
     }
     return {
-      posts: posts.filter(p => match(`${p.title} ${p.excerpt || ''}`)),
+      posts: posts.filter(p => match(`${p.title} ${p.excerpt || ''} ${(p.topics || []).join(' ')}`)),
       newsletters: newsletters.filter(n => match(`${n.label} ${n.title || ''}`)),
       events: events.filter(e => match(`${e.title} ${e.description} ${e.type} ${e.location || ''}`)),
     }

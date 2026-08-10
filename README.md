@@ -50,6 +50,23 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Mailchimp newsletter archive
+
+The newsletter archive uses the Mailchimp Marketing API when
+`MAILCHIMP_API_KEY` is available. The server prefix is normally derived from
+the key's `-usN` suffix. `MAILCHIMP_SERVER_PREFIX` and `MAILCHIMP_LIST_ID` are
+optional overrides.
+
+Without an API key—or whenever the API is unavailable—the site automatically
+uses Mailchimp's public RSS feed plus the legacy archive. Builds and local
+development therefore do not require credentials. Store a local key only in
+`.env.local`; for production, set it directly as a Fly secret and never commit
+it:
+
+```bash
+fly secrets set MAILCHIMP_API_KEY="your-key" -a redstonelake-com
+```
+
 ## Technology Stack
 
 - **Framework**: Next.js 13

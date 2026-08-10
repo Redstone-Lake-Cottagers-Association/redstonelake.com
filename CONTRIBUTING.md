@@ -86,7 +86,7 @@ Entry for `news-index.json` (add at the top):
 }
 ```
 
-Entry for `news-posts.json` (same fields, plus `content`):
+Entry for `news-posts.json` (same fields, plus `topics` and `content`):
 
 ```json
 {
@@ -95,6 +95,7 @@ Entry for `news-posts.json` (same fields, plus `content`):
   "date": "2026-08-16T09:00:00",
   "excerpt": "Two or three sentences summarizing the article — shown on news cards and the homepage.",
   "categories": ["News"],
+  "topics": ["shorelines", "water-quality"],
   "featuredImage": "/images/news/2026-corn-roast-recap/crowd.jpg",
   "content": "<p>Article body goes here as HTML.</p><h2>Section heading</h2><p>More paragraphs. Links look like <a href=\"/events\">this</a>.</p>"
 }
@@ -109,8 +110,20 @@ Entry for `news-posts.json` (same fields, plus `content`):
 | `date` | ✅ | ISO format with time: `"2026-08-16T09:00:00"` (this is different from the event date format!) |
 | `excerpt` | ✅ | 1–3 plain-text sentences for cards/previews |
 | `categories` | ✅ | Usually `["News"]` |
+| `topics` | ✅ (posts file only) | Curated collections containing this article. Use `[]` when none apply. See the allowed values below. |
 | `featuredImage` | optional | Path to an image (see below), or `null` — cards get an auto-generated placeholder |
 | `content` | ✅ (posts file only) | Article body as HTML: `<p>`, `<h2>`, `<ul>/<li>`, `<a>`, `<img>` |
+
+### Article topics
+
+Topics are assigned with the article in `news-posts.json`; there is no separate
+article-to-topic list to maintain. An article may have more than one topic. The
+single current list of allowed values and their public labels is
+[`src/data/news-topics.json`](src/data/news-topics.json).
+
+If no collection applies, write `"topics": []` explicitly. Pull requests and
+production deployments automatically validate that every article has a topics
+array and that every value is recognized.
 
 ### Images
 

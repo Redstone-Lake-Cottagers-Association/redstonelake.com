@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import posts from '@/data/news-index.json'
+import { NEWS_TOPICS } from '@/lib/news-topics'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelake.com'
 
@@ -46,6 +47,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/news/${p.slug}`,
       lastModified: new Date(p.date),
       changeFrequency: 'yearly' as const,
+      priority: 0.6,
+    })),
+    ...NEWS_TOPICS.map(topic => ({
+      url: `${SITE_URL}/news/topics/${topic.slug}`,
+      changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),
   ]
