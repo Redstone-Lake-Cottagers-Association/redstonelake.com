@@ -11,6 +11,7 @@ export interface Newsletter {
   url: string
   title?: string
   dateMs?: number
+  available?: boolean
 }
 
 export function normalizeUrl(url: string) {
@@ -60,9 +61,17 @@ export async function getFeedNewsletters(): Promise<Newsletter[]> {
 /** Feed items merged ahead of the static archive, deduped by URL. */
 export async function getAllNewsletters(): Promise<{ fresh: Newsletter[]; archived: Newsletter[] }> {
   const feed = await getFeedNewsletters()
-  const known = new Set(archived.map(n => normalizeUrl(n.url)))
+  const archivedNewsletters = archived as Newsletter[]
+  const feedByUrl = new Map(feed.map(newsletter => [normalizeUrl(newsletter.url), newsletter]))
+  const known = new Set(archivedNewsletters.map(n => normalizeUrl(n.url)))
   const fresh = feed.filter(n => !known.has(normalizeUrl(n.url)))
-  return { fresh, archived }
+  const enrichedArchive = archivedNewsletters.map(newsletter => {
+    const feedMatch = feedByUrl.get(normalizeUrl(newsletter.url))
+    return feedMatch
+      ? { ...newsletter, title: newsletter.title || feedMatch.title, dateMs: feedMatch.dateMs }
+      : newsletter
+  })
+  return { fresh, archived: enrichedArchive }
 }
 
 /** The most recent newsletters — for teasers. The feed is date-sorted and
@@ -71,5 +80,5 @@ export async function getAllNewsletters(): Promise<{ fresh: Newsletter[]; archiv
 export async function getLatestNewsletters(count: number): Promise<Newsletter[]> {
   const feed = await getFeedNewsletters()
   if (feed.length > 0) return feed.slice(0, count)
-  return archived.slice(0, count)
+  return (archived as Newsletter[]).filter(newsletter => newsletter.available !== false).slice(0, count)
 }

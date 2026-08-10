@@ -3,8 +3,10 @@ import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
 import { getEvents } from '@/lib/events'
 import NewsExplorer from '@/components/NewsExplorer'
-import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
+import { getAllNewsletters, getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
+import { NEWS_TOPICS, getPostSlugsForTopic } from '@/lib/news-topics'
+import { newsletterId } from '@/lib/newsletter-id'
 
 export const metadata: Metadata = {
   title: `News & Events | ${ORG_NAME}`,
@@ -15,7 +17,9 @@ export const revalidate = NEWSLETTER_REVALIDATE
 
 export default async function NewsPage() {
   const latestNewsletters = await getLatestNewsletters(4)
-  const allNewsletters = await getLatestNewsletters(200)
+  const newsletterArchive = await getAllNewsletters()
+  const allNewsletters = [...newsletterArchive.fresh, ...newsletterArchive.archived]
+    .filter(newsletter => newsletter.available !== false)
   const now = Date.now()
   const allEvents = await getEvents()
   const upcomingEvents = allEvents
@@ -33,10 +37,47 @@ export default async function NewsPage() {
       </div>
 
       <NewsExplorer
-        posts={posts}
-        newsletters={allNewsletters.map(n => ({ label: n.label, url: n.url, title: n.title }))}
+        posts={posts.map(post => ({
+          ...post,
+          topics: NEWS_TOPICS
+            .filter(topic => getPostSlugsForTopic(topic.slug).includes(post.slug))
+            .map(topic => topic.label),
+        }))}
+        newsletters={allNewsletters.map(n => ({
+          label: n.label,
+          url: `/newsletters/${newsletterId(n.label, n.url)}`,
+          title: n.title,
+        }))}
         events={allEvents.map(e => ({ id: e.id, title: e.title, date: e.date, time: e.time, location: e.location, icon: e.icon, type: e.type, description: e.description }))}
       >
+      {/* Curated topics complement search with browsable editorial collections. */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card lake-card">
+            <div className="card-body">
+              <div className="mb-3">
+                <h5 className="mb-1">Browse by topic</h5>
+                <p className="small text-muted mb-0">Explore related articles selected by our editors.</p>
+              </div>
+              <div className="d-flex flex-wrap gap-2">
+                {NEWS_TOPICS.map(topic => {
+                  const count = getPostSlugsForTopic(topic.slug).length
+                  return (
+                    <Link
+                      key={topic.slug}
+                      href={`/news/topics/${topic.slug}`}
+                      className="btn btn-outline-primary btn-sm"
+                    >
+                      {topic.label} <span className="opacity-75">({count})</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Events strip — the events calendar lives at /events */}
       <div className="row mb-4">
         <div className="col-12">
@@ -78,7 +119,7 @@ export default async function NewsPage() {
                   {latestNewsletters.map(n => (
                     <div key={n.url + n.label} className="col-md-6">
                       <a
-                        href={n.url}
+                        href={`/newsletters/${newsletterId(n.label, n.url)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="d-flex align-items-baseline gap-3 py-2 px-3 rounded border text-decoration-none bg-white newsletter-row h-100"

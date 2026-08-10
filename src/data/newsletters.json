@@ -57,6 +57,6 @@
   { "label": "May 2021", "year": 2021, "url": "https://mailchi.mp/bb1225be88ba/rlca_eblasts-7917123" },
   { "label": "April 2021", "year": 2021, "url": "https://mailchi.mp/ab21bcb65539/rlca_eblasts-7913287" },
   { "label": "March 2021", "year": 2021, "url": "https://mailchi.mp/c24b0e83b308/rlca_eblasts-7908911" },
-  { "label": "February 2021", "year": 2021, "url": "https://mailchi.mp/ab21bcb65539/rlca_eblasts-7913287" },
-  { "label": "December 2020", "year": 2020, "url": "https://mailchi.mp/ab21bcb65539/rlca_eblasts-7913287" }
+  { "label": "February 2021", "year": 2021, "url": "https://mailchi.mp/ab21bcb65539/rlca_eblasts-7913287", "available": false },
+  { "label": "December 2020", "year": 2020, "url": "https://mailchi.mp/ab21bcb65539/rlca_eblasts-7913287", "available": false }
 ]
