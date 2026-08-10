@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { getAllNewsletters, NEWSLETTER_REVALIDATE, type Newsletter } from '@/lib/newsletters'
+import { getAllNewsletters, type Newsletter } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
 import NewsletterArchive from '@/components/NewsletterArchive'
 import { newsletterId } from '@/lib/newsletter-id'
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   description: 'Archive of our monthly newsletters. Become a member to get your copy directly in your inbox.',
 }
 
-export const revalidate = NEWSLETTER_REVALIDATE
+// Fly injects the optional Mailchimp API key at runtime, after the image build.
+export const dynamic = 'force-dynamic'
 
 export default async function NewslettersPage() {
   const { fresh, archived } = await getAllNewsletters()
@@ -36,7 +37,7 @@ export default async function NewslettersPage() {
               ...newsletter,
               href: newsletter.available === false
                 ? undefined
-                : `/newsletters/${newsletterId(newsletter.label, newsletter.url)}`,
+                : `/newsletters/${newsletterId(newsletter.label, newsletter.url, newsletter.campaignId)}`,
             }))}
           />
         </div>

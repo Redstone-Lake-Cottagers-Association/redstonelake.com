@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
+import { getLatestNewsletters } from '@/lib/newsletters'
 import { newsletterId } from '@/lib/newsletter-id'
 
-export const revalidate = NEWSLETTER_REVALIDATE
+// Fly injects the optional Mailchimp API key at runtime, after the image build.
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const newsletters = await getLatestNewsletters(4)
@@ -10,7 +11,7 @@ export async function GET() {
     {
       newsletters: newsletters.map(newsletter => ({
         ...newsletter,
-        href: `/newsletters/${newsletterId(newsletter.label, newsletter.url)}`,
+        href: `/newsletters/${newsletterId(newsletter.label, newsletter.url, newsletter.campaignId)}`,
       })),
     },
     { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=21600' } }

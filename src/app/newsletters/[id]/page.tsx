@@ -14,7 +14,7 @@ interface Props {
 async function findNewsletter(id: string): Promise<Newsletter | undefined> {
   const { fresh, archived } = await getAllNewsletters()
   return [...fresh, ...archived].find(newsletter => (
-    newsletter.available !== false && newsletterId(newsletter.label, newsletter.url) === id
+    newsletter.available !== false && newsletterId(newsletter.label, newsletter.url, newsletter.campaignId) === id
   ))
 }
 

@@ -1,4 +1,6 @@
-export function newsletterId(label: string, url: string) {
+export function newsletterId(label: string, url: string, campaignId?: string) {
+  if (campaignId && /^[a-zA-Z0-9_-]+$/.test(campaignId)) return `campaign-${campaignId}`
+
   const labelSlug = label
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')

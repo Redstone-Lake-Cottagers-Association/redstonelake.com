@@ -4,7 +4,7 @@ import posts from '@/data/news-index.json'
 import fullPosts from '@/data/news-posts.json'
 import { getEvents } from '@/lib/events'
 import NewsExplorer from '@/components/NewsExplorer'
-import { getAllNewsletters, getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
+import { getAllNewsletters, getLatestNewsletters } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
 import { NEWS_TOPICS, getTopicsForPost } from '@/lib/news-topics'
 import { newsletterId } from '@/lib/newsletter-id'
@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   description: `Community news, conservation insights and updates from the ${ORG_NAME}.`,
 }
 
-export const revalidate = NEWSLETTER_REVALIDATE
+// Newsletter data can use a Mailchimp key injected only at runtime by Fly.
+export const dynamic = 'force-dynamic'
 
 export default async function NewsPage() {
   const fullPostBySlug = new Map(fullPosts.map(post => [post.slug, post]))
@@ -45,7 +46,7 @@ export default async function NewsPage() {
         }))}
         newsletters={allNewsletters.map(n => ({
           label: n.label,
-          url: `/newsletters/${newsletterId(n.label, n.url)}`,
+          url: `/newsletters/${newsletterId(n.label, n.url, n.campaignId)}`,
           title: n.title,
         }))}
         events={allEvents.map(e => ({ id: e.id, title: e.title, date: e.date, time: e.time, location: e.location, icon: e.icon, type: e.type, description: e.description }))}
@@ -119,7 +120,7 @@ export default async function NewsPage() {
                   {latestNewsletters.map(n => (
                     <div key={n.url + n.label} className="col-md-6">
                       <a
-                        href={`/newsletters/${newsletterId(n.label, n.url)}`}
+                        href={`/newsletters/${newsletterId(n.label, n.url, n.campaignId)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="d-flex align-items-baseline gap-3 py-2 px-3 rounded border text-decoration-none bg-white newsletter-row h-100"
