@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate news articles and topics
+        run: npm run validate:content
       
       - name: Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@master

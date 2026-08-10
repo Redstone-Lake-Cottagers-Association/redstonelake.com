@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
+import fullPosts from '@/data/news-posts.json'
 import { getEvents } from '@/lib/events'
 import NewsExplorer from '@/components/NewsExplorer'
 import { getAllNewsletters, getLatestNewsletters, NEWSLETTER_REVALIDATE } from '@/lib/newsletters'
 import { ORG_NAME } from '@/lib/branding'
-import { NEWS_TOPICS, getPostSlugsForTopic } from '@/lib/news-topics'
+import { NEWS_TOPICS, getTopicsForPost } from '@/lib/news-topics'
 import { newsletterId } from '@/lib/newsletter-id'
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 export const revalidate = NEWSLETTER_REVALIDATE
 
 export default async function NewsPage() {
+  const fullPostBySlug = new Map(fullPosts.map(post => [post.slug, post]))
   const latestNewsletters = await getLatestNewsletters(4)
   const newsletterArchive = await getAllNewsletters()
   const allNewsletters = [...newsletterArchive.fresh, ...newsletterArchive.archived]
@@ -39,9 +41,7 @@ export default async function NewsPage() {
       <NewsExplorer
         posts={posts.map(post => ({
           ...post,
-          topics: NEWS_TOPICS
-            .filter(topic => getPostSlugsForTopic(topic.slug).includes(post.slug))
-            .map(topic => topic.label),
+          topics: getTopicsForPost(fullPostBySlug.get(post.slug)!).map(topic => topic.label),
         }))}
         newsletters={allNewsletters.map(n => ({
           label: n.label,
@@ -61,7 +61,7 @@ export default async function NewsPage() {
               </div>
               <div className="d-flex flex-wrap gap-2">
                 {NEWS_TOPICS.map(topic => {
-                  const count = getPostSlugsForTopic(topic.slug).length
+                  const count = fullPosts.filter(post => post.topics.includes(topic.slug)).length
                   return (
                     <Link
                       key={topic.slug}

@@ -43,7 +43,7 @@ export default function NewsArticle({ params }: Props) {
   if (!post) notFound()
 
   const isProtection = LAKE_PROTECTION_SLUGS.has(params.slug)
-  const topics = getTopicsForPost(params.slug)
+  const topics = getTopicsForPost(post)
   const backHref = isProtection ? '/#essential-lake-protection' : '/news'
   const backLabel = isProtection ? '← Back to Lake Protection' : '← Back to News'
 

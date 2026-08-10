@@ -2,12 +2,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import posts from '@/data/news-index.json'
+import fullPosts from '@/data/news-posts.json'
 import NewsCard from '@/components/NewsCard'
 import {
   NEWS_TOPICS,
   getNewsTopic,
-  getPostSlugsForTopic,
-  type NewsTopicSlug,
 } from '@/lib/news-topics'
 import { ORG_NAME } from '@/lib/branding'
 
@@ -33,7 +32,9 @@ export default function NewsTopicPage({ params }: Props) {
   const topic = getNewsTopic(params.topic)
   if (!topic) notFound()
 
-  const postSlugs = new Set(getPostSlugsForTopic(topic.slug as NewsTopicSlug))
+  const postSlugs = new Set(
+    fullPosts.filter(post => post.topics.includes(topic.slug)).map(post => post.slug)
+  )
   const topicPosts = posts.filter(post => postSlugs.has(post.slug))
 
   return (

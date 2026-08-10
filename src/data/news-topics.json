@@ -1,0 +1,27 @@
+[
+  {
+    "slug": "invasive-species",
+    "label": "Invasive Species",
+    "description": "Prevention, identification and local action to keep invasive plants and animals out of our lakes."
+  },
+  {
+    "slug": "shorelines",
+    "label": "Shorelines",
+    "description": "Naturalization, erosion prevention and practical ways to protect the water’s edge."
+  },
+  {
+    "slug": "water-quality",
+    "label": "Water Quality",
+    "description": "Lake health, monitoring, algae, runoff and the science behind clean water."
+  },
+  {
+    "slug": "wildlife",
+    "label": "Wildlife",
+    "description": "The birds, fish, pollinators and other wildlife that share our watershed."
+  },
+  {
+    "slug": "local-government-bylaws",
+    "label": "Local Government & Bylaws",
+    "description": "Municipal decisions, elections and rules that affect lake-area residents."
+  }
+]
