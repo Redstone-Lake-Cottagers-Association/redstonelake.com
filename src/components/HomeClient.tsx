@@ -26,14 +26,57 @@ const latestPosts = newsIndex.slice(0, 6)
 // monthName is derived at render time when grouping the calendar by month.
 type Event = LakeEvent & { monthName?: string }
 
-export default function HomeClient({ events }: { events: LakeEvent[] }) {
+interface HomepageNewsletter {
+  title?: string
+  dateMs?: number
+  href: string
+}
+
+interface LatestUpdate {
+  href: string
+  dateMs: number
+  title: string
+  excerpt: string
+  cta: string
+  icon: string
+  featuredImage?: string
+}
+
+export default function HomeClient({
+  events,
+  latestNewsletter,
+}: {
+  events: LakeEvent[]
+  latestNewsletter: HomepageNewsletter | null
+}) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [showMoreMonths, setShowMoreMonths] = useState(false)
   const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
 
-  // Hero strip: newest article + the next upcoming event (falling back to the most recent one)
+  // Hero strip: newest article or newsletter + the next upcoming event
+  // (falling back to the most recent event).
   const latestNews = newsIndex[0]
+  const latestNewsDate = new Date(latestNews.date).getTime()
+  const latestNewsletterDate = latestNewsletter?.dateMs || 0
+  const latestUpdate: LatestUpdate = latestNewsletter && latestNewsletterDate > latestNewsDate
+    ? {
+        href: latestNewsletter.href,
+        dateMs: latestNewsletterDate,
+        title: latestNewsletter.title || 'Monthly Newsletter',
+        excerpt: `Read the newest update from the ${ORG_ACRONYM}.`,
+        cta: 'Read the newsletter →',
+        icon: '📬',
+      }
+    : {
+        href: `/news/${latestNews.slug}`,
+        dateMs: latestNewsDate,
+        title: latestNews.title,
+        excerpt: latestNews.excerpt,
+        cta: 'Read the full story →',
+        icon: '📰',
+        featuredImage: latestNews.featuredImage,
+      }
   const startOfToday = new Date()
   startOfToday.setHours(0, 0, 0, 0)
   const futureEvents = events
@@ -176,19 +219,19 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
                 <div className="hero-strip">
                   <div className="row g-3 align-items-stretch">
                     <div className={heroEvent ? 'col-md-7' : 'col-12'}>
-                      <Link href={`/news/${latestNews.slug}`} className="hero-strip-card">
-                        {latestNews.featuredImage ? (
-                          <img src={latestNews.featuredImage} alt="" className="hero-strip-thumb" />
+                      <Link href={latestUpdate.href} className="hero-strip-card">
+                        {latestUpdate.featuredImage ? (
+                          <img src={latestUpdate.featuredImage} alt="" className="hero-strip-thumb" />
                         ) : (
-                          <span className="hero-strip-thumb hero-strip-thumb-fallback" aria-hidden="true">📰</span>
+                          <span className="hero-strip-thumb hero-strip-thumb-fallback" aria-hidden="true">{latestUpdate.icon}</span>
                         )}
                         <span className="hero-strip-body">
                           <span className="hero-strip-label">
-                            Latest News · {new Date(latestNews.date).toLocaleDateString('en-CA', { month: 'long', day: 'numeric' })}
+                            Latest Update · {new Date(latestUpdate.dateMs).toLocaleDateString('en-CA', { month: 'long', day: 'numeric' })}
                           </span>
-                          <span className="hero-strip-title">{latestNews.title}</span>
-                          <span className="hero-strip-excerpt">{latestNews.excerpt}</span>
-                          <span className="hero-strip-cta">Read the full story →</span>
+                          <span className="hero-strip-title">{latestUpdate.title}</span>
+                          <span className="hero-strip-excerpt">{latestUpdate.excerpt}</span>
+                          <span className="hero-strip-cta">{latestUpdate.cta}</span>
                         </span>
                       </Link>
                     </div>
