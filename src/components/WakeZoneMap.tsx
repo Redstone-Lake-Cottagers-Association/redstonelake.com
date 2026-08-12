@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { calculateLakeAreaHectares, formatLakeArea } from '@/lib/lakeArea'
+import { LAKE_USE_SUMMARIES } from '@/lib/lakeUseSummaries'
 
 type Position = [number, number]
 type Geometry = {
@@ -54,6 +56,15 @@ export default function WakeZoneMap() {
   const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
+    const handleLakeSelect = (event: Event) => {
+      const selectedLake = (event as CustomEvent<{ lake?: string }>).detail?.lake
+      if (selectedLake && LAKES.includes(selectedLake)) setLake(selectedLake)
+    }
+    window.addEventListener('wake-map-select', handleLakeSelect)
+    return () => window.removeEventListener('wake-map-select', handleLakeSelect)
+  }, [])
+
+  useEffect(() => {
     Promise.all([
       fetch('/map-data/wake-zones.geojson').then(response => response.json()),
       fetch('/map-data/our-lakes.geojson').then(response => response.json()),
@@ -80,6 +91,8 @@ export default function WakeZoneMap() {
     () => lakeShapes?.features.filter(feature => feature.properties.NAME === lake) ?? [],
     [lake, lakeShapes]
   )
+  const selectedArea = useMemo(() => calculateLakeAreaHectares(selectedShapes), [selectedShapes])
+  const useSummary = LAKE_USE_SUMMARIES[lake]
   const hasWaterSportsArea = PRACTICAL_WATER_SPORTS_LAKES.has(lake) && (zones?.features.some(
     feature => feature.properties.lake === lake && feature.properties.zone === 'water-sports'
   ) ?? false)
@@ -183,7 +196,7 @@ export default function WakeZoneMap() {
   }, [lake, selectedShapes, width, zones])
 
   return (
-    <div className="wake-map-panel">
+    <div className="wake-map-panel" id="selected-lake-map">
       <div className="wake-lake-picker" role="group" aria-label="Choose a lake map">
         {LAKES.map(name => (
           <button
@@ -202,6 +215,12 @@ export default function WakeZoneMap() {
         <div>
           <span className="wake-kicker">Shoreline-distance map</span>
           <h3>{lake}</h3>
+        </div>
+        <div className={`wake-map-profile is-${useSummary.tone}`}>
+          <span>Best suited for</span>
+          <strong>{useSummary.status}</strong>
+          <p>{useSummary.text}</p>
+          <small>Mapped surface area <b>{formatLakeArea(selectedArea)}</b></small>
         </div>
       </div>
 
