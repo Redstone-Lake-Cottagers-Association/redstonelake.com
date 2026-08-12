@@ -11,6 +11,7 @@ import {
   Waves,
 } from 'lucide-react'
 import WakeZoneMap from '@/components/WakeZoneMap'
+import WakeMapOverview from '@/components/WakeMapOverview'
 import WakeSimulator from '@/components/WakeSimulator'
 import { ORG_NAME } from '@/lib/branding'
 
@@ -158,6 +159,7 @@ function WakeComparison() {
           <div className="wake-cone wake-cone-small" />
           <div className="top-distance"><i />50 m to shore</div>
           <div className="top-shore"><span>shoreline</span></div>
+          <div className="top-course">Course parallel to shore <b>↓</b></div>
           <div className="top-arrival">about 20–35 sec</div>
         </div>
       </article>
@@ -188,6 +190,7 @@ function WakeComparison() {
           <div className="wake-cone wake-cone-large" />
           <div className="top-distance"><i />50 m to shore</div>
           <div className="top-shore"><span>shoreline</span></div>
+          <div className="top-course">Course parallel to shore <b>↓</b></div>
           <div className="top-arrival">about 20–35 sec</div>
         </div>
       </article>
@@ -208,13 +211,13 @@ export default function WatchYourWakePage() {
             <span className="wake-eyebrow">Respect the lake. Protect the shore.</span>
             <h1>Watch your wake</h1>
             <p className="wake-hero-lead">
-              Slow does not always mean small: a planing hull can make its largest wake just before it
-              gets fully on plane. Keep to the near-shore speed rule—and move high-wake water sports
-              well offshore, inside the mapped 300-metre-plus area.
+              Find your lake in the map previews below, then see where near-shore speed limits,
+              low-wake transit and water sports belong. Slow does not always mean a small wake—your
+              operating choices still matter in every zone.
             </p>
             <div className="wake-hero-actions">
-              <a href="#lake-maps" className="btn btn-light btn-lg">See your lake’s zones</a>
-              <a href="#wake-simulator" className="btn btn-outline-light btn-lg">Try the simulator</a>
+              <a href="#lake-map-previews" className="btn btn-light btn-lg">Compare all seven maps</a>
+              <a href="#lake-maps" className="btn btn-outline-light btn-lg">Open the detailed maps</a>
             </div>
           </div>
           <div className="wake-rule-sign" aria-label="10 kilometres per hour maximum within 30 metres of shore, plus 300 metres or more for high-wake water sports">
@@ -236,6 +239,8 @@ export default function WatchYourWakePage() {
           </div>
         </div>
       </section>
+
+      <WakeMapOverview />
 
       <section className="wake-section wake-simulator-feature" id="wake-simulator">
         <div className="container">
