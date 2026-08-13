@@ -94,7 +94,9 @@ async function fetchApiNewsletters(config: NonNullable<ReturnType<typeof apiConf
 
     const data = await res.json() as MailchimpCampaignResponse
     const newsletters = (data.campaigns || []).flatMap(campaign => {
-      const archiveUrl = campaign.archive_url || campaign.long_archive_url
+      // Prefer Mailchimp's direct HTTPS archive URL. Its short archive_url is
+      // commonly HTTP, which an HTTPS page cannot safely embed in an iframe.
+      const archiveUrl = (campaign.long_archive_url || campaign.archive_url)?.replace(/^http:/, 'https:')
       const date = campaign.send_time ? new Date(campaign.send_time) : null
       if (!campaign.id || !archiveUrl || !date || isNaN(date.getTime())) return []
 
