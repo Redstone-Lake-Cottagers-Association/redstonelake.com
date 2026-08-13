@@ -53,6 +53,7 @@ interface TimedCache<T> {
 }
 
 let apiCache: TimedCache<Newsletter[] | null> | null = null
+const latestApiCache = new Map<number, TimedCache<Newsletter[] | null>>()
 let feedCache: TimedCache<Newsletter[]> | null = null
 
 function cacheExpiry() {
@@ -69,12 +70,15 @@ function apiConfig() {
   return { apiKey, server }
 }
 
-async function fetchApiNewsletters(config: NonNullable<ReturnType<typeof apiConfig>>): Promise<Newsletter[] | null> {
+async function fetchApiNewsletters(
+  config: NonNullable<ReturnType<typeof apiConfig>>,
+  count: number
+): Promise<Newsletter[] | null> {
   try {
     const url = new URL(`https://${config.server}.api.mailchimp.com/3.0/campaigns`)
     url.searchParams.set('status', 'sent')
     url.searchParams.set('list_id', MAILCHIMP_LIST_ID)
-    url.searchParams.set('count', '1000')
+    url.searchParams.set('count', String(count))
     url.searchParams.set('sort_field', 'send_time')
     url.searchParams.set('sort_dir', 'DESC')
     url.searchParams.set(
@@ -124,8 +128,21 @@ export async function getApiNewsletters(): Promise<Newsletter[] | null> {
   const key = `${config.server}:${MAILCHIMP_LIST_ID}`
   if (apiCache?.key === key && apiCache.expiresAt > Date.now()) return apiCache.value
 
-  const value = await fetchApiNewsletters(config)
+  const value = await fetchApiNewsletters(config, 1000)
   apiCache = { key, expiresAt: cacheExpiry(), value }
+  return value
+}
+
+async function getLatestApiNewsletters(count: number): Promise<Newsletter[] | null> {
+  const config = apiConfig()
+  if (!config) return null
+
+  const key = `${config.server}:${MAILCHIMP_LIST_ID}:${count}`
+  const cached = latestApiCache.get(count)
+  if (cached?.key === key && cached.expiresAt > Date.now()) return cached.value
+
+  const value = await fetchApiNewsletters(config, count)
+  latestApiCache.set(count, { key, expiresAt: cacheExpiry(), value })
   return value
 }
 
@@ -191,8 +208,8 @@ export async function getAllNewsletters(): Promise<{ fresh: Newsletter[]; archiv
 /** The most recent newsletters — for teasers. The campaign API is complete;
  *  the RSS feed is the no-key fallback, then the static archive is last. */
 export async function getLatestNewsletters(count: number): Promise<Newsletter[]> {
-  const api = await getApiNewsletters()
-  if (api && api.length > 0) return api.slice(0, count)
+  const api = await getLatestApiNewsletters(count)
+  if (api && api.length > 0) return api
 
   const feed = await getFeedNewsletters()
   if (feed.length > 0) return feed.slice(0, count)

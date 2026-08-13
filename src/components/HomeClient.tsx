@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import LakeInfo from '@/components/LakeInfo'
 import LakeDataPreview from '@/components/LakeDataPreview'
 import HeroMap from '@/components/HeroMap'
@@ -42,17 +42,19 @@ interface LatestUpdate {
   featuredImage?: string
 }
 
-export default function HomeClient({
-  events,
-  latestNewsletter,
-}: {
-  events: LakeEvent[]
-  latestNewsletter: HomepageNewsletter | null
-}) {
+export default function HomeClient({ events }: { events: LakeEvent[] }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [showMoreMonths, setShowMoreMonths] = useState(false)
   const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
+  const [latestNewsletter, setLatestNewsletter] = useState<HomepageNewsletter | null>(null)
+
+  useEffect(() => {
+    fetch('/api/newsletters?count=1')
+      .then(response => response.ok ? response.json() : { newsletters: [] })
+      .then(data => setLatestNewsletter(data.newsletters?.[0] || null))
+      .catch(() => setLatestNewsletter(null))
+  }, [])
 
   // Hero strip: newest article or newsletter + the next upcoming event
   // (falling back to the most recent event).
