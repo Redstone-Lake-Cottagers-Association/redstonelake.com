@@ -50,6 +50,7 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/runtime-supervisor.mjs ./runtime-supervisor.mjs
 
 USER nextjs
 
@@ -59,6 +60,8 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-# server.js is created by next build from the standalone output
+# server.js is created by next build from the standalone output. The supervisor
+# runs it as a child and deliberately exits non-zero if local liveness checks
+# repeatedly fail, allowing Fly's on-failure restart policy to recover the VM.
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"]
+CMD ["node", "runtime-supervisor.mjs"]

@@ -20,6 +20,17 @@ primary_region = 'yyz'
   min_machines_running = 0
   processes = ['app']
 
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "15s"
+    method = "GET"
+    path = "/api/live"
+    protocol = "http"
+    timeout = "3s"
+
+    [http_service.checks.headers]
+      X-Forwarded-Proto = "https"
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
@@ -27,3 +38,8 @@ primary_region = 'yyz'
 
 [env]
   NODE_ENV = 'production'
+
+[[restart]]
+  policy = 'on-failure'
+  retries = 10
+  processes = ['app']
