@@ -105,6 +105,7 @@ export default function Header() {
                   <li><Link href="/lake-health" className="dropdown-item">Lake Health Data</Link></li>
                   <li><Link href="/lake-map" className="dropdown-item">Lake Map</Link></li>
                   <li><Link href="/water-quality-program" className="dropdown-item">Water Quality Program</Link></li>
+                  <li><Link href="/watch-your-wake" className="dropdown-item">Watch Your Wake</Link></li>
                   <li><Link href="/healthy-shoreline" className="dropdown-item">Healthy Shoreline</Link></li>
                   <li><Link href="/septic-systems" className="dropdown-item">Septic Systems</Link></li>
                   <li><Link href="/get-the-lead-out" className="dropdown-item">Get the Lead Out</Link></li>
@@ -117,4 +118,4 @@ export default function Header() {
       </nav>
     </header>
   )
-} 
+}

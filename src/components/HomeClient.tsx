@@ -444,7 +444,7 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
                     <p className="mb-3 text-muted">
                       Boat wakes erode shorelines, muddy fish habitat and can swamp loon nests right at the waterline. Keep to 10 km/h within 30 metres of shore, take big wakes to deep open water, and be #WakeAware around paddlers and swimmers.
                     </p>
-                    <Link href="/news/watch-your-wake-to-protect-our-shorelines" className="btn btn-outline-primary btn-sm">
+                    <Link href="/watch-your-wake" className="btn btn-outline-primary btn-sm">
                       Learn About Wake Safety →
                     </Link>
                   </div>
