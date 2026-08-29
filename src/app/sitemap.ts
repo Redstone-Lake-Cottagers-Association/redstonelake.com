@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/membership', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/newsletters', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/water-quality', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/water-quality/2025-results', priority: 0.7, changeFrequency: 'yearly' },
     { path: '/about', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/board-members', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/business-directory', priority: 0.7, changeFrequency: 'monthly' },

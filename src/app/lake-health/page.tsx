@@ -25,6 +25,8 @@ export default function LakeHealthPage() {
           {SUMMARY_2025}
         </p>
         <p className="small mb-0">
+          <Link href="/water-quality/2025-results">Read the 2025 water quality report →</Link>
+          <span className="mx-2" aria-hidden="true">·</span>
           <Link href="/lake-map">Explore the lakes on our interactive map →</Link>
         </p>
       </div>
