@@ -88,7 +88,21 @@ export default function WaterQualityProgramPage() {
 
           <h3 className="mb-3">See the results</h3>
           <div className="row g-3 mb-5">
-            <div className="col-md-6 d-flex">
+            <div className="col-md-6 col-xl-4 d-flex">
+              <div className="card lake-card w-100">
+                <div className="card-body text-center">
+                  <h5 className="mb-2">📝 2025 Results</h5>
+                  <p className="text-muted small mb-3">
+                    A plain-language summary of what we measured, what the results mean and the two
+                    areas we&rsquo;re watching more closely.
+                  </p>
+                  <Link href="/water-quality/2025-results" className="btn btn-outline-primary btn-sm">
+                    Read the 2025 Report
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-6 col-xl-4 d-flex">
               <div className="card lake-card w-100">
                 <div className="card-body text-center">
                   <h5 className="mb-2">📊 Lake Health Data Explorer</h5>
@@ -100,7 +114,7 @@ export default function WaterQualityProgramPage() {
                 </div>
               </div>
             </div>
-            <div className="col-md-6 d-flex">
+            <div className="col-md-6 col-xl-4 d-flex">
               <div className="card lake-card w-100">
                 <div className="card-body text-center">
                   <h5 className="mb-2">💧 Live Water Level</h5>
