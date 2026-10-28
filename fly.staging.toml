@@ -1,0 +1,42 @@
+# Staging app (staging.redstonelake.com), password-protected via src/proxy.ts.
+# Deploy: fly deploy -c fly.staging.toml
+
+app = 'redstonelake-com-staging'
+primary_region = 'yyz'
+
+[build]
+  # Keep in step with fly.toml so staging previews what production will build
+  [build.args]
+    NEXT_PUBLIC_BRAND = "rala"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "15s"
+    method = "GET"
+    path = "/api/live"
+    protocol = "http"
+    timeout = "3s"
+
+    [http_service.checks.headers]
+      X-Forwarded-Proto = "https"
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[env]
+  NODE_ENV = 'production'
+
+[[restart]]
+  policy = 'on-failure'
+  retries = 10
+  processes = ['app']
