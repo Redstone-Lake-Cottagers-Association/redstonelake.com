@@ -10,13 +10,6 @@ const nextConfig = {
       { source: '/directory/:slug', destination: '/business-directory', permanent: true },
     ]
   },
-  experimental: {
-    outputFileTracingRoot: undefined,
-  },
-  eslint: {
-    // Disable ESLint during builds for deployment
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // Disable TypeScript errors during builds for deployment
     ignoreBuildErrors: true,

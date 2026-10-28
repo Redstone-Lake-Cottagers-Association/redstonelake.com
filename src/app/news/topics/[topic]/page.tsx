@@ -11,15 +11,15 @@ import {
 import { ORG_NAME } from '@/lib/branding'
 
 interface Props {
-  params: { topic: string }
+  params: Promise<{ topic: string }>
 }
 
 export function generateStaticParams() {
   return NEWS_TOPICS.map(topic => ({ topic: topic.slug }))
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const topic = getNewsTopic(params.topic)
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const topic = getNewsTopic((await params).topic)
   if (!topic) return {}
 
   return {
@@ -28,8 +28,8 @@ export function generateMetadata({ params }: Props): Metadata {
   }
 }
 
-export default function NewsTopicPage({ params }: Props) {
-  const topic = getNewsTopic(params.topic)
+export default async function NewsTopicPage({ params }: Props) {
+  const topic = getNewsTopic((await params).topic)
   if (!topic) notFound()
 
   const postSlugs = new Set(

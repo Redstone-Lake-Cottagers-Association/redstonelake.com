@@ -5,7 +5,7 @@ import { ORG_NAME } from '@/lib/branding'
 import { getTopicsForPost } from '@/lib/news-topics'
 
 interface Props {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 
@@ -21,8 +21,9 @@ export function generateStaticParams() {
   return posts.map(post => ({ slug: post.slug }))
 }
 
-export function generateMetadata({ params }: Props) {
-  const post = posts.find(p => p.slug === params.slug)
+export async function generateMetadata({ params }: Props) {
+  const { slug } = await params
+  const post = posts.find(p => p.slug === slug)
   if (!post) return {}
   return {
     title: `${post.title.replace(/&#\d+;|&[a-z]+;/g, '')} | ${ORG_NAME}`,
@@ -38,11 +39,12 @@ function formatDate(date: string) {
   })
 }
 
-export default function NewsArticle({ params }: Props) {
-  const post = posts.find(p => p.slug === params.slug)
+export default async function NewsArticle({ params }: Props) {
+  const { slug } = await params
+  const post = posts.find(p => p.slug === slug)
   if (!post) notFound()
 
-  const isProtection = LAKE_PROTECTION_SLUGS.has(params.slug)
+  const isProtection = LAKE_PROTECTION_SLUGS.has(slug)
   const topics = getTopicsForPost(post)
   const backHref = isProtection ? '/#essential-lake-protection' : '/news'
   const backLabel = isProtection ? '← Back to Lake Protection' : '← Back to News'

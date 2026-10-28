@@ -1,14 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getAllNewsletters, NEWSLETTER_REVALIDATE, type Newsletter } from '@/lib/newsletters'
+import { getAllNewsletters, type Newsletter } from '@/lib/newsletters'
 import { newsletterId } from '@/lib/newsletter-id'
 import { ORG_NAME } from '@/lib/branding'
 
-export const revalidate = NEWSLETTER_REVALIDATE
+// Must be a literal for Next to read it; keep in sync with NEWSLETTER_REVALIDATE
+export const revalidate = 21600
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 async function findNewsletter(id: string): Promise<Newsletter | undefined> {
@@ -19,7 +20,8 @@ async function findNewsletter(id: string): Promise<Newsletter | undefined> {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const newsletter = await findNewsletter(params.id)
+  const { id } = await params
+  const newsletter = await findNewsletter(id)
   if (!newsletter) return {}
 
   return {
@@ -29,7 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function NewsletterPage({ params }: Props) {
-  const newsletter = await findNewsletter(params.id)
+  const { id } = await params
+  const newsletter = await findNewsletter(id)
   if (!newsletter) notFound()
 
   return (
