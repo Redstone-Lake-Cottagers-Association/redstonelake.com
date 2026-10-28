@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { ORG_ACRONYM } from '@/lib/branding'
 
 declare global {
   interface Window {
@@ -77,7 +78,7 @@ export default function LakeMap() {
             scale: 0.8
           })
           .setLngLat(lake.coordinates)
-          .setPopup(new window.mapboxgl.Popup({ offset: 25 }).setHTML(`<strong>${lake.name}</strong><br/>Protected by RLCA`))
+          .setPopup(new window.mapboxgl.Popup({ offset: 25 }).setHTML(`<strong>${lake.name}</strong><br/>Protected by ${ORG_ACRONYM}`))
           .addTo(map.current)
         })
       })

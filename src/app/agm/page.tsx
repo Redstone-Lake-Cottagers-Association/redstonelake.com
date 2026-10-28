@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ORG_NAME } from '@/lib/branding'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 export const metadata: Metadata = {
   title: `Annual General Meeting | ${ORG_NAME}`,
@@ -101,7 +101,7 @@ export default function AgmPage() {
             <div className="card-body text-center">
               <h5>Be part of something special. Become a Member today!</h5>
               <p className="text-muted mb-3">Members can attend and vote at our Annual General Meetings.</p>
-              <Link href="/membership" className="btn btn-lake-primary">Join RLCA</Link>
+              <Link href="/membership" className="btn btn-lake-primary">Join {ORG_ACRONYM}</Link>
             </div>
           </div>
         </div>

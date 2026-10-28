@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ORG_ACRONYM } from '@/lib/branding'
 
 export default function WaterQuality() {
   return (
@@ -60,7 +61,7 @@ export default function WaterQuality() {
             <div className="card-body">
               <h3>Water Testing Program</h3>
               <p>
-                The RLCA conducts regular water quality testing throughout the summer months to monitor the health of our lakes. Our testing program includes:
+                The {ORG_ACRONYM} conducts regular water quality testing throughout the summer months to monitor the health of our lakes. Our testing program includes:
               </p>
               
               <div className="row">

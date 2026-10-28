@@ -66,6 +66,9 @@ export default function HeroMap() {
 
   useEffect(() => {
     let token: string | null = null
+    // Set on unmount so a late script onload (or React's dev double-run of
+    // effects) can't build a map into a container that's gone
+    let cancelled = false
 
     async function fetchToken(): Promise<string | null> {
       try {
@@ -84,6 +87,7 @@ export default function HeroMap() {
 
     async function start() {
       token = await fetchToken()
+      if (cancelled) return
       if (!token) { setPlain(true); return }
 
       if (!webglAvailable()) {
@@ -108,6 +112,7 @@ export default function HeroMap() {
     }
 
     function initializeMap() {
+      if (cancelled || !mapContainer.current) return
       if (map.current) return // Initialize map only once
 
       try {
@@ -134,6 +139,21 @@ export default function HeroMap() {
         return
       }
 
+      // A rejected token (e.g. a dev host missing from the token's URL
+      // allowlist) leaves a blank map; fall back to the plain panel instead.
+      // Having a listener also stops Mapbox logging every tile error itself.
+      map.current.on('error', (e: any) => {
+        const status = e?.error?.status
+        if (status === 401 || status === 403) {
+          console.warn(`Mapbox rejected the access token (${status}); showing plain lake panel`)
+          map.current?.remove()
+          map.current = null
+          setPlain(true)
+        } else {
+          console.warn('Mapbox error:', e?.error?.message || e)
+        }
+      })
+
       // Add markers for each lake when map loads
       map.current.on('load', () => {
         LAKES.forEach(lake => {
@@ -155,8 +175,10 @@ export default function HeroMap() {
     start()
 
     return () => {
+      cancelled = true
       if (map.current) {
         map.current.remove()
+        map.current = null
       }
     }
   }, [])

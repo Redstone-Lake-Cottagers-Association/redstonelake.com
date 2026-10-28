@@ -48,12 +48,22 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
   const [showMoreMonths, setShowMoreMonths] = useState(false)
   const [hasClickedShowMore, setHasClickedShowMore] = useState(false)
   const [latestNewsletter, setLatestNewsletter] = useState<HomepageNewsletter | null>(null)
+  // The newsletter loads client-side (the Mailchimp key only exists at runtime),
+  // so hold a placeholder in the "latest update" slot until we know whether it
+  // beats the newest article; otherwise the article shows, then gets swapped out.
+  const [newsletterChecked, setNewsletterChecked] = useState(false)
 
   useEffect(() => {
+    let done = false
+    const finish = () => { done = true; setNewsletterChecked(true) }
+    // Don't hold the slot hostage to a slow Mailchimp: fall back to the article
+    const timeout = setTimeout(finish, 2500)
     fetch('/api/newsletters?count=1')
       .then(response => response.ok ? response.json() : { newsletters: [] })
-      .then(data => setLatestNewsletter(data.newsletters?.[0] || null))
-      .catch(() => setLatestNewsletter(null))
+      .then(data => { if (!done) setLatestNewsletter(data.newsletters?.[0] || null) })
+      .catch(() => {})
+      .finally(() => { clearTimeout(timeout); finish() })
+    return () => clearTimeout(timeout)
   }, [])
 
   // Hero strip: newest article or newsletter + the next upcoming event
@@ -197,31 +207,38 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
           <div className="row align-items-stretch">
             <div className="col-lg-8 d-flex flex-column">
               <div className="d-flex flex-column flex-grow-1">
-                <h1 className="display-2 fw-bold mb-4" style={{lineHeight: '1.1', minHeight: '3.5rem'}}>
-                  Where <span style={{
-                    fontWeight: '900',
-                    textShadow: '0 0 30px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.8)',
-                    letterSpacing: '0.02em'
-                  }}>community</span> meets <span style={{
-                    fontWeight: '900',
-                    textShadow: '0 0 30px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.8)',
-                    letterSpacing: '0.02em'
-                  }}>conservation</span>
+                <p className="hero-eyebrow">Redstone Area Lakes Association · Est. 1961</p>
+                <h1 className="display-2 fw-bold mb-4">
+                  Where community meets conservation
                 </h1>
-                <p className="lead mb-4 fs-3" style={{maxWidth: '600px', fontWeight: '400', lineHeight: '1.5', minHeight: '4.5rem'}}>
+                <p className="lead mb-4 fs-3">
                   Over 60 years of protecting lakes and building community in the Redstone group of lakes, Haliburton.
                 </p>
                 <div className="d-flex flex-column flex-sm-row gap-3">
-                  <Link href="/membership" className="btn btn-lake-primary btn-lg hero-cta">
+                  <Link href="/membership" className="btn btn-lg hero-cta hero-cta-primary">
                     Join Our Community
+                  </Link>
+                  <Link href="/lake-health" className="btn btn-lg hero-cta hero-cta-secondary">
+                    Explore Lake Health
                   </Link>
                 </div>
 
                 {/* Latest news & next event strip */}
                 <div className="hero-strip">
-                  <div className="row g-3 align-items-stretch">
-                    <div className={heroEvent ? 'col-md-7' : 'col-12'}>
-                      <Link href={latestUpdate.href} className="hero-strip-card">
+                  <div className="hero-strip-heading">What&rsquo;s happening</div>
+                  <div className="hero-strip-panel">
+                    {!newsletterChecked ? (
+                      <div className="hero-strip-card hero-strip-placeholder" aria-busy="true" aria-label="Loading latest update">
+                        <span className="hero-strip-thumb hero-strip-skeleton" />
+                        <span className="hero-strip-body">
+                          <span className="hero-strip-skeleton hero-strip-skeleton-line" style={{ width: '38%' }} />
+                          <span className="hero-strip-skeleton hero-strip-skeleton-line is-title" style={{ width: '62%' }} />
+                          <span className="hero-strip-skeleton hero-strip-skeleton-line" style={{ width: '85%' }} />
+                          <span className="hero-strip-skeleton hero-strip-skeleton-line" style={{ width: '30%' }} />
+                        </span>
+                      </div>
+                    ) : (
+                      <Link href={latestUpdate.href} className="hero-strip-card hero-strip-fade-in">
                         {latestUpdate.featuredImage ? (
                           <img src={latestUpdate.featuredImage} alt="" className="hero-strip-thumb" />
                         ) : (
@@ -236,27 +253,25 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
                           <span className="hero-strip-cta">{latestUpdate.cta}</span>
                         </span>
                       </Link>
-                    </div>
+                    )}
                     {heroEvent && (
-                      <div className="col-md-5">
-                        <button type="button" className="hero-strip-card" onClick={() => openEventModal(heroEvent)}>
-                          <span className="hero-strip-datebadge" aria-hidden="true">
-                            <span className="hero-strip-datebadge-month">{heroEvent.month}</span>
-                            <span className="hero-strip-datebadge-day">{heroEvent.day}</span>
-                          </span>
-                          <span className="hero-strip-body">
-                            <span className="hero-strip-label">{heroEventIsUpcoming ? 'Next Event' : 'Recent Event'}</span>
-                            <span className="hero-strip-title">{heroEvent.icon} {heroEvent.title}</span>
-                            {(heroEvent.time || heroEvent.location) && (
-                              <span className="hero-strip-meta">
-                                {[heroEvent.time, heroEvent.location].filter(Boolean).join(' · ')}
-                              </span>
-                            )}
-                            <span className="hero-strip-excerpt">{heroEvent.description}</span>
-                            <span className="hero-strip-cta">Event details →</span>
-                          </span>
-                        </button>
-                      </div>
+                      <button type="button" className="hero-strip-card" onClick={() => openEventModal(heroEvent)}>
+                        <span className="hero-strip-datebadge" aria-hidden="true">
+                          <span className="hero-strip-datebadge-month">{heroEvent.month}</span>
+                          <span className="hero-strip-datebadge-day">{heroEvent.day}</span>
+                        </span>
+                        <span className="hero-strip-body">
+                          <span className="hero-strip-label">{heroEventIsUpcoming ? 'Next Event' : 'Recent Event'}</span>
+                          <span className="hero-strip-title">{heroEvent.icon} {heroEvent.title}</span>
+                          {(heroEvent.time || heroEvent.location) && (
+                            <span className="hero-strip-meta">
+                              {[heroEvent.time, heroEvent.location].filter(Boolean).join(' · ')}
+                            </span>
+                          )}
+                          <span className="hero-strip-excerpt">{heroEvent.description}</span>
+                          <span className="hero-strip-cta">Event details →</span>
+                        </span>
+                      </button>
                     )}
                   </div>
                 </div>

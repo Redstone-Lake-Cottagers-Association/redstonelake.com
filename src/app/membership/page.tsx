@@ -94,7 +94,7 @@ export default function Membership() {
               <p className="text-muted">
                 Fill in the registration form below, then pay your dues by Interac
                 e-Transfer® to <strong>treasurer@redstonelake.com</strong> — or mail a cheque
-                with your details to <strong>RLCA</strong>, Box 3, West Guilford, Ontario K0M 2S0.
+                with your details to <strong>{ORG_ACRONYM}</strong>, Box 3, West Guilford, Ontario K0M 2S0.
               </p>
               <p className="text-muted small mb-0">
                 Questions about joining or renewing? Email{' '}

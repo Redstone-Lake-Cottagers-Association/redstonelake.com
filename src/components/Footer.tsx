@@ -30,6 +30,7 @@ export default function Footer() {
               <li><Link href="/volunteers" className="text-white-50">Volunteers</Link></li>
               <li><Link href="/governance" className="text-white-50">Governing Docs</Link></li>
               <li><Link href="/agm" className="text-white-50">Annual General Meeting</Link></li>
+              <li><Link href="/media-package" className="text-white-50">Media Package</Link></li>
               <li><Link href="/contact" className="text-white-50">Contact Us</Link></li>
             </ul>
           </div>
@@ -82,7 +83,8 @@ export default function Footer() {
               <Link href="/terms" className="text-white-50">Terms of Use</Link>
             </p>
             <p className="mb-0 text-white-50" style={{ fontSize: '0.78rem' }}>
-              Redstone Lake Cottagers Association is an Ontario Not-for-Profit Corporation
+              The Redstone Area Lakes Association (formerly the Redstone Lake Cottagers
+              Association) is an Ontario Not-for-Profit Corporation
               (Ontario Corporation Number 114778), incorporated August 16, 1961.
               Registered office: West Guilford, Ontario, Canada.{' '}
               <a href="https://www.obrpartner.mgcs.gov.on.ca/onbis/corporations/viewInstance/view.pub?id=280aa9d4fbca6577ccb365bb8f57e85a8b028ff989a4417163d9faefb51bbd20&_timestamp=2157795618925474" target="_blank" rel="noopener noreferrer" className="text-white-50" style={{ textDecoration: 'underline' }}>

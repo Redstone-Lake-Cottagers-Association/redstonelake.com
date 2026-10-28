@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ORG_ACRONYM } from '@/lib/branding'
 
 type Term = '1yr' | '3yr'
 
@@ -108,7 +109,7 @@ export default function MembershipForm() {
             </a>
           </div>
           <p className="small text-muted mt-3 mb-0">
-            Prefer a cheque? Mail it with your details to RLCA, Box 3, West Guilford, Ontario K0M 2S0.
+            Prefer a cheque? Mail it with your details to {ORG_ACRONYM}, Box 3, West Guilford, Ontario K0M 2S0.
           </p>
         </div>
       </div>

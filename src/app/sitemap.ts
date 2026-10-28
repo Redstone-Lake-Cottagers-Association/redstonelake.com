@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/business-directory', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/agm', priority: 0.7, changeFrequency: 'yearly' },
     { path: '/governance', priority: 0.6, changeFrequency: 'yearly' },
+    { path: '/media-package', priority: 0.4, changeFrequency: 'yearly' },
     { path: '/contact', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/galleries', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/new-cottager-guide', priority: 0.6, changeFrequency: 'yearly' },

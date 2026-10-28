@@ -10,7 +10,7 @@ primary_region = 'yyz'
   # Flip to "rala" (and redeploy) to rebrand the site to the new association
   # name once the non-profit application clears and members are notified.
   [build.args]
-    NEXT_PUBLIC_BRAND = "legacy"
+    NEXT_PUBLIC_BRAND = "rala"
 
 [http_service]
   internal_port = 3000

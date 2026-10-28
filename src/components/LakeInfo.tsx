@@ -335,6 +335,12 @@ export default function LakeInfo() {
                       Fire season (Apr 1 – Oct 31): open-air fires only 7 p.m. – 7 a.m.
                     </div>
                   )}
+                  {fireBanStatus.status === 'loading' && (
+                    // Same text as the usual in-season state, hidden, so the banner doesn't grow on load
+                    <div className="small" aria-hidden style={{ visibility: 'hidden' }}>
+                      Fire season (Apr 1 – Oct 31): open-air fires only 7 p.m. – 7 a.m.
+                    </div>
+                  )}
                   {fireBanStatus.status === 'safe' && (
                     <div className="small" style={{ opacity: 0.85 }}>
                       Outside fire season — no municipal fire ban in effect

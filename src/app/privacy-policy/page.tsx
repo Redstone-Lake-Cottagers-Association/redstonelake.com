@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
           <div className="article-content">
             <p>
               The {ORG_NAME} (&ldquo;{ORG_ACRONYM}&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) is a
-              volunteer-run, not-for-profit cottagers&rsquo; association in Haliburton County,
+              volunteer-run, not-for-profit lakes association in Haliburton County,
               Ontario. We respect your privacy and handle personal information in accordance with
               Canada&rsquo;s <em>Personal Information Protection and Electronic Documents Act</em> (PIPEDA).
             </p>

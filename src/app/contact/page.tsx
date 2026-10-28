@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ORG_NAME } from '@/lib/branding'
+import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
 export const metadata: Metadata = {
   title: `Contact Us | ${ORG_NAME}`,
@@ -36,7 +36,7 @@ export default function ContactPage() {
       <div className="text-center mb-5">
         <h1 className="display-4 mb-3">Contact Us</h1>
         <p className="lead text-muted">
-          We’re looking for new members to join our Cottagers Association. Want to know about the
+          We’re looking for new members to join our association. Want to know about the
           benefits that come with a membership? Send us an email.
         </p>
       </div>
@@ -61,11 +61,11 @@ export default function ContactPage() {
             <div className="card-body">
               <h5 className="mb-2">Official Organization Details</h5>
               <ul className="list-unstyled mb-2 small">
-                <li><strong>Legal name:</strong> Redstone Lake Cottagers Association</li>
+                <li><strong>Legal name:</strong> Redstone Area Lakes Association (formerly Redstone Lake Cottagers Association)</li>
                 <li><strong>Type:</strong> Ontario Not-for-Profit Corporation (incorporated August 16, 1961)</li>
                 <li><strong>Ontario Corporation Number (OCN):</strong> 114778</li>
                 <li><strong>Registered office:</strong> West Guilford, Ontario, Canada</li>
-                <li><strong>Mailing address:</strong> RLCA, Box 3, West Guilford, Ontario K0M 2S0</li>
+                <li><strong>Mailing address:</strong> {ORG_ACRONYM}, Box 3, West Guilford, Ontario K0M 2S0</li>
               </ul>
               <p className="small text-muted mb-0">
                 Verify our registration in the{' '}
@@ -80,7 +80,7 @@ export default function ContactPage() {
           <div className="card lake-card mt-4">
             <div className="card-body text-center">
               <h5>Be part of something special. Become a Member today!</h5>
-              <Link href="/membership" className="btn btn-lake-primary mt-2">Join RLCA</Link>
+              <Link href="/membership" className="btn btn-lake-primary mt-2">Join {ORG_ACRONYM}</Link>
             </div>
           </div>
         </div>

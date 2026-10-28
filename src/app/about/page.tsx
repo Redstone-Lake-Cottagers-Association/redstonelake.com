@@ -5,7 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `About Us | ${ORG_NAME}`,
   description:
-    'A volunteer-run cottagers’ association protecting the Redstone Group of Lakes in Haliburton County since 1961.',
+    'A volunteer-run association protecting the Redstone Group of Lakes in Haliburton County since 1961.',
 }
 
 const OBR_URL =
@@ -43,7 +43,7 @@ export default function AboutPage() {
           <div className="text-center mb-5">
             <h1 className="mb-3">About the {ORG_NAME}</h1>
             <p className="lead text-muted mx-auto" style={{ maxWidth: '660px' }}>
-              A volunteer-run cottagers&rsquo; association protecting the lakes — and the community —
+              A volunteer-run association protecting the lakes — and the community —
               of the Redstone Group of Lakes in Haliburton County since 1961.
             </p>
           </div>
@@ -66,8 +66,7 @@ export default function AboutPage() {
             <p>
               At the 2026 Annual General Meeting, members voted to change the association&rsquo;s
               name to the <strong>Redstone Area Lakes Association (RALA)</strong> — read the{' '}
-              <Link href="/news/2026-annual-general-meeting">full story in our AGM recap</Link>. The
-              new name takes effect once the corporate filings are complete.
+              <Link href="/news/2026-annual-general-meeting">full story in our AGM recap</Link>.
             </p>
 
             <h3>Seven lakes, one watershed</h3>
@@ -136,11 +135,12 @@ export default function AboutPage() {
           <div className="border-top pt-4">
             <h5 className="mb-2">Official organization details</h5>
             <p className="small text-muted mb-1">
-              <strong>Legal name:</strong> Redstone Lake Cottagers Association ·{' '}
+              <strong>Legal name:</strong> Redstone Area Lakes Association (formerly Redstone Lake
+              Cottagers Association) ·{' '}
               <strong>Type:</strong> Ontario Not-for-Profit Corporation (incorporated August 16, 1961) ·{' '}
               <strong>Ontario Corporation Number (OCN):</strong> 114778 ·{' '}
               <strong>Registered office:</strong> West Guilford, Ontario, Canada ·{' '}
-              <strong>Mailing address:</strong> RLCA, Box 3, West Guilford, Ontario K0M 2S0
+              <strong>Mailing address:</strong> {ORG_ACRONYM}, Box 3, West Guilford, Ontario K0M 2S0
             </p>
             <p className="small text-muted mb-0">
               Verify our registration in the{' '}

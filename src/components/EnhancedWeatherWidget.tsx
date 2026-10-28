@@ -252,6 +252,8 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                 </div>
               </div>
               <div className="text-muted fw-medium" style={{ marginTop: '4px' }}>Loading...</div>
+              {/* Reserve the "Today: high/low" line so the card doesn't grow on load */}
+              <div aria-hidden style={{ marginTop: '2px', fontSize: '0.9rem', visibility: 'hidden' }}>Today: high --°</div>
             </div>
             <div className="col-5">
               <div className="small">
@@ -267,9 +269,13 @@ export default function EnhancedWeatherWidget({ onExpand, showForecast = true }:
                   <span>☁️</span>
                   <span>--%</span>
                 </div>
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between" style={{ marginBottom: '2px' }}>
                   <span>💨</span>
                   <span>-- km/h</span>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <span>🌫️</span>
+                  <span>--</span>
                 </div>
               </div>
             </div>
