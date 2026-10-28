@@ -5,6 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Contact Us | ${ORG_NAME}`,
   description: `Get in touch with the ${ORG_NAME}.`,
+  alternates: { canonical: '/contact' },
 }
 
 const contacts = [

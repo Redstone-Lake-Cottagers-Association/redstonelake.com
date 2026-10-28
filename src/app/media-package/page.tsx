@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: 'Media Package | Redstone Area Lakes Association',
   description:
     'Logos, colours, name usage and approved descriptions of the Redstone Area Lakes Association (RALA) for partners, sponsors, press and volunteers.',
+  alternates: { canonical: '/media-package' },
 }
 
 const LOGOS = [

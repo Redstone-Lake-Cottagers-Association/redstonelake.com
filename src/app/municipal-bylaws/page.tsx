@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Municipal By-Laws | ${ORG_NAME}`,
   description:
     'The Dysart et al by-laws cottagers ask about most — burning, noise, fireworks, shoreline trees, septic and short-term rentals — with links to the official sources.',
+  alternates: { canonical: '/municipal-bylaws' },
 }
 
 const DYSART = 'https://www.dysartetal.ca'

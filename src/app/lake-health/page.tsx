@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: `Lake Health Data | ${ORG_NAME}`,
   description:
     'Decades of provincial water quality data for the Redstone group of lakes — phosphorus, water clarity, calcium, chloride and sulphate from the Ontario Lake Partner Program.',
+  // ?lake= / ?lat=&lng= views are the same page
+  alternates: { canonical: '/lake-health' },
 }
 
 export default function LakeHealthPage() {

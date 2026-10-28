@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getAllNewsletters, type Newsletter } from '@/lib/newsletters'
+import { findLegacyNewsletter, getAllNewsletters, type Newsletter } from '@/lib/newsletters'
 import { newsletterId } from '@/lib/newsletter-id'
 import { ORG_NAME } from '@/lib/branding'
 
@@ -14,9 +14,14 @@ interface Props {
 
 async function findNewsletter(id: string): Promise<Newsletter | undefined> {
   const { fresh, archived } = await getAllNewsletters()
-  return [...fresh, ...archived].find(newsletter => (
-    newsletter.available !== false && newsletterId(newsletter.label, newsletter.url, newsletter.campaignId) === id
-  ))
+  const all = [...fresh, ...archived].filter(newsletter => newsletter.available !== false)
+  const newsletter = all.find(n => newsletterId(n.label, n.url, n.campaignId) === id)
+  if (newsletter) return newsletter
+
+  // An ID from before the switch to Mailchimp campaign IDs: 301 to the current page
+  const legacy = findLegacyNewsletter(id, all)
+  if (legacy) permanentRedirect(`/newsletters/${newsletterId(legacy.label, legacy.url, legacy.campaignId)}`)
+  return undefined
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,6 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${newsletter.label} Newsletter | ${ORG_NAME}`,
     description: newsletter.title || `${ORG_NAME} newsletter for ${newsletter.label}.`,
+    alternates: { canonical: `/newsletters/${id}` },
   }
 }
 

@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   title: `Lake Map | ${ORG_NAME}`,
   description:
     'Interactive map of the Redstone group of lakes — depth contours, property parcels, and natural heritage areas.',
+  // ?lake= / ?lat=&lng= views are the same page
+  alternates: { canonical: '/lake-map' },
 }
 
 export default function LakeMapPage() {

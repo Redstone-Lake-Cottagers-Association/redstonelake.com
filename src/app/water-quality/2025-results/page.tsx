@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `2025 Water Quality Results | ${ORG_NAME}`,
   description:
     'A plain-language summary of the 2025 water quality results for Redstone, Little Redstone, Pelaw, Bitter, Burdock, Tedious (Long) and Coleman lakes.',
+  alternates: { canonical: '/water-quality/2025-results' },
 }
 
 const RESULTS = [

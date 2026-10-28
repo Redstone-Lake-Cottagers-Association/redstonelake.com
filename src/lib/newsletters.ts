@@ -1,4 +1,5 @@
 import archived from '@/data/newsletters.json'
+import { labelSlug, newsletterId } from '@/lib/newsletter-id'
 
 export const NEWSLETTER_FEED_URL =
   'https://us14.campaign-archive.com/feed?u=abfff5b565ccb6c32026c05ab&id=754031d995'
@@ -18,6 +19,24 @@ export interface Newsletter {
 
 export function normalizeUrl(url: string) {
   return url.split('?')[0].replace(/\/$/, '')
+}
+
+/** Newsletter page IDs changed when the archive moved from the static list and
+ * RSS feed (date label + URL hash, e.g. "june-2026-if0wr") to Mailchimp campaign
+ * IDs ("campaign-…"). Google indexed the old IDs, so map one back to the
+ * current newsletter: by the archive entry's URL when the ID came from the
+ * static archive, otherwise by its exact date label ("jun-8-2026-…"). */
+export function findLegacyNewsletter(id: string, current: Newsletter[]): Newsletter | undefined {
+  const legacy = (archived as Newsletter[]).find(n => newsletterId(n.label, n.url) === id)
+  if (legacy) {
+    const url = normalizeUrl(legacy.url)
+    const byUrl = current.find(n => normalizeUrl(n.url) === url)
+    if (byUrl) return byUrl
+  }
+
+  const slug = id.replace(/-[a-z0-9]+$/, '')
+  const sameLabel = current.filter(n => labelSlug(n.label) === slug)
+  return sameLabel.length === 1 ? sameLabel[0] : undefined
 }
 
 

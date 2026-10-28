@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/galleries', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/new-cottager-guide', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/healthy-shoreline', priority: 0.6, changeFrequency: 'yearly' },
+    { path: '/watch-your-wake', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/septic-systems', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/get-the-lead-out', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/municipal-bylaws', priority: 0.5, changeFrequency: 'yearly' },

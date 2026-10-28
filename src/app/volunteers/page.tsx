@@ -5,6 +5,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Volunteers | ${ORG_NAME}`,
   description: 'Everything the association does is done by volunteers. Here’s how to lend a hand.',
+  alternates: { canonical: '/volunteers' },
 }
 
 const ROLES = [

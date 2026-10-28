@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Healthy Shoreline | ${ORG_NAME}`,
   description:
     'Why a naturalized shoreline is the best thing you can do for the lake — and where to find native plants in Haliburton.',
+  alternates: { canonical: '/healthy-shoreline' },
 }
 
 const SOURCES = [

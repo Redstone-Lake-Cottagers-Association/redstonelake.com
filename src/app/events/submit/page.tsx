@@ -6,6 +6,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Submit an Event | ${ORG_NAME}`,
   description: 'Share a community event with the lake community.',
+  alternates: { canonical: '/events/submit' },
 }
 
 export default function SubmitEventPage() {

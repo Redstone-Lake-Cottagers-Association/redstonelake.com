@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: `Sponsors & Business Directory | ${ORG_NAME}`,
   description:
     'Our sponsors — whose generous support funds our work on the lakes — and local businesses and organizations serving the Redstone group of lakes.',
+  alternates: { canonical: '/business-directory' },
 }
 
 function domain(url: string | null | undefined) {

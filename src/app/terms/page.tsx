@@ -5,6 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Terms of Use | ${ORG_NAME}`,
   description: 'Terms of use for this website.',
+  alternates: { canonical: '/terms' },
 }
 
 export default function TermsPage() {

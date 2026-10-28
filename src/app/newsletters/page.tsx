@@ -8,6 +8,7 @@ import { newsletterId } from '@/lib/newsletter-id'
 export const metadata: Metadata = {
   title: `Newsletters | ${ORG_NAME}`,
   description: 'Archive of our monthly newsletters. Become a member to get your copy directly in your inbox.',
+  alternates: { canonical: '/newsletters' },
 }
 
 // Fly injects the optional Mailchimp API key at runtime, after the image build.
