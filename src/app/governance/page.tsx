@@ -5,6 +5,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Governing Documents | ${ORG_NAME}`,
   description: 'RLCA governing documents — letters patent, by-laws, amendments and resolutions dating back to 1961.',
+  alternates: { canonical: '/governance' },
 }
 
 const documents = [

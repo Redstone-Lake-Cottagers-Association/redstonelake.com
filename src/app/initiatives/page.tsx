@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Initiatives | ${ORG_NAME}`,
   description:
     'The association’s active programs: hazard buoys, water quality monitoring, lead-free tackle, shoreline health and more.',
+  alternates: { canonical: '/initiatives' },
 }
 
 const INITIATIVES = [

@@ -27,6 +27,14 @@ export function generateMetadata({ params }: Props) {
   return {
     title: `${post.title.replace(/&#\d+;|&[a-z]+;/g, '')} | ${ORG_NAME}`,
     description: post.excerpt,
+    alternates: { canonical: `/news/${post.slug}` },
+    openGraph: {
+      type: 'article',
+      title: post.title.replace(/&#\d+;|&[a-z]+;/g, ''),
+      description: post.excerpt,
+      publishedTime: post.date,
+      ...(post.featuredImage ? { images: [post.featuredImage] } : {}),
+    },
   }
 }
 

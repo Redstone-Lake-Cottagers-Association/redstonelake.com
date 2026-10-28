@@ -6,6 +6,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Events | ${ORG_NAME}`,
   description: 'Upcoming and past community events on the Redstone group of lakes.',
+  alternates: { canonical: '/events' },
 }
 
 export const dynamic = 'force-dynamic' // "upcoming vs past" depends on today's date

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Contribute to This Website | ${ORG_NAME}`,
   description:
     'This website is open source. Learn how to propose a change, report a problem, or submit an improvement on GitHub.',
+  alternates: { canonical: '/contribute' },
 }
 
 const REPO = 'https://github.com/Redstone-Lake-Cottagers-Association/redstonelake.com'

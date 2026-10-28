@@ -5,6 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Get the Lead Out | ${ORG_NAME}`,
   description: 'Lead fishing tackle kills common loons. Trade in your lead weights and tackle for a free limited edition custom lure.',
+  alternates: { canonical: '/get-the-lead-out' },
 }
 
 export default function GetTheLeadOutPage() {

@@ -5,6 +5,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Annual General Meeting | ${ORG_NAME}`,
   description: 'Minutes, presentations and recordings from our Annual General Meetings.',
+  alternates: { canonical: '/agm' },
 }
 
 interface AgmItem {

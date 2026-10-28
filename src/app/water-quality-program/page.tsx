@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Water Quality Program | ${ORG_NAME}`,
   description:
     'How our volunteer lake stewards monitor water quality on all seven lakes — and where to explore nearly 30 years of results.',
+  alternates: { canonical: '/water-quality-program' },
 }
 
 const MEASURES = [

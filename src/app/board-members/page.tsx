@@ -5,6 +5,7 @@ import { ORG_NAME } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Board Members | ${ORG_NAME}`,
   description: `The volunteer board of directors and committee members of the ${ORG_NAME}.`,
+  alternates: { canonical: '/board-members' },
 }
 
 function initials(name: string) {

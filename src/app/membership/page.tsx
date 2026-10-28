@@ -6,6 +6,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Membership | ${ORG_NAME}`,
   description: `Join the ${ORG_NAME} (${ORG_ACRONYM}) — membership dues, benefits and how to register.`,
+  alternates: { canonical: '/membership' },
 }
 
 const DUES = [

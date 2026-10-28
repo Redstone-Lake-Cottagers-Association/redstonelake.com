@@ -1,4 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+import { ORG_NAME } from '@/lib/branding'
+
+export const metadata: Metadata = {
+  title: `Water Quality | ${ORG_NAME}`,
+  description:
+    'Water quality monitoring on the Redstone group of lakes: phosphorus, water clarity and calcium results, how we sample, and what the numbers mean.',
+  alternates: { canonical: '/water-quality' },
+}
 
 export default function WaterQuality() {
   return (

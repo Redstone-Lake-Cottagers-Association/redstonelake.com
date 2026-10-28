@@ -12,6 +12,7 @@ import { newsletterId } from '@/lib/newsletter-id'
 export const metadata: Metadata = {
   title: `News & Events | ${ORG_NAME}`,
   description: `Community news, conservation insights and updates from the ${ORG_NAME}.`,
+  alternates: { canonical: '/news' },
 }
 
 // Newsletter data can use a Mailchimp key injected only at runtime by Fly.

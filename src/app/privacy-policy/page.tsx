@@ -5,6 +5,7 @@ import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 export const metadata: Metadata = {
   title: `Privacy Policy | ${ORG_NAME}`,
   description: 'How the association collects, uses and protects personal information.',
+  alternates: { canonical: '/privacy-policy' },
 }
 
 export default function PrivacyPolicyPage() {

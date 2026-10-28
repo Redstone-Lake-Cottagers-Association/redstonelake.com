@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `About Us | ${ORG_NAME}`,
   description:
     'A volunteer-run cottagers’ association protecting the Redstone Group of Lakes in Haliburton County since 1961.',
+  alternates: { canonical: '/about' },
 }
 
 const OBR_URL =

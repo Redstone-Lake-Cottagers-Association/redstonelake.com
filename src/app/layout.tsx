@@ -9,9 +9,22 @@ import { ORG_NAME } from '@/lib/branding'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelake.com'
+const DESCRIPTION = 'Protecting our lakes today and for future generations – Bitter, Burdock, Coleman, Little Redstone, Long (Tedious), Pelaw and Redstone Lakes.'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: ORG_NAME,
-  description: 'Protecting our lakes today and for future generations – Bitter, Burdock, Coleman, Little Redstone, Long (Tedious), Pelaw and Redstone Lakes.',
+  description: DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    siteName: ORG_NAME,
+    locale: 'en_CA',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 630, alt: 'Redstone Lake in Haliburton' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({
