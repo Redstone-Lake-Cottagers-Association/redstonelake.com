@@ -87,8 +87,8 @@ export default function Footer() {
               Association) is an Ontario Not-for-Profit Corporation
               (Ontario Corporation Number 114778), incorporated August 16, 1961.
               Registered office: West Guilford, Ontario, Canada.{' '}
-              <a href="https://www.obrpartner.mgcs.gov.on.ca/onbis/corporations/viewInstance/view.pub?id=280aa9d4fbca6577ccb365bb8f57e85a8b028ff989a4417163d9faefb51bbd20&_timestamp=2157795618925474" target="_blank" rel="noopener noreferrer" className="text-white-50" style={{ textDecoration: 'underline' }}>
-                View our record in the Ontario Business Registry
+              <a href="https://opencorporates.com/companies/ca_on/114778" target="_blank" rel="noopener noreferrer" className="text-white-50" style={{ textDecoration: 'underline' }}>
+                View our public corporation record
               </a>. This site and the domains redstonelake.com, redstonelakes.com and
               redstonelakes.ca are owned and operated by the association.
             </p>

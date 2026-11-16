@@ -74,7 +74,13 @@ B2. next.config.js: change the www -> apex redirect to
     old domains, so they never reach Fly.)
 B3. src/app/watch-your-wake/page.tsx: hardcoded canonical and OG url ->
     redstonelakes.ca.
-B4. cloudflare/data-refresh-worker/wrangler.toml: SITE_BASE_URL ->
+B4. [DONE 2026-11-16: first deployed via the Cloudflare dashboard (Node 20 on
+    the dev Mac is too old for wrangler 4) as Worker "rlca-data-refresh" in
+    the account that holds the redstone zones. Cron */15 * * * *, workers.dev
+    URL disabled, SITE_BASE_URL unset (the code defaults to redstonelakes.ca).
+    First scheduled run at 18:00 UTC succeeded. To update it, paste worker.js
+    into the dashboard editor, or upgrade Node to 22+ and run wrangler deploy.]
+    cloudflare/data-refresh-worker/wrangler.toml: SITE_BASE_URL ->
     https://redstonelakes.ca, then redeploy the worker.
 B5. README/CONTRIBUTING: update the site links.
 B6. Optional (only after E3 is done and tested): switch the public contact
@@ -205,3 +211,19 @@ E7. Mailgun: redstonelake.com has a full Mailgun sending setup in DNS:
     don't recreate them on the new domains. While cleaning up, also remove the legacy ip4:
     ranges in the SPF record that belonged to the old web host, once nothing
     sends from them.
+
+ROLLBACK VALUES (removed 2026-11-16, Mailgun cleanup on redstonelake.com)
+SPF was:   "v=spf1 mx ip4:96.31.32.192/29 ip4:64.79.170.0/24 ip4:216.32.60.0/28 ip4:216.177.91.16/28 include:_spf.google.com include:mailgun.org ~all"
+pic._domainkey TXT was: "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+RejPQ2DLamCK7o8ZsqPhB+HKWhtqkFmjXWyzgXVOZu9NSgx1QQwyNta68xd3Nm1cmgedwPn1O+jIQRFny5xIrAk0yxpKGxhZqF4jX6QA97gXX9HOnSaCVBhwQJ5Mx8H69cTAgWDtjPY/e5ilVUaCPNkb54Ao9eDpZijT/v0pVQIDAQAB"
+email CNAME was: mailgun.org (proxied status: DNS only)
+_dmarc was: "v=DMARC1; p=none; pct=100; fo=1; ri=3600; rua=mailto:f6e9103c@dmarc.mailgun.org,mailto:xm26vy33z5q@inbox.ondmarc.com,mailto:4a92e4831fa0497a9cc08babd4e2a8cf@dmarc-reports.cloudflare.net; ruf=mailto:f6e9103c@dmarc.mailgun.org,mailto:xm26vy33z5q@inbox.ondma" "rc.com;"
+
+CORRECTION 2026-11-16: the Mailgun records above were RESTORED the same day.
+Mailgun is the planned sender for the membership admin portal
+(branch codex/membership-admin-portal; AUTH_FROM membership@redstonelake.com).
+Restored: SPF include:mailgun.org, pic._domainkey DKIM (identical value),
+email CNAME -> mailgun.org (DNS only), and the Mailgun DMARC rua/ruf address.
+Still removed, and confirmed unused by 30 days of DMARC data: the four legacy
+Host Collective/CenturyLink ip4 ranges in SPF, and the unknown OnDMARC (Red
+Sift) report address.
+Current SPF: v=spf1 include:_spf.google.com include:mailgun.org ~all

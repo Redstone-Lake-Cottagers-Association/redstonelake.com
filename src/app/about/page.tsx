@@ -9,8 +9,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
 }
 
-const OBR_URL =
-  'https://www.obrpartner.mgcs.gov.on.ca/onbis/corporations/viewInstance/view.pub?id=280aa9d4fbca6577ccb365bb8f57e85a8b028ff989a4417163d9faefb51bbd20&_timestamp=2157795618925474'
+// Ontario Business Registry record links (viewInstance/view.pub?id=...) only
+// work in the session that created them, so link to OpenCorporates' copy of
+// the record (a permanent page) and to the registry's own search page.
+const OBR_RECORD_URL = 'https://opencorporates.com/companies/ca_on/114778'
+const OBR_SEARCH_URL =
+  'https://www.appmybizaccount.gov.on.ca/onbis/master/entry.pub?applicationCode=onbis-master&businessService=registerItemSearch'
 
 const PILLARS = [
   {
@@ -144,12 +148,9 @@ export default function AboutPage() {
               <strong>Mailing address:</strong> {ORG_ACRONYM}, Box 3, West Guilford, Ontario K0M 2S0
             </p>
             <p className="small text-muted mb-0">
-              Verify our registration in the{' '}
-              <a href={OBR_URL} target="_blank" rel="noopener noreferrer">Ontario Business Registry record</a>{' '}
-              or search the{' '}
-              <a href="https://www.ontario.ca/page/ontario-business-registry" target="_blank" rel="noopener noreferrer">
-                Ontario Business Registry
-              </a>{' '}
+              View our{' '}
+              <a href={OBR_RECORD_URL} target="_blank" rel="noopener noreferrer">public corporation record</a>, or search the{' '}
+              <a href={OBR_SEARCH_URL} target="_blank" rel="noopener noreferrer">Ontario Business Registry</a>{' '}
               for OCN 114778. This website and the domains redstonelake.com, redstonelakes.com and
               redstonelakes.ca are owned and operated by the association. Questions?{' '}
               <Link href="/contact">Contact us</Link>.
