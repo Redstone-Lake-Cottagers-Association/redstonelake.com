@@ -3,7 +3,7 @@ import HomeClient from '@/components/HomeClient'
 import { getEvents } from '@/lib/events'
 import { ORG_NAME, ORG_ACRONYM } from '@/lib/branding'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelake.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelakes.ca'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },

@@ -1,0 +1,207 @@
+DOMAIN CUTOVER RUNBOOK: redstonelakes.ca becomes the primary domain
+=====================================================================
+
+Goal
+- Website: redstonelakes.ca is the canonical site. redstonelake.com and
+  redstonelakes.com (apex + www) 301-redirect to https://redstonelakes.ca,
+  keeping the path, so old links and eblast links still land on the right page.
+- Email: Google Workspace keeps working on all three domains. Every mailbox
+  receives at, and can send from, @redstonelake.com, @redstonelakes.ca and
+  @redstonelakes.com. The default From address moves to @redstonelakes.ca.
+- No lost mail at any point. MX records are never touched by the website
+  redirect work.
+
+All three zones are in the same Cloudflare account. There is no Cloudflare API
+token on the dev machine, so Cloudflare steps are done in the dashboard.
+
+
+Current state (checked 2026-11-16)
+-----------------------------------
+redstonelake.com
+  Web:   proxied to Fly app redstonelake-com (certs issued for apex, www, new.)
+  MX:    smtp.google.com
+  SPF:   google + mailgun + several legacy IP ranges from the old web host
+  DKIM:  google._domainkey present
+  DMARC: p=none
+
+redstonelakes.com and redstonelakes.ca (identical setup)
+  Web:   Cloudflare 301 -> https://redstonelake.com/ (drops the path)
+  MX:    Google (legacy 5-record aspmx set). Fine, no change needed.
+  SPF:   v=spf1 include:_spf.google.com ~all
+  Google site-verification TXT present, so both domains are probably already
+  added in the Workspace Admin console. Confirm in step E1.
+  DKIM:  MISSING
+  DMARC: MISSING
+
+Also noticed: old.redstonelake.com currently returns Cloudflare 526 (invalid
+origin certificate). Retire it or fix it, but don't let it block launch.
+
+
+PART A: Before launch day (no visible change, safe to do early)
+---------------------------------------------------------------
+A1. Issue Fly certs for the new hostnames ahead of time:
+      fly certs add redstonelakes.ca -a redstonelake-com
+      fly certs add www.redstonelakes.ca -a redstonelake-com
+    Then, in the redstonelakes.ca Cloudflare zone, add the records that
+    `fly certs setup <host> -a redstonelake-com` prints for the proxied
+    pattern:
+      CNAME _acme-challenge      -> redstonelakes.ca.<id>.flydns.net.      DNS ONLY (grey)
+      CNAME _acme-challenge.www  -> www.redstonelakes.ca.<id>.flydns.net.  DNS ONLY (grey)
+      TXT   _fly-ownership       -> app-<id>
+      TXT   _fly-ownership.www   -> app-<id>
+    The _acme-challenge records MUST be grey-cloud, or validation never
+    completes. Wait until `fly certs list` shows both as Issued.
+
+A2. In the redstonelakes.ca zone, set SSL/TLS mode to Full (strict).
+    This is set per zone, and the .ca zone is probably still on Flexible.
+    Flexible + Fly force_https = infinite redirect loop.
+
+A3. Add redstonelakes.ca to the Mapbox token's allowed URLs (otherwise maps
+    fall back to the plain panel).
+
+A4. Email authentication (Part E below) can and should be done now. It is
+    independent of the website.
+
+
+PART B: Code changes (one branch, deployed at cutover)
+------------------------------------------------------
+B1. fly.toml: add NEXT_PUBLIC_SITE_URL = "https://redstonelakes.ca" under
+    [build.args]. It is inlined at build time, so it must be a build arg, not
+    [env]. This drives metadataBase, canonical URLs, sitemap.xml, robots.txt
+    and the homepage structured data.
+B2. next.config.js: change the www -> apex redirect to
+    www.redstonelakes.ca -> https://redstonelakes.ca. (Cloudflare handles the
+    old domains, so they never reach Fly.)
+B3. src/app/watch-your-wake/page.tsx: hardcoded canonical and OG url ->
+    redstonelakes.ca.
+B4. cloudflare/data-refresh-worker/wrangler.toml: SITE_BASE_URL ->
+    https://redstonelakes.ca, then redeploy the worker.
+B5. README/CONTRIBUTING: update the site links.
+B6. Optional (only after E3 is done and tested): switch the public contact
+    addresses on the site (contact, volunteers, membership, footer, forms) from
+    @redstonelake.com to @redstonelakes.ca. Both deliver to the same inboxes.
+
+
+PART C: Launch day, in order
+----------------------------
+C1. Deploy the Part B branch to production.
+C2. redstonelakes.ca zone:
+      - Delete or disable the existing redirect rule that sends it to
+        redstonelake.com (otherwise it ping-pongs with C3).
+      - Point apex + www at the Fly app as proxied (orange) CNAMEs, the same
+        as redstonelake.com uses today. Leave the MX/TXT records alone.
+      - Check: https://redstonelakes.ca and https://www.redstonelakes.ca load.
+C3. redstonelake.com zone: Rules > Redirect Rules > new rule
+      When:   (http.host eq "redstonelake.com") or (http.host eq "www.redstonelake.com")
+      Then:   Dynamic, 301,
+              concat("https://redstonelakes.ca", http.request.uri.path)
+              Preserve query string: ON
+    Match those two hostnames only. Do NOT use a zone-wide match, or
+    staging.redstonelake.com and old.redstonelake.com get redirected too.
+C4. redstonelakes.com zone: edit the existing redirect so it targets
+    https://redstonelakes.ca with the same dynamic path-preserving expression
+    (it currently drops the path and points at redstonelake.com).
+C5. Smoke test (expect a single 301 hop, path preserved):
+      curl -sI https://redstonelake.com/news/2026-annual-general-meeting
+      curl -sI https://www.redstonelake.com/membership
+      curl -sI https://redstonelakes.com/contact
+      curl -sI https://www.redstonelakes.com/
+      curl -sI https://redstonelakes.ca/        (200)
+    Then send a test email to an @redstonelake.com address to prove mail is
+    unaffected.
+C6. Google Search Console: verify redstonelakes.ca (domain property via DNS
+    TXT), then on the redstonelake.com property run Settings > Change of
+    address -> redstonelakes.ca. Submit https://redstonelakes.ca/sitemap.xml.
+
+Rollback: disable the C3/C4 redirect rules and re-enable the old .ca rule.
+DNS and MX are unchanged by C3/C4, so rollback is instant.
+
+
+PART E: Email (Google Workspace, Admin console)
+-----------------------------------------------
+E1. Admin > Account > Domains > Manage domains. Confirm redstonelakes.ca and
+    redstonelakes.com are listed as "User alias domain" with status Active /
+    Gmail activated. If either is missing, add it as a USER ALIAS domain
+    (free, no extra licences) and verify with the TXT record Google gives.
+    With alias domains, every user automatically receives mail at
+    user@redstonelakes.ca and user@redstonelakes.com.
+    Groups (e.g. info@ if it is a Google Group) also need their alias-domain
+    addresses enabled: Admin > Groups > the group > add alias.
+
+[DONE 2026-11-16: E1 confirmed (both alias domains verified). E2 DKIM (2048-bit,
+ selector google) published and authenticating for .ca and .com. E3 DMARC
+ "v=DMARC1; p=none;" published on both.]
+
+E2. DKIM for each alias domain: Admin > Apps > Google Workspace > Gmail >
+    Authenticate email > choose redstonelakes.ca > Generate new record
+    (2048-bit, selector "google"). Add it in Cloudflare as
+      TXT google._domainkey  (the value Google shows)
+    wait about 30 minutes, then click "Start authentication". Repeat for
+    redstonelakes.com.
+
+E3. DMARC for both alias domains (Cloudflare TXT _dmarc):
+      v=DMARC1; p=none; rua=mailto:<reporting address>
+    Start at p=none, then move to p=quarantine once reports look clean.
+    SPF is already correct on both (include:_spf.google.com) unless SES,
+    Mailchimp or Mailgun will send as those domains (see E5/E6).
+
+E4. Sending From the new domains, default .ca. Two routes:
+    Route 1 (launch-day, low risk): each user, in Gmail > Settings > Accounts >
+      "Send mail as" > Add another address > name@redstonelakes.ca
+      (and .com if wanted), with "Treat as an alias" ticked. Because these are
+      alias-domain addresses there is no SMTP or verification step. Then click
+      "make default" on the .ca address. Admins cannot set this centrally from
+      the console, so each board member does it once (two-minute how-to email).
+    Route 2 (later, cleaner): make redstonelakes.ca the Workspace primary
+      domain and rename each user to @redstonelakes.ca. Old @redstonelake.com
+      addresses are kept automatically as aliases, so nothing is lost, but
+      third-party logins tied to the old address (Mailchimp, AWS, Fly, Google
+      sign-ins elsewhere) need checking first. Do this after launch has
+      settled.
+    Replying: Gmail > Settings > Accounts > "When replying to a message" >
+      "Reply from the same address the message was sent to" (Gmail's
+      default). Once all three addresses are in a user's "Send mail as" list,
+      a reply to mail sent to name@redstonelake.com goes out from
+      @redstonelake.com, and so on. This only works for addresses on that
+      list. Mail that arrives through a Google Group (e.g. a shared address)
+      is addressed to the group, so the user also needs the group's address
+      as a send-as alias, or the reply goes out from their default address.
+
+E5. Website form email (membership + event submissions). This is NOT SES:
+    production has no AWS secrets, only MEMBERSHIP_SHEET_WEBHOOK. The forms
+    post to the Google Apps Script in docs/sheet-apps-script.js, which appends
+    a row to the sheet and sends a notification with MailApp.sendEmail from
+    the Workspace account that owns the script. That mail is already signed
+    by Google, so nothing is required at cutover.
+      - Optional: change the hard-coded @redstonelake.com recipients in the
+        script to @redstonelakes.ca (both deliver to the same inboxes), then
+        paste it back into the Apps Script editor and redeploy.
+      - MailApp always sends from the owning account's primary address. To
+        send as @redstonelakes.ca it needs GmailApp.sendEmail(..., {from:
+        'website@redstonelakes.ca'}), which requires that alias in the owner's
+        "Send mail as" list (E4). It's an internal notification, so this is
+        low priority.
+      - The SES code path in src/app/api/membership/route.ts is an unused
+        fallback. Leave it unconfigured.
+
+E6. Mailchimp:
+      - Account > Domains: add and verify redstonelakes.ca, then Authenticate
+        it (adds CNAMEs k2._domainkey and k3._domainkey plus a DMARC check).
+        Note that redstonelake.com is not currently authenticated in Mailchimp
+        either (no k2/k3 records), so this is an improvement.
+      - Audience > Settings > Audience name and defaults: change the default
+        From email to @redstonelakes.ca.
+      - Update footer/template links and any saved templates from
+        redstonelake.com to redstonelakes.ca (the redirect keeps old links
+        working, but new campaigns should use the new domain).
+
+E7. Mailgun: redstonelake.com has a full Mailgun sending setup in DNS:
+    include:mailgun.org in SPF, DKIM selector pic._domainkey, a tracking
+    CNAME email.redstonelake.com -> mailgun.org, and Mailgun addresses in the
+    DMARC rua/ruf. Nothing in this repo or the Apps Script uses Mailgun, so it
+    almost certainly belonged to the old WordPress site. The Mailgun account
+    was probably under the old host, not RALA. Confirm nobody on the board has
+    a Mailgun login. Once confirmed, delete those records after cutover and
+    don't recreate them on the new domains. While cleaning up, also remove the legacy ip4:
+    ranges in the SPF record that belonged to the old web host, once nothing
+    sends from them.

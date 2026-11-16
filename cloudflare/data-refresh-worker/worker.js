@@ -12,7 +12,7 @@
 
 export default {
   async scheduled(event, env, ctx) {
-    const base = env.SITE_BASE_URL || 'https://www.redstonelake.com'
+    const base = env.SITE_BASE_URL || 'https://redstonelakes.ca'
     const targets = [
       `${base}/api/water-levels?stationId=17&lang=EN`,
       `${base}/api/weather?type=current`,

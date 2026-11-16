@@ -9,4 +9,4 @@ crons = ["*/15 * * * *"]
 
 [vars]
 # Point at wherever the Next.js app is reachable (Fly URL until DNS cutover).
-SITE_BASE_URL = "https://www.redstonelake.com"
+SITE_BASE_URL = "https://redstonelakes.ca"

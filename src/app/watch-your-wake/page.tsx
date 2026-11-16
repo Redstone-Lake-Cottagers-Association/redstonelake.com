@@ -19,11 +19,11 @@ export const metadata: Metadata = {
   title: `Watch Your Wake | ${ORG_NAME}`,
   description:
     'Answers about Ontario’s 30-metre near-shore speed rule, water-sports distances, towing safety, wake behaviour and shoreline zones for all seven Redstone area lakes.',
-  alternates: { canonical: 'https://redstonelake.com/watch-your-wake' },
+  alternates: { canonical: '/watch-your-wake' },
   openGraph: {
     title: `Watch Your Wake | ${ORG_NAME}`,
     description: 'Ontario wake rules, evidence-based shoreline distances and water-sports guidance for the Redstone area lakes.',
-    url: 'https://redstonelake.com/watch-your-wake',
+    url: '/watch-your-wake',
     type: 'article',
   },
 }

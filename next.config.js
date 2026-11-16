@@ -62,13 +62,15 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // One canonical host: www otherwise serves a duplicate of every page
-      {
+      // One canonical host: redstonelakes.ca. Cloudflare redirects
+      // redstonelake.com and redstonelakes.com before they reach Fly; these
+      // rules are the fallback if a request for those hosts gets here anyway.
+      ...['www.redstonelakes.ca', 'redstonelake.com', 'www.redstonelake.com'].map((host) => ({
         source: '/:path*',
-        has: [{ type: 'host', value: 'www.redstonelake.com' }],
-        destination: 'https://redstonelake.com/:path*',
+        has: [{ type: 'host', value: host }],
+        destination: 'https://redstonelakes.ca/:path*',
         permanent: true,
-      },
+      })),
       ...legacyRedirects,
       ...legacyDocumentRedirects(),
       ...wordpressRedirects,

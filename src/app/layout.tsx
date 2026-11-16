@@ -9,7 +9,7 @@ import { ORG_NAME } from '@/lib/branding'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelake.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://redstonelakes.ca'
 const DESCRIPTION = 'Protecting our lakes today and for future generations – Bitter, Burdock, Coleman, Little Redstone, Long (Tedious), Pelaw and Redstone Lakes.'
 
 export const metadata: Metadata = {
