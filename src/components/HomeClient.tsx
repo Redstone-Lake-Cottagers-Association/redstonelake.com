@@ -331,7 +331,7 @@ export default function HomeClient({ events }: { events: LakeEvent[] }) {
           <div className="row g-4">
             <div className="col-lg-4">
               <div className="card lake-card h-100">
-                <img src="/images/pages/media-galleries/Fishing_Buddies-1024x576.png" alt="Members showing off their catch on Redstone Lake" className="card-img-top" style={{ objectFit: 'cover' }} />
+                <img src="/images/pages/media-galleries/20210703_160904_resized-1024x768.jpg" alt="Members waving from a pontoon boat on Redstone Lake" className="card-img-top" style={{ objectFit: 'cover' }} />
                 <div className="card-body d-flex flex-column">
                   <h4 className="card-title">Making a Difference</h4>
                   <p className="card-text text-muted mb-4">
