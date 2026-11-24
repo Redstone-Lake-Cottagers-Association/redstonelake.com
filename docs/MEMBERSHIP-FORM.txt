@@ -64,3 +64,20 @@ are needed. (Only "New deployment" generates a new URL.)
 Notes: the "Anyone" access is required for the site to POST; the URL is unguessable and the
 script only appends rows. Donna can also add her own notification rules in the Sheet
 (Tools → Notification settings).
+
+## Website health alerts (fire-ban check)
+
+The same script also emails president@redstonelake.com (Andrew CC'd) when the website's
+fire-ban check breaks, for example because Dysart changed their website. The email asks
+the president to tell IT. It is sent at most once every 7 days while the problem lasts;
+temporary outages (timeouts, server errors) must last 3 hours before they count. That
+state is kept in the script's Script Properties, so the website needs no database.
+
+Turn it on, in this order (the order matters: an older script would file the alert as a
+bogus membership registration):
+1. Paste the current docs/sheet-apps-script.js and deploy a New version (above).
+2. Optional check: in the editor, pick testSiteAlert → Run. Andrew gets a [TEST] email.
+3. `fly secrets set ALERT_WEBHOOK="<the same /exec URL>" -a redstonelake-com`
+
+Without ALERT_WEBHOOK the site still flags the problem (the banner shows "Status
+unavailable" and /debug/health turns red); it just sends no email.

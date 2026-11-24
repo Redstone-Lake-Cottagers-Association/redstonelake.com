@@ -62,6 +62,8 @@ interface DysartFireBanResponse {
     primaryAlert?: FireBanAlert;
     lastUpdated: string;
   };
+  // Official level from Dysart's Fire and Emergency Services page
+  fireRisk?: { level: string; asOf?: string; details: string; sourceUrl: string };
 }
 
 
@@ -344,6 +346,15 @@ export default function LakeInfo() {
                   {fireBanStatus.status === 'safe' && (
                     <div className="small" style={{ opacity: 0.85 }}>
                       Outside fire season — no municipal fire ban in effect
+                    </div>
+                  )}
+                  {fireBanStatus.data?.fireRisk && fireBanStatus.status !== 'error' && (
+                    <div className="small" style={{ opacity: 0.85 }} title={`Dysart et al fire risk${fireBanStatus.data.fireRisk.asOf ? `, as of ${fireBanStatus.data.fireRisk.asOf}` : ''}`}>
+                      Fire risk: <strong>{fireBanStatus.data.fireRisk.level}</strong>
+                      {(() => {
+                        const d = fireBanStatus.data.fireRisk.asOf ? new Date(fireBanStatus.data.fireRisk.asOf) : null
+                        return d && !isNaN(d.getTime()) ? ` · ${d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}` : ''
+                      })()}
                     </div>
                   )}
 

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  DYSART_FIRE_PAGE, DYSART_HOMEPAGE, checkDysartPage, checkFireServicesPage, isRoutineFireRisk, mentionsFire,
+  parseDysartAlerts, parseFireServicesPage, soundsLikeBan, type FireBanAlert, type FireRiskStatus
+} from '@/lib/fire-ban-source';
+import { reportSiteProblem, type SiteProblem } from '@/lib/site-alerts';
 
 export const revalidate = 21600; // 6 hours
-
-interface FireBanAlert {
-  title: string;
-  description: string;
-  color: string;
-}
 
 interface DysartFireBanResponse {
   source: 'Dysart et al';
@@ -32,6 +31,8 @@ interface DysartFireBanResponse {
   debugInfo?: {
     requestUrl?: string;
   };
+  health?: { ok: boolean; problem?: string };
+  fireRisk?: { level: string; asOf?: string; details: string; sourceUrl: string };
 }
 
 // In-memory cache (best-effort; also use Next revalidate above)
@@ -155,7 +156,7 @@ export async function GET(request: NextRequest) {
 
     const results: DysartFireBanResponse = {
       source: 'Dysart et al',
-      sourceUrl: 'https://www.dysartetal.ca/',
+      sourceUrl: DYSART_HOMEPAGE,
       alerts: [],
       hasActiveBan: false,
       summary: {
@@ -242,107 +243,113 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    // Fetch alerts from the Municipality of Dysart et al homepage. Their 2026
-    // site redesign removed the old JSON alert feed (getalertbannerfeeds.ashx),
-    // so we extract the Umbraco alert banners and alert modals from the HTML.
-    const stripTags = (s: string) =>
-      s.replace(/<[^>]+>/g, ' ')
-        .replace(/&amp;/g, '&').replace(/&#8217;|&rsquo;/g, '’').replace(/&#8211;|&ndash;/g, '–')
-        .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-        .replace(/\s+/g, ' ').trim();
-    const severityToColor = (sev: string) =>
-      /danger|error|red/i.test(sev) ? 'Red' : /warning/i.test(sev) ? 'Orange' : 'Blue';
+    // Two Dysart et al pages feed the status:
+    //  1. Fire and Emergency Services: the official dated "Fire Risk" level
+    //  2. the homepage alert banners/pop-ups, where bans are also announced
+    // Their 2026 redesign broke the old homepage feed and the site silently
+    // showed "no fire ban" for six months, so a page we can't read is now a
+    // reported problem, never a quiet "no ban". "Status unavailable" shows
+    // only when neither page can be read.
+    // FIRE_BAN_SOURCE_URL / FIRE_SERVICES_SOURCE_URL override them for local testing only.
+    const isDev = process.env.NODE_ENV !== 'production';
+    const homeUrl = (isDev && process.env.FIRE_BAN_SOURCE_URL) || results.sourceUrl;
+    const firePageUrl = (isDev && process.env.FIRE_SERVICES_SOURCE_URL) || DYSART_FIRE_PAGE;
+    const problems: SiteProblem[] = [];
+
+    const loadPage = async (url: string, label: string): Promise<{ html?: string; problem?: SiteProblem }> => {
+      try {
+        const r = await fetchWithTimeout(url, { headers: { 'Accept': 'text/html', 'User-Agent': 'Redstone Lake Website' } }, 10000);
+        if (!r.ok) {
+          // 5xx is usually a passing outage; 4xx (page gone, access blocked) is not
+          return { problem: { check: 'fire-ban', transient: r.status >= 500, reason: `Dysart’s ${label} answered with an error (HTTP ${r.status}).` } };
+        }
+        return { html: await r.text() };
+      } catch (err) {
+        return { problem: { check: 'fire-ban', transient: true, reason: `The website couldn’t reach Dysart’s ${label} (${err instanceof Error ? err.message : 'network error'}).` } };
+      }
+    };
 
     try {
-      const municipalResponse = await fetchWithTimeout(
-        results.sourceUrl,
-        {
-          headers: {
-            'Accept': 'text/html',
-            'User-Agent': 'Redstone Lake Website'
-          }
-        },
-        10000
-      );
+      const [home, firePage] = await Promise.all([
+        loadPage(homeUrl, 'homepage'),
+        loadPage(firePageUrl, 'Fire and Emergency Services page'),
+      ]);
 
-      if (!municipalResponse.ok) {
-        throw new Error(`Dysart homepage responded with status ${municipalResponse.status}`);
+      let homeAlerts: FireBanAlert[] | null = null;
+      if (home.html) {
+        const alerts = parseDysartAlerts(home.html);
+        const pageProblem = checkDysartPage(home.html, alerts);
+        if (pageProblem) problems.push({ check: 'fire-ban', transient: false, reason: pageProblem });
+        else homeAlerts = alerts;
+      } else if (home.problem) {
+        problems.push(home.problem);
       }
 
-      const html = await municipalResponse.text();
-      const alerts: FireBanAlert[] = [];
-
-      // Alert banners: <div id="alert-banner-N" class="umb--alert umb--alert--{severity}"> …
-      const bannerRe = /id="alert-banner-\d+"\s+class="umb--alert umb--alert--(\w+)"[\s\S]*?umb--alert__title"[^>]*>([\s\S]*?)<\/div>[\s\S]*?umb--alert__summary"[^>]*>([\s\S]*?)<\/div>/g;
-      for (const m of html.matchAll(bannerRe)) {
-        alerts.push({ title: stripTags(m[2]), description: stripTags(m[3]), color: severityToColor(m[1]) });
+      let risk: FireRiskStatus | null = null;
+      if (firePage.html) {
+        const status = parseFireServicesPage(firePage.html);
+        const pageProblem = checkFireServicesPage(firePage.html, status);
+        // An editor mid-update can briefly leave the block out: wait for it to persist
+        if (pageProblem) problems.push({ check: 'fire-ban', transient: true, reason: pageProblem });
+        else risk = status;
+      } else if (firePage.problem) {
+        problems.push(firePage.problem);
       }
 
-      // Alert modals: <div id="alert-modal-N" class="bx--modal umb--alert umb--alert--{severity} …
-      const modalRe = /id="alert-modal-\d+"\s+class="bx--modal umb--alert umb--alert--(\w+)[\s\S]*?bx--modal-header__heading[^>]*>([\s\S]*?)<\/p>[\s\S]*?bx--modal-content">([\s\S]*?)<\/div>/g;
-      for (const m of html.matchAll(modalRe)) {
-        alerts.push({ title: stripTags(m[2]), description: stripTags(m[3]), color: severityToColor(m[1]) });
-      }
-
-      results.alerts = alerts;
+      results.alerts = homeAlerts ?? [];
+      if (risk) results.fireRisk = { ...risk, sourceUrl: DYSART_FIRE_PAGE };
       if (debug) {
-        console.log('[fire-ban] dysart alerts count:', results.alerts.length);
+        console.log('[fire-ban] homepage alerts:', homeAlerts?.length ?? 'unreadable', '| fire risk:', risk?.level ?? 'unreadable');
         results.debugInfo = results.debugInfo || {};
-        results.debugInfo.requestUrl = results.sourceUrl;
+        results.debugInfo.requestUrl = `${homeUrl} + ${firePageUrl}`;
       }
 
-      if (alerts.length === 0) {
-        // Municipality has no alerts posted at all: confidently no ban, no AI needed
+      if (!homeAlerts && !risk) {
+        // Neither page could be read: never guess
         results.hasActiveBan = false;
-        results.summary.status = 'none';
-        results.aiAnalysis = {
-          hasFireBan: false,
-          banType: 'none',
-          summary: 'No alerts are currently posted by the Municipality of Dysart et al.',
-          confidence: 1
-        };
-      } else if (!results.alerts.some(a => /fire|burn|ban|flame/i.test(`${a.title} ${a.description}`))) {
-        // No alert even mentions fire — classify deterministically and skip the
-        // AI call entirely (most alerts are road closures etc.; this keeps
-        // Claude usage to the rare fire-related alert, a few calls per season)
-        results.hasActiveBan = false;
-        results.summary.status = 'none';
-        results.aiAnalysis = {
-          hasFireBan: false,
-          banType: 'none',
-          summary: 'No fire-related alerts are posted by the municipality.',
-          confidence: 0.95
-        };
+        results.summary.status = 'error';
       } else {
-        // AI analysis (required to interpret fire-related alerts)
-        const ai = await analyzeWithClaude(results.alerts, results.sourceUrl, debug, aiDebugMessages);
-        if (ai) {
-          results.aiAnalysis = ai;
-          if (typeof ai.hasFireBan === 'boolean') {
-            results.hasActiveBan = ai.hasFireBan;
-            results.summary.status = ai.hasFireBan ? 'active' : 'none';
-          }
-          if (!results.summary.primaryAlert && results.alerts.length > 0) {
-            results.summary.primaryAlert = results.alerts[0];
-          }
-        } else if (!results.alerts.some(a => /fire|burn|ban|flame/i.test(`${a.title} ${a.description}`))) {
-          // AI unavailable, but no alert even mentions fire — safe to report
-          // no fire alert deterministically. (Confirming a REAL ban still
-          // requires classification, so that direction stays 'error'.)
+        const homeFireAlerts = homeAlerts && mentionsFire(homeAlerts) ? homeAlerts : [];
+        const riskAlert: FireBanAlert | null = risk && !isRoutineFireRisk(risk.level)
+          ? { title: `Fire Risk: ${risk.level}${risk.asOf ? ` (as of ${risk.asOf})` : ''}`, description: risk.details, color: 'Red' }
+          : null;
+        const riskLine = risk ? `Dysart’s fire risk is ${risk.level}${risk.asOf ? ` as of ${risk.asOf}` : ''}` : '';
+
+        if (homeFireAlerts.length === 0 && !riskAlert) {
+          // Fire risk Low/Moderate and no alert mentions fire: no ban, no AI call
+          // (most alerts are road closures etc.; Claude only sees the rare fire notice)
           results.hasActiveBan = false;
           results.summary.status = 'none';
           results.aiAnalysis = {
             hasFireBan: false,
             banType: 'none',
-            summary: 'No fire-related alerts are posted by the municipality (keyword check; AI classifier unavailable).',
-            confidence: 0.9
+            summary: risk ? `${riskLine}; no fire ban is in effect.` : 'No fire-related alerts are posted by the municipality.',
+            confidence: risk ? 0.97 : 0.9
           };
         } else {
-          // AI unavailable and alerts mention fire - cannot determine status
-          results.hasActiveBan = false;
-          results.summary.status = 'error';
-          if (debug) {
-            aiDebugMessages.push('AI analysis required but unavailable - cannot determine fire ban status');
+          const aiInputs = [...homeFireAlerts, ...(riskAlert ? [riskAlert] : [])];
+          const ai = await analyzeWithClaude(aiInputs, results.sourceUrl, debug, aiDebugMessages);
+          if (ai) {
+            results.aiAnalysis = ai;
+            if (typeof ai.hasFireBan === 'boolean') {
+              results.hasActiveBan = ai.hasFireBan;
+              results.summary.status = ai.hasFireBan ? 'active' : 'none';
+            }
+            results.summary.primaryAlert = homeFireAlerts[0] ?? riskAlert ?? undefined;
+          } else if (riskAlert && risk && soundsLikeBan(risk)) {
+            // Claude is down but the official page plainly says there's a ban
+            results.hasActiveBan = true;
+            results.summary.status = 'active';
+            results.summary.primaryAlert = riskAlert;
+            results.aiAnalysis = { hasFireBan: true, banType: 'total', summary: `${riskLine}.`, confidence: 0.8 };
+            problems.push({ check: 'fire-ban', transient: true, reason: 'Dysart posted fire-ban information, but the AI classifier that reads it is not working.' });
+          } else {
+            // A fire notice is posted but Claude couldn't read it (outage, spend
+            // cap, revoked key or retired model): status is unknown
+            results.hasActiveBan = false;
+            results.summary.status = 'error';
+            problems.push({ check: 'fire-ban', transient: true, reason: 'Dysart posted fire-related information, but the AI classifier that reads it is not working.' });
+            if (debug) aiDebugMessages.push('AI analysis required but unavailable - cannot determine fire ban status');
           }
         }
       }
@@ -351,6 +358,18 @@ export async function GET(request: NextRequest) {
       console.error('Error fetching Dysart fire ban data:', error);
       results.hasActiveBan = false;
       results.summary.status = 'error';
+      problems.push({ check: 'fire-ban', transient: true, reason: `The fire-ban check failed unexpectedly (${error instanceof Error ? error.message : 'unknown error'}).` });
+    }
+
+    results.health = problems.length
+      ? { ok: false, problem: problems.map(p => p.reason).join(' ') }
+      : { ok: true };
+    if (problems.length && !testMode) {
+      await reportSiteProblem({
+        check: 'fire-ban',
+        transient: problems.every(p => p.transient),
+        reason: problems.map(p => p.reason).join(' '),
+      });
     }
 
     
