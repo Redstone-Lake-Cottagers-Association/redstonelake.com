@@ -34,13 +34,39 @@ function colorByLake(key: 'color' | 'outline'): any[] {
   return ['match', ['get', 'ID'], ...LAKES.flatMap(l => [l.id, l[key]]), '#94a3b8']
 }
 
+// Popup box size (px) used to pick which side of the clicked point it opens on
+const POPUP_MAX_W = 280
+const POPUP_H = 150
+const POPUP_OFFSET = 10
+// Mapbox applies a numeric offset diagonally on corner anchors: about 7px each way
+const CORNER_SHIFT = Math.round(POPUP_OFFSET / Math.SQRT2)
+
+// Popup width for a map this wide. At up to ~2/3 of the map width, one of
+// left / centre / right always fits the popup inside the map (phones included).
+function popupWidth(mapWidth: number): number {
+  return Math.min(POPUP_MAX_W, Math.floor((mapWidth - CORNER_SHIFT - 2) / 1.5))
+}
+
+// Mapbox popup anchor: 'bottom' puts the popup above the point, 'top' below it;
+// -left/-right shift it sideways so it stays inside the map's clipped box
+function popupAnchor(pt: { x: number; y: number }, mapWidth: number, w: number): string {
+  const vertical = pt.y >= POPUP_H + POPUP_OFFSET ? 'bottom' : 'top'
+  const overflow = {
+    '': Math.max(0, w / 2 - pt.x) + Math.max(0, pt.x + w / 2 - mapWidth),
+    '-left': Math.max(0, pt.x + CORNER_SHIFT + w - mapWidth),
+    '-right': Math.max(0, w + CORNER_SHIFT - pt.x),
+  }
+  const side = (['', '-left', '-right'] as const).reduce((a, b) => (overflow[b] < overflow[a] ? b : a))
+  return vertical + side
+}
+
 function popupHtml(lake: (typeof LAKES)[number]): string {
   const linkStyle = 'display:block;margin-top:4px;font-weight:600;color:#0f4c81;text-decoration:none;font-size:12.5px;'
   const waterLevel = lake.hasGauge
     ? `<a href="/lake-health#water-level" style="${linkStyle}">💧 Live water level →</a>`
     : `<span style="${linkStyle}color:#94a3b8;cursor:not-allowed;" title="No water-level gauge on this lake">💧 Water level — not available for this lake</span>`
   return `
-    <div style="color:#334155;font-family:'Inter',sans-serif;line-height:1.45;min-width:210px;">
+    <div style="color:#334155;font-family:'Inter',sans-serif;line-height:1.45;min-width:180px;">
       <strong style="color:#0f172a;font-size:14px;">${lake.name}</strong>
       <a href="/lake-health?lake=${lake.id}#explore" style="${linkStyle}">🔬 Water quality data →</a>
       ${waterLevel}
@@ -74,7 +100,7 @@ export default function HeroMap() {
   const map = useRef<any>(null)
   // Set once the map has loaded; the legend buttons call it to open a lake's
   // popup (the keyboard route to the links, now the map has no pins)
-  const openLakeRef = useRef<((id: string) => void) | null>(null)
+  const openLakeRef = useRef<((id: string, focus: boolean) => void) | null>(null)
   const [fallbackUrl, setFallbackUrl] = useState<string | null>(null)
   // Last resort when Mapbox is unreachable entirely (ad blockers, offline):
   // a styled panel with no external dependencies.
@@ -184,56 +210,83 @@ export default function HeroMap() {
           source: 'hero-lakes',
           paint: {
             'fill-color': colorByLake('color'),
-            'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.6, 0.4],
+            'fill-opacity': 0.4,
           },
         }, firstLabel)
         m.addLayer({
           id: 'hero-lakes-line',
           type: 'line',
           source: 'hero-lakes',
-          paint: { 'line-color': colorByLake('outline'), 'line-width': 1, 'line-opacity': 0.8 },
+          paint: {
+            'line-color': colorByLake('outline'),
+            // Hover thickens the shoreline rather than darkening the fill, so
+            // sweeping the mouse across Redstone doesn't flash a big block
+            'line-width': ['case', ['boolean', ['feature-state', 'hover'], false], 2.5, 1],
+            'line-opacity': 0.8,
+          },
         }, firstLabel)
 
-        // One popup, opened by clicking a lake's water (at the click) or its
-        // legend entry (at the lake's centroid). Clicking the same lake again,
-        // or anywhere off our lakes, closes it.
-        const popup = new window.mapboxgl.Popup({
-          offset: 10,
-          className: 'lake-popup',
-          focusAfterOpen: false,
-          closeOnClick: false,
-          maxWidth: '280px'
-        })
+        // One popup at a time, opened by clicking a lake's water (at the click)
+        // or its legend entry (at the lake's centroid). Clicking the same lake
+        // again, or anywhere off our lakes, closes it.
+        //
+        // The popup's side is fixed when it opens. Left to Mapbox, the side is
+        // recomputed on every redraw (e.g. each hover change); because the
+        // popup's size depends on its side (the tip takes width, so the text
+        // rewraps), it flip-flopped between sides as the mouse moved. The map
+        // never pans or zooms, so a side chosen once stays right.
+        let popup: any = null
         let openId: string | null = null
-        popup.on('close', () => { openId = null })
+        const closePopup = () => { popup?.remove() }
         const openLake = (id: string, lngLat: any, focus = false) => {
           const lake = LAKES.find(l => l.id === id)
           if (!lake) return
-          popup.setLngLat(lngLat).setHTML(popupHtml(lake)).addTo(m)
+          closePopup()
+          const mapWidth = m.getContainer().clientWidth
+          const w = popupWidth(mapWidth)
+          const p = new window.mapboxgl.Popup({
+            anchor: popupAnchor(m.project(lngLat), mapWidth, w),
+            offset: POPUP_OFFSET,
+            className: 'lake-popup',
+            focusAfterOpen: false,
+            closeOnClick: false,
+            maxWidth: `${w}px`
+          })
+          p.on('close', () => { if (popup === p) { popup = null; openId = null } })
+          p.setLngLat(lngLat).setHTML(popupHtml(lake)).addTo(m)
+          popup = p
           openId = id
-          if (focus) popup.getElement()?.querySelector('a')?.focus()
+          if (focus) p.getElement()?.querySelector('a')?.focus()
         }
-        openLakeRef.current = id => {
+        openLakeRef.current = (id, focus) => {
           const lake = LAKES.find(l => l.id === id)
-          if (lake) openLake(id, lake.coordinates, true)
+          if (lake) openLake(id, lake.coordinates, focus)
+        }
+
+        // The lake under a point, or failing that one within a few pixels, so
+        // thin arms like Pelaw's are easy to hit
+        const lakeAt = (pt: { x: number; y: number }): string | null => {
+          const query = (geom: any) => m.queryRenderedFeatures(geom, { layers: ['hero-lakes-fill'] })[0]?.properties?.ID ?? null
+          return query([pt.x, pt.y]) ?? query([[pt.x - 4, pt.y - 4], [pt.x + 4, pt.y + 4]])
         }
 
         m.on('click', (e: any) => {
-          const id = m.queryRenderedFeatures(e.point, { layers: ['hero-lakes-fill'] })[0]?.properties?.ID
-          if (!id || id === openId) popup.remove()
+          const id = lakeAt(e.point)
+          if (!id || id === openId) closePopup()
           else openLake(id, e.lngLat)
         })
 
-        // Hover: pointer cursor and a slightly stronger fill on the lake under the mouse
+        // Hover: pointer cursor and a thicker shoreline on the lake under the mouse
         let hovered: string | null = null
         const setHover = (id: string | null) => {
+          if (id === hovered) return // no redraw while the mouse stays on one lake
           if (hovered) m.setFeatureState({ source: 'hero-lakes', id: hovered }, { hover: false })
           hovered = id
           if (id) m.setFeatureState({ source: 'hero-lakes', id }, { hover: true })
           m.getCanvas().style.cursor = id ? 'pointer' : ''
         }
-        m.on('mousemove', 'hero-lakes-fill', (e: any) => setHover(e.features?.[0]?.id ?? null))
-        m.on('mouseleave', 'hero-lakes-fill', () => setHover(null))
+        m.on('mousemove', (e: any) => setHover(lakeAt(e.point)))
+        m.on('mouseout', () => setHover(null))
       })
     }
 
@@ -331,7 +384,9 @@ export default function HeroMap() {
                 key={lake.id}
                 type="button"
                 className="legend-item d-inline-flex align-items-center gap-1"
-                onClick={() => openLakeRef.current?.(lake.id)}
+                // detail 0 = keyboard activation: only then move focus into the
+                // popup, so a mouse click doesn't leave a focus ring on its link
+                onClick={e => openLakeRef.current?.(lake.id, e.detail === 0)}
                 aria-label={`${lake.name}: water data and map links`}
               >
                 <span
