@@ -30,7 +30,7 @@ Licence: Open Government Licence – Ontario unless noted.
 | `ansi.geojson` | GeoHub "Areas of Natural and Scientific Interest" download; also live at `LIO_OPEN_DATA/LIO_Open05/MapServer/3` | Filter to bbox; keep NAME/TYPE/SIGNIFICANCE. 3 features: Clear Lake, West Guilford, Kennisis River |
 | `wetlands.geojson` | `LIO_OPEN_DATA/LIO_Open01/MapServer/15` ("Wetland With Significance") | Envelope query (paged, ~1 172 features), keep WETLAND_TYPE/WETLAND_SIGNIFICANCE/EVALUATED_WETLAND_NAME, simplify 20% |
 | `wmu.geojson` | `LIO_OPEN_DATA/LIO_Open05/MapServer/5` ("Wildlife Management Unit") | Envelope query (2 units: 54, 56), clip to bbox, keep OFFICIAL_NAME |
-| `our-lakes.geojson` | County GIS `Public/IdentifyLayers/MapServer/13` ("Lakes and Rivers"), `OFF_NAME` query for the seven lakes | 8 polygons (Pelaw is two parts); ids match lake-health explorer ids. Also the source of the lake-pin centroids in `InteractiveLakeMap.tsx` |
+| `our-lakes.geojson` | County GIS `Public/IdentifyLayers/MapServer/13` ("Lakes and Rivers"), `OFF_NAME` query for the seven lakes | 8 polygons (Pelaw is two parts); ids match lake-health explorer ids. Also the source of the lake-pin centroids in `InteractiveLakeMap.tsx`, and of the colour-filled lakes on the homepage map (`HeroMap.tsx`, coloured by ID) |
 | `crown-land.geojson` | `LIO_OPEN_DATA/LIO_Open08/MapServer/34` ("Crown Land – MNR Unpatented Land") | Envelope query (127 features), keep AREA_IN_HA/LOCATION_DESCR, simplify 25% |
 | `dams.geojson` | `LIO_OPEN_DATA/LIO_Open04/MapServer/0` ("Ontario Dam Inventory") | 6 points; keep DAM_NAME/DAM_OWNERSHIP |
 | `trails.geojson` | `LIO_OPEN_DATA/LIO_Open04/MapServer/19` ("OTN Trail Segment") | 37 segments; keep TRAIL_NAME/TRAIL_ASSOCIATION/PERMITTED_USES/TRAIL_LENGTH_KM |

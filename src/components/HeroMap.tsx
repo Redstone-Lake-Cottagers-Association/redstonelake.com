@@ -8,19 +8,31 @@ declare global {
   }
 }
 
-// Lake centroids from the County of Haliburton GIS lakes layer; each lake gets
-// its own distinct pin colour, echoed in the legend below the map. `id`
-// matches the lake-health explorer; hasGauge marks the one lake with a live
+// Lake centroids from the County of Haliburton GIS lakes layer. Each lake has
+// its own colour: its water is filled with `color` and outlined in `outline`
+// (a darker shade of the same hue), and the legend below the map repeats it.
+// `id` matches the lake-health explorer and the ID property in
+// /map-data/our-lakes.geojson; hasGauge marks the one lake with a live
 // water-level gauge (Parks Canada station 17 on Redstone).
 const LAKES = [
-  { id: 'redstone', name: 'Redstone Lake', coordinates: [-78.5328, 45.17969], color: '#0284c7', hasGauge: true },
-  { id: 'little-redstone', name: 'Little Redstone Lake', coordinates: [-78.56998, 45.2157], color: '#0d9488', hasGauge: false },
-  { id: 'pelaw', name: 'Pelaw Lake', coordinates: [-78.54372, 45.21756], color: '#7c3aed', hasGauge: false },
-  { id: 'bitter', name: 'Bitter Lake', coordinates: [-78.57593, 45.17299], color: '#15803d', hasGauge: false },
-  { id: 'tedious', name: 'Long (Tedious) Lake', coordinates: [-78.57552, 45.1639], color: '#ea580c', hasGauge: false },
-  { id: 'burdock', name: 'Burdock Lake', coordinates: [-78.58639, 45.17215], color: '#1e3a8a', hasGauge: false },
-  { id: 'coleman', name: 'Coleman Lake', coordinates: [-78.54549, 45.15417], color: '#be185d', hasGauge: false },
+  { id: 'redstone', name: 'Redstone Lake', coordinates: [-78.5328, 45.17969], color: '#0284c7', outline: '#075985', hasGauge: true },
+  { id: 'little-redstone', name: 'Little Redstone Lake', coordinates: [-78.56998, 45.2157], color: '#0d9488', outline: '#115e59', hasGauge: false },
+  { id: 'pelaw', name: 'Pelaw Lake', coordinates: [-78.54372, 45.21756], color: '#7c3aed', outline: '#5b21b6', hasGauge: false },
+  { id: 'bitter', name: 'Bitter Lake', coordinates: [-78.57593, 45.17299], color: '#15803d', outline: '#14532d', hasGauge: false },
+  { id: 'tedious', name: 'Long (Tedious) Lake', coordinates: [-78.57552, 45.1639], color: '#ea580c', outline: '#9a3412', hasGauge: false },
+  { id: 'burdock', name: 'Burdock Lake', coordinates: [-78.58639, 45.17215], color: '#1e3a8a', outline: '#172554', hasGauge: false },
+  { id: 'coleman', name: 'Coleman Lake', coordinates: [-78.54549, 45.15417], color: '#be185d', outline: '#831843', hasGauge: false },
 ]
+
+// Lake shorelines (islands cut out) from the County of Haliburton GIS
+// "Lakes and Rivers" layer, the same file the full /lake-map draws; see
+// docs/DATA-SOURCES.txt. Features carry ID = one of the LAKES ids above.
+const LAKE_SHAPES_URL = '/map-data/our-lakes.geojson'
+
+// Mapbox `match` expression: lake ID -> one of the LAKES colours
+function colorByLake(key: 'color' | 'outline'): any[] {
+  return ['match', ['get', 'ID'], ...LAKES.flatMap(l => [l.id, l[key]]), '#94a3b8']
+}
 
 function popupHtml(lake: (typeof LAKES)[number]): string {
   const linkStyle = 'display:block;margin-top:4px;font-weight:600;color:#0f4c81;text-decoration:none;font-size:12.5px;'
@@ -48,7 +60,8 @@ function webglAvailable(): boolean {
 }
 
 // Static Images API fallback for browsers without WebGL (hardware acceleration
-// off, older devices): same style, same pins, no interactivity.
+// off, older devices): same style, no interactivity. It has no lake fills, so
+// it marks each lake with a pin in the lake's colour instead.
 function staticMapUrl(token: string): string {
   const pins = LAKES
     .map(l => `pin-s+${l.color.slice(1)}(${l.coordinates[0]},${l.coordinates[1]})`)
@@ -59,6 +72,9 @@ function staticMapUrl(token: string): string {
 export default function HeroMap() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
+  // Set once the map has loaded; the legend buttons call it to open a lake's
+  // popup (the keyboard route to the links, now the map has no pins)
+  const openLakeRef = useRef<((id: string) => void) | null>(null)
   const [fallbackUrl, setFallbackUrl] = useState<string | null>(null)
   // Last resort when Mapbox is unreachable entirely (ad blockers, offline):
   // a styled panel with no external dependencies.
@@ -154,21 +170,70 @@ export default function HeroMap() {
         }
       })
 
-      // Add markers for each lake when map loads
+      // Colour each lake's water when the map loads
       map.current.on('load', () => {
-        LAKES.forEach(lake => {
-          const marker = new window.mapboxgl.Marker({
-            color: lake.color,
-            scale: 0.8
-          })
-          .setLngLat(lake.coordinates)
-          .setPopup(new window.mapboxgl.Popup({
-            offset: 25,
-            className: 'lake-popup',
-            focusAfterOpen: false
-          }).setHTML(popupHtml(lake)))
-          .addTo(map.current)
+        const m = map.current
+        if (!m) return
+
+        // Fills go under the basemap's labels so lake and place names stay legible
+        const firstLabel = m.getStyle().layers.find((l: any) => l.type === 'symbol')?.id
+        m.addSource('hero-lakes', { type: 'geojson', data: LAKE_SHAPES_URL, promoteId: 'ID' })
+        m.addLayer({
+          id: 'hero-lakes-fill',
+          type: 'fill',
+          source: 'hero-lakes',
+          paint: {
+            'fill-color': colorByLake('color'),
+            'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.6, 0.4],
+          },
+        }, firstLabel)
+        m.addLayer({
+          id: 'hero-lakes-line',
+          type: 'line',
+          source: 'hero-lakes',
+          paint: { 'line-color': colorByLake('outline'), 'line-width': 1, 'line-opacity': 0.8 },
+        }, firstLabel)
+
+        // One popup, opened by clicking a lake's water (at the click) or its
+        // legend entry (at the lake's centroid). Clicking the same lake again,
+        // or anywhere off our lakes, closes it.
+        const popup = new window.mapboxgl.Popup({
+          offset: 10,
+          className: 'lake-popup',
+          focusAfterOpen: false,
+          closeOnClick: false,
+          maxWidth: '280px'
         })
+        let openId: string | null = null
+        popup.on('close', () => { openId = null })
+        const openLake = (id: string, lngLat: any, focus = false) => {
+          const lake = LAKES.find(l => l.id === id)
+          if (!lake) return
+          popup.setLngLat(lngLat).setHTML(popupHtml(lake)).addTo(m)
+          openId = id
+          if (focus) popup.getElement()?.querySelector('a')?.focus()
+        }
+        openLakeRef.current = id => {
+          const lake = LAKES.find(l => l.id === id)
+          if (lake) openLake(id, lake.coordinates, true)
+        }
+
+        m.on('click', (e: any) => {
+          const id = m.queryRenderedFeatures(e.point, { layers: ['hero-lakes-fill'] })[0]?.properties?.ID
+          if (!id || id === openId) popup.remove()
+          else openLake(id, e.lngLat)
+        })
+
+        // Hover: pointer cursor and a slightly stronger fill on the lake under the mouse
+        let hovered: string | null = null
+        const setHover = (id: string | null) => {
+          if (hovered) m.setFeatureState({ source: 'hero-lakes', id: hovered }, { hover: false })
+          hovered = id
+          if (id) m.setFeatureState({ source: 'hero-lakes', id }, { hover: true })
+          m.getCanvas().style.cursor = id ? 'pointer' : ''
+        }
+        m.on('mousemove', 'hero-lakes-fill', (e: any) => setHover(e.features?.[0]?.id ?? null))
+        m.on('mouseleave', 'hero-lakes-fill', () => setHover(null))
       })
     }
 
@@ -176,6 +241,7 @@ export default function HeroMap() {
 
     return () => {
       cancelled = true
+      openLakeRef.current = null
       if (map.current) {
         map.current.remove()
         map.current = null
@@ -243,27 +309,72 @@ export default function HeroMap() {
         />
       )}
 
-      {/* Legend: one distinct colour per lake; click a pin for actions */}
+      {/* Legend: one colour per lake. On the live map each entry is a button
+          that opens that lake's popup, with a swatch matching the lake's fill;
+          the static fallback image marks the lakes with pins, so it shows those. */}
       {!plain && (
         <div className="d-flex flex-wrap justify-content-center gap-3 mt-2 small text-muted">
-          {LAKES.map(lake => (
-            <span key={lake.id} className="d-inline-flex align-items-center gap-1">
-              <svg width="11" height="14" viewBox="0 0 27 41" aria-hidden="true">
-                <path
-                  d="M13.5 0C6.04 0 0 6.04 0 13.5c0 9.8 12.1 26 13.5 27.5C14.9 39.5 27 23.3 27 13.5 27 6.04 20.96 0 13.5 0z"
-                  fill={lake.color}
+          {LAKES.map(lake => {
+            const label = lake.name.replace(/ Lake$/, '')
+            return fallbackUrl ? (
+              <span key={lake.id} className="d-inline-flex align-items-center gap-1">
+                <svg width="11" height="14" viewBox="0 0 27 41" aria-hidden="true">
+                  <path
+                    d="M13.5 0C6.04 0 0 6.04 0 13.5c0 9.8 12.1 26 13.5 27.5C14.9 39.5 27 23.3 27 13.5 27 6.04 20.96 0 13.5 0z"
+                    fill={lake.color}
+                  />
+                </svg>
+                {label}
+              </span>
+            ) : (
+              <button
+                key={lake.id}
+                type="button"
+                className="legend-item d-inline-flex align-items-center gap-1"
+                onClick={() => openLakeRef.current?.(lake.id)}
+                aria-label={`${lake.name}: water data and map links`}
+              >
+                <span
+                  aria-hidden="true"
+                  className="legend-swatch"
+                  style={{ background: `${lake.color}66`, borderColor: lake.outline }}
                 />
-              </svg>
-              {lake.name.replace(/ Lake$/, '')}
+                {label}
+              </button>
+            )
+          })}
+          {!fallbackUrl && (
+            <span className="d-inline-flex align-items-center" style={{ fontSize: '0.72rem' }}>
+              — click a lake for water data &amp; map
             </span>
-          ))}
-          <span className="d-inline-flex align-items-center" style={{ fontSize: '0.72rem' }}>
-            — click a pin for water data &amp; map
-          </span>
+          )}
         </div>
       )}
 
       <style jsx>{`
+        .legend-item {
+          background: none;
+          border: 0;
+          padding: 0;
+          color: inherit;
+          font: inherit;
+          cursor: pointer;
+        }
+        .legend-item:hover {
+          color: #0f172a;
+        }
+        .legend-item:focus-visible {
+          outline: 2px solid #0284c7;
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+        .legend-swatch {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 3px;
+          border: 1.5px solid;
+        }
         .mapbox-container :global(.mapboxgl-ctrl-logo) {
           display: none !important;
         }
