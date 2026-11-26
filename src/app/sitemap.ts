@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/agm', priority: 0.7, changeFrequency: 'yearly' },
     { path: '/governance', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/media-package', priority: 0.4, changeFrequency: 'yearly' },
+    { path: '/signs', priority: 0.3, changeFrequency: 'monthly' },
     { path: '/contact', priority: 0.6, changeFrequency: 'yearly' },
     { path: '/galleries', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/new-cottager-guide', priority: 0.6, changeFrequency: 'yearly' },

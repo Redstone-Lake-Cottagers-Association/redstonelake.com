@@ -36,10 +36,22 @@ const LOGOS = [
     preview: '/brand/rala-roundel.png',
     dark: false,
     wide: false,
-    use: 'Our badge for square or round spaces: the website favicon, social media profile pictures, app icons, stickers, hats, shirts, buoys and signage.',
+    use: 'Our badge for square or round spaces: the website favicon, social media profile pictures, app icons, stickers, hats, shirts, buoys and small signs.',
     files: [
       { label: 'PNG, transparent', href: '/brand/rala-roundel.png' },
       { label: 'Original JPG', href: '/brand/originals/rala-roundel-original.jpg' },
+    ],
+  },
+  {
+    name: 'Lake scene emblem',
+    tag: 'Vector, for print',
+    preview: '/brand/rala-emblem.svg',
+    dark: false,
+    wide: false,
+    use: 'The lake scene from our logos, redrawn as vector artwork so it prints sharp at any size. Give the SVG to sign shops, banner and embroidery printers, with our name set beside it as on the horizontal logo or our road sign.',
+    files: [
+      { label: 'SVG, vector', href: '/brand/rala-emblem.svg' },
+      { label: 'PNG, transparent', href: '/brand/rala-emblem.png' },
     ],
   },
 ]
@@ -51,7 +63,8 @@ const PLACEMENTS = [
   ['Email signatures, letterhead and newsletters', 'Horizontal'],
   ['Slide decks and the website footer (dark backgrounds)', 'Horizontal, reversed'],
   ['Sponsor and partner listings', 'Horizontal for wide slots, roundel for square slots'],
-  ['Stickers, hats, shirts, buoys and signage', 'Roundel'],
+  ['Stickers, hats, shirts and buoys', 'Roundel'],
+  ['Road signs, banners and other large prints', 'Lake scene emblem (vector) with the name beside it'],
   ['Certificates and printed programs', 'Horizontal or roundel'],
 ]
 
@@ -124,7 +137,8 @@ export default function MediaPackagePage() {
           <p className="text-muted mb-4">
             We have two logos: the <strong>horizontal logo</strong>, used on the website and
             anywhere wide, and the <strong>roundel</strong>, used in square spaces like browser
-            tabs and profile pictures. Pick the one that fits the space.
+            tabs and profile pictures. Pick the one that fits the space. For signs and other large
+            prints, the lake scene is also available on its own as a vector file.
           </p>
           <div className="row g-4 mb-5 justify-content-center">
             {LOGOS.map(logo => (
@@ -154,6 +168,18 @@ export default function MediaPackagePage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="media-boilerplate d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
+            <div>
+              <h2 className="h5 mb-1">Signs</h2>
+              <p className="mb-0 text-muted small">
+                Print-ready files and editable sources for our road signs, with every version kept.
+              </p>
+            </div>
+            <Link href="/signs" className="btn btn-outline-primary btn-sm">
+              Go to Signs
+            </Link>
           </div>
 
           <h2 className="h3 mb-3">Which logo goes where</h2>

@@ -31,6 +31,7 @@ export default function Footer() {
               <li><Link href="/governance" className="text-white-50">Governing Docs</Link></li>
               <li><Link href="/agm" className="text-white-50">Annual General Meeting</Link></li>
               <li><Link href="/media-package" className="text-white-50">Media Package</Link></li>
+              <li><Link href="/signs" className="text-white-50">Signs</Link></li>
               <li><Link href="/contact" className="text-white-50">Contact Us</Link></li>
             </ul>
           </div>
