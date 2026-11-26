@@ -74,6 +74,7 @@ const nextConfig = {
       ...legacyRedirects,
       ...legacyDocumentRedirects(),
       ...wordpressRedirects,
+      { source: '/directory', destination: '/business-directory', permanent: true },
       { source: '/directory/:slug', destination: '/business-directory', permanent: true },
     ]
   },
